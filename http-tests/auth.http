@@ -1,0 +1,35 @@
+### GET request to example server
+POST http://localhost:8000/api/stuff/auth/signin/
+Content-Type: application/json
+#X-Without-SSR:
+
+{
+  "username": "admin",
+  "password": "Rt3$YiOO"
+}
+
+### REFRESH
+POST localhost:8000/api/stuff/refresh/
+Cookie: __rclientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyNzg0NjYwNSwiaWF0IjoxNzI3ODAzNDA1LCJqdGkiOiIyZWEyOTMxMjEyMGE0MWU1YTFkYTUwYzdhYmUzMjRjMSIsInVzZXJpZCI6IllXbzhudUplcHZaQ3hoaDYifQ.Qhz9zn7lhk7AIw_xdSpn-xKDcKyMuQd3puRguq8NKsY
+#Content-Type: application/json
+#
+#{
+#  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyNzg0NjYwNSwiaWF0IjoxNzI3ODAzNDA1LCJqdGkiOiIyZWEyOTMxMjEyMGE0MWU1YTFkYTUwYzdhYmUzMjRjMSIsInVzZXJpZCI6IllXbzhudUplcHZaQ3hoaDYifQ.Qhz9zn7lhk7AIw_xdSpn-xKDcKyMuQd3puRguq8NKsY"
+#}
+
+
+###
+GET http://localhost:8000/api/cards/items/
+Content-Type: application/json
+#Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI2MDY2NTQyLCJpYXQiOjE3MjYwNjU2NDIsImp0aSI6IjVkNjEzNDQzOGJjMDRjZmE5YTA3ZGE3Y2EyYjI4NWZhIiwidXNlcl9pZCI6M30.RHy0o0oyas0NzIRDXJD2IRSD1ovt7XQ-tGxieSYCOpY
+
+###
+GET http://localhost:3000/api/auth/providers
+
+###
+POST localhost:8000/api/stuff/refresh/
+Content-Type: application/json
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyNzQxNjM2MiwiaWF0IjoxNzI3MzczMTYyLCJqdGkiOiIwOWQxN2Y0N2RiYTQ0ZTBkOTNjMDc0MjFlZjVlYmIzZCIsInVzZXJfaWQiOjN9.kpIfSjumaeGOo8CkTGM9VXqhpgCwvH665tTw0h8brXE"
+}

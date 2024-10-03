@@ -1,0 +1,70 @@
+services:
+  traefik:
+    image: traefik:v3.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+    ports:
+      - "3010:80"
+      - "8800:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  postgres:
+    image: postgres
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=main
+      - POSTGRES_DB=wallet
+      # secrets
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: backend/
+      dockerfile: dev.Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`) || PathPrefix(`/admin`) || PathPrefix(`/static`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+    restart: on-failure
+    environment:
+#      - ALLOWED_ORIGINS=http://77.238.243.142:8001
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
+      - DJANGO_SETTINGS_DEBUG_MODE=1
+      - DJANGO_SETTINGS_PRODUCTION_MODE=0
+      - SERVER_ADDRESS=0.0.0.0
+      - SERVER_PORT=8000
+      - POSTGRES_DB_HOST=postgres
+      - POSTGRES_DB_NAME=wallet
+      - POSTGRES_DB_USER=main
+      - POSTGRES_DB_PORT=5432
+      # secrets
+      - SECRET_KEY=${SECRET_KEY}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
+    command: ["python", "/home/wallet_app/app/entrypoint.py"]
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: dev.Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    restart: on-failure
+    depends_on:
+      - backend
+
+
+volumes:
+  postgresdata:

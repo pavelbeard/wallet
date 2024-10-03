@@ -1,3 +1,58 @@
+*.local
+.idea
+*__pycache__
+
+# backend
 test.*
-singleton/*
-check_db/*
+backend/singleton/*
+backend/check_db/*
+backend/access_timer_middleware/*
+.*venv
+db.*
+pavelbeard.com*
+
+# frontend
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+## dependencies
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
+frontend/.yarn/install-state.gz
+
+## testing
+frotend/coverage
+frontend/.swc
+
+## next.js
+frontend/.next/
+frontend/out/
+
+## production
+frontend/docker
+
+## misc
+frontend/.DS_Store
+frontend/*.pem
+
+## debug
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+## local env files
+frontend/.env*.local
+
+## vercel
+frontend/.vercel
+
+## typescript
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+### others
+
+secrets_cartera_app.json
+*.unused
+

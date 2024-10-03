@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.__Glaze-blue-grad {
+    @apply bg-gradient-to-t from-indigo-300 via-sky-400 to-blue-500
+}
+
+.__Text-wrapper-main-page {
+    @apply flex flex-col mt-4 mx-12 max-w-[450px]
+}
+
+.__Text-style-main-page {
+    @apply text-4xl text-white text-center my-2
+}
+
+.__Link-hover {
+    @apply p-2 m-2 hover:bg-gray-200 hover:rounded-xl
+}
