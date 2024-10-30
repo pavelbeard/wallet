@@ -8,19 +8,31 @@
 }
 
 .container-bg {
-  @apply bg-gradient-to-b from-cyan-300 via-sky-500 to-blue-500;
+  /*@apply bg-gradient-to-b from-cyan-300 via-sky-500 to-blue-500;*/
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-sky-300;
 }
 
 .auth-bg {
-  @apply bg-gradient-to-b from-slate-300 via-slate-400 to-slate-500;
+  /*@apply bg-gradient-to-b from-slate-300 via-slate-400 to-slate-500;*/
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-slate-300;
 }
 
 .dashboard-bg {
-  @apply bg-gradient-to-b from-green-300/80 via-emerald-300/80 to-emerald-500/80;
+  /*@apply bg-gradient-to-b from-green-300/80 via-emerald-300/80 to-emerald-500/80;*/
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-green-300;
+}
+
+.error-bg {
+  /*@apply bg-gradient-to-b from-rose-500 to-red-700;*/
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-red-300;
 }
 
 .welcome-text {
   @apply text-xl lg:text-3xl text-white font-bold text-center;
+}
+
+.main-links {
+  @apply text-center text-lg font-bold
 }
 
 .field-error {
@@ -28,5 +40,11 @@
 }
 
 .auth-question {
-    @apply pl-2 hover:text-slate-600
+  @apply hover:text-slate-600;
+}
+
+@layer utilities {
+  .grid-row-3-auto-1fr-auto {
+    grid-template-rows: auto 1fr auto;
+  }
 }

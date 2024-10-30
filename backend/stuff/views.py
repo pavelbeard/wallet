@@ -3,9 +3,13 @@ import logging
 import re
 import sys
 import uuid
+from typing import Type
 
+import requests
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
+from dj_rest_auth.registration import views as dj_rest_auth_views
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.http import JsonResponse, HttpResponse
 from django.utils.translation import gettext_lazy as _
 from django_otp import devices_for_user
@@ -15,24 +19,27 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError, AuthenticationFailed
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import permissions as stuff_permissions
 from . import serializers, models, stuff_logic
-from .stuff_logic import get_custom_jwt
-
-User = get_user_model()
+from .stuff_logic import get_custom_jwt, signin_logic
+from .utils import User, LOGIN_TYPE
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 
 class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
     def signup(self, request):
         try:
+            username = request.data.get('username')
+            if username is not None and '@' in username:
+                request.data['email'] = request.data['username']
+                del request.data['username']
             serializer = serializers.SignupSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
 
@@ -40,8 +47,8 @@ class AuthViewSet(viewsets.ViewSet):
             if not instance:
                 return AuthenticationFailed(_('Failed to create signup!'))
 
-            user = User.objects.get(email=serializer.validated_data.data['email'])
-            stuff_logic.verify_email_logic(request, user)
+            user = User.objects.filter(email=instance.email).first()
+            # stuff_logic.verify_email_logic(request, user)
 
             return Response({"detail": _("You have been registered successfully!")}, status=status.HTTP_201_CREATED)
         except ValidationError:
@@ -54,7 +61,7 @@ class AuthViewSet(viewsets.ViewSet):
             serializer = serializers.SigninSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             # The result is None and with an error data or Response 200 with a success message
-            result, data = stuff_logic.signin_logic(serializer.validated_data, request)
+            result, data = stuff_logic.signin_logic(request, serializer.validated_data)
 
             if result is None:
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
@@ -69,7 +76,6 @@ class AuthViewSet(viewsets.ViewSet):
             logger.error(_('Something went wrong...'), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
     @action(detail=False, methods=['POST'])
     def signout(self, request):
         try:
@@ -79,7 +85,29 @@ class AuthViewSet(viewsets.ViewSet):
             logger.exception(_('Token is blacklisted'), exc_info=True)
             return JsonResponse({'error': _('Token is blacklisted')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class OAuth2ViewSet(viewsets.ViewSet,  dj_rest_auth_views.SocialLoginView):
+    adapter_class: Type[OAuth2Adapter]
 
+    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
+    def signin_with_google(self, request, *args, **kwargs):
+        self.adapter_class = GoogleOAuth2Adapter
+        try:
+            response = super().post(request, *args, **kwargs)
+            response_user_data = response.data.get('user')
+            user = User.objects.get(pk=response_user_data.get('pk'))
+            if user.is_oauth_user is not True:
+                user.is_oauth_user = True
+                user.is_email_verified = True
+                user.save()
+
+            result, data = stuff_logic.signin_logic(request=request, login_type=LOGIN_TYPE.OAUTH2)
+            if result is None:
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+            return result
+        except Exception as e:
+            logger.error(_('Something went wrong...'), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = serializers.CookieTokenRefreshSerializer
@@ -105,13 +133,16 @@ class CookieTokenRefreshView(TokenRefreshView):
 
             del response.data['refresh']
 
+        if response.status_code == status.HTTP_401_UNAUTHORIZED:
+            response.data['error'] = _('Token is blacklisted.')
+
         return super().finalize_response(request, response, *args, **kwargs)
 
 
 class WalletUserViewSet(viewsets.ModelViewSet):
     queryset = models.WalletUser.objects.all()
     serializer_class = serializers.WalletUserSerializer
-    lookup_field = 'userid'
+    lookup_field = 'public_id'
 
     @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
     def check_user_by_username(self, request, **kwargs):

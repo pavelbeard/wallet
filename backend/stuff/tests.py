@@ -1,11 +1,8 @@
 import time
-from datetime import timedelta, datetime
+from datetime import timedelta
 
-import jwt
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from qrcode.image.pil import PilImage
-from qrcode.main import GenericImage
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient, APITestCase
@@ -72,38 +69,48 @@ class StuffTests(APITestCase):
 
         response = self.client.post(self.login_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('access', response.json())
+        self.assertIn('detail', response.json())
 
     # signup
     def test_signup_with_username(self):
         data = {
-            'username': 'testuser_new',
+            'username': 'testuser_new1',
             'password': self.password,
+            'password2': self.password,
         }
 
         response = self.client.post(self.signup_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('access', response.json())
+        self.assertIn('detail', response.json())
+
+    def test_signup_only_with_email(self):
+        data = {
+            'email': 'testuser1@example.com',
+        }
+        response = self.client.post(self.signup_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_signup_with_email_as_username(self):
         data = {
-            'username': 'testuser_new@example.com',
+            'username': 'testuser_new1@example.com',
             'password': self.password,
+            'password2': self.password,
         }
 
         response = self.client.post(self.signup_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('access', response.json())
+        self.assertIn('detail', response.json())
 
     def test_signup_with_email(self):
         data = {
-            'email': 'testuser_new@example.com',
+            'email': 'testuser_new11@example.com',
             'password': self.password,
+            'password2': self.password,
         }
 
         response = self.client.post(self.signup_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('access', response.json())
+        self.assertIn('detail', response.json())
 
     # missing credentials
 
@@ -198,7 +205,7 @@ class TokensVerificationTestCase(APITestCase):
     def test_password_verification_flow(self):
         pass
 
-    @override_api_settings(USER_ID_FIELD='userid')
+    @override_api_settings(USER_ID_FIELD='public_id')
     def test_two_factor_verification_flow(self):
         user = self.user
         user.is_two_factor_enabled = True

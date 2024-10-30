@@ -1,11 +1,11 @@
-import { expect, test } from "vitest";
+import Page from "@/app/[locale]/(public)/page";
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import Page from "@/app/[locale]/page";
+import { expect, test } from "vitest";
 
-test('should render the home page', async () => {
-    render(<Page params={{ locale: 'es' }} />);
+test("should render the home page", async () => {
+  // @ts-ignore
+  render(async () => await Page({ params: { locale: "es" } }));
 
-    const signInText = screen.getByText('Ir a iniciar sesión');
-    expect(signInText.innerText).toContain('Ir a iniciar sesión');
+  const signInText = screen.getByRole("heading", { level: 1 });
+  expect(signInText.innerText).toContain("Ir a iniciar sesión");
 });

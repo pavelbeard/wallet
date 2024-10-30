@@ -1,42 +1,25 @@
-
-import React from "react";
+import Footer from "@/app/components/footer/footer";
+import "@/app/globals.css";
+import { Props } from "@/app/lib/types";
+import LayoutPublicContainer from "@/app/ui/layout-public-container";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import LayoutContainer from "@/app/ui/layout-container";
-import { Props } from "@/app/lib/types";
-import getPathname from "@/app/lib/getPathname";
-import './globals.css';
-import { Link } from "@/i18n/routing";
+import Header from "@/app/components/header/header";
+import HeaderProvider from "@/app/components/header/header-provider";
 
-export default async function RootLayout({ children }: Props){
-    const pathname = await getPathname();
-    const lang = await getLocale();
-    const messages = await getMessages();
+export default async function RootPublicLayout({ children }: Props) {
+  const lang = await getLocale();
+  const messages = await getMessages();
 
-    const linkToDashboardDev =
-        process.env.NODE_ENV == 'development' && <Link locale={lang} href={'/dashboard'}>To Dashboard</Link>
-
-    return (
-        <html lang={lang}>
-          <head>
-              <meta charSet="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <link rel="icon" href="/favicon.ico" />
-                <title>Cartera</title>
-          </head>
-          <body>
-              <NextIntlClientProvider messages={messages}>
-                  {pathname == "/" || pathname == `/${lang}`
-                    ? <LayoutContainer color="container-bg">
-                          {children}
-                          {linkToDashboardDev}
-                      </LayoutContainer>
-                    : <>
-                          {children}
-                          {linkToDashboardDev}
-                      </>}
-              </NextIntlClientProvider>
-          </body>
-        </html>
-    );
+  return (
+    <NextIntlClientProvider locale={lang} messages={messages}>
+      <LayoutPublicContainer color="container-bg">
+        <HeaderProvider>
+          <Header />
+        </HeaderProvider>
+        {children}
+        <Footer />
+      </LayoutPublicContainer>
+    </NextIntlClientProvider>
+  );
 }

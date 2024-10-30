@@ -1,37 +1,42 @@
 import { API_PATH } from "@/app/lib/constants";
+import { CredentialInput } from "@auth/core/providers";
 import { Account, Profile, User } from "next-auth";
 
-const SIGN_IN_HANDLERS = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  credentials: async (
-    user: User,
-    account: Account,
-    profile: Profile,
-    email: string,
-    credentials: unknown,
-  ) => {
+type Provider = {
+  user: User;
+  account: Account | null;
+  profile: Profile | undefined;
+  email: { verificationRequest?: boolean | undefined } | undefined;
+  credentials: Record<string, CredentialInput> | undefined;
+};
+
+type Handler = ({
+  user,
+  account,
+  profile,
+  email,
+  credentials,
+}: Provider) => Promise<boolean | string>;
+
+export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
+  credentials: async (): Promise<boolean | string> => {
     return true;
   },
-  google: async (
-    user: User,
-    account: Account,
-    profile: Profile,
-    email: string,
-    credentials: unknown,
-  ) => {
+  google: async ({ account }: Provider): Promise<boolean | string> => {
     try {
-      const response = await fetch(`${API_PATH}/api/stuff/auth-google/`, {
+      const response = await fetch(`${API_PATH}/api/stuff/oauth2/signin_with_google/`, {
         method: "POST",
-        body: JSON.stringify({ data: { access_token: account.id_token } }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: account?.access_token }),
       });
 
       const json = await response.json();
-      return json.data();
+      return true;
     } catch (error) {
       console.error(error);
-      return null;
+      return false;
     }
   },
 };
 
-export const 
+export const SIGN_IN_PROVIDERS: string[] = Object.keys(SIGN_IN_HANDLERS);

@@ -22,8 +22,8 @@ frontend/.pnp.js
 frontend/.yarn/install-state.gz
 
 ## testing
-frotend/coverage
-frontend/.swc
+frontend/playwright-report
+frontend/test-results
 
 ## next.js
 frontend/.next/
@@ -56,3 +56,5 @@ frontend/next-env.d.ts
 secrets_cartera_app.json
 *.unused
 
+## .DS_Store
+*.DS_Store

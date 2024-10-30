@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export default function useCheckDesktopScreen() {
-    const [isDesktop, setIsDesktop] = useState(false);
+export default function useMediaBreakpoint(width: number) {
+  const [targetReached, setTargetReached] = useState(false);
+  const updateTarget = useCallback((e: MediaQueryListEvent) => {
+    setTargetReached(e.matches);
+  }, []);
 
-    useEffect(() => {
-        const changeDesktop = () => {
-            setIsDesktop(window.innerWidth > 768);
-        }
+  useEffect(() => {
+    const media = window.matchMedia(`(min-width: ${width}px)`);
+    media.addEventListener("change", updateTarget);
 
-        addEventListener('resize', changeDesktop);
+    if (media.matches) {
+      setTargetReached(true);
+    }
 
-        return () => {
-            removeEventListener('resize', changeDesktop);
-        }
-    }, [isDesktop]);
+    return () => media.removeEventListener("change", updateTarget);
+  }, []);
 
-    return isDesktop;
+  return targetReached;
 }

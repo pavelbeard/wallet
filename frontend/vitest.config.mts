@@ -1,9 +1,11 @@
-import { defineConfig } from "vitest/config.js";
-import react from "@vitejs/plugin-react"
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-    plugins: [react()],
-    test: {
-        environment: "happy-dom"
-    }
-})
+  plugins: [tsconfigPaths(), react()],
+  test: {
+    environment: "jsdom",
+    dir: "./tests-vitest",
+  },
+});

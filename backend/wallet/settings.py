@@ -9,26 +9,36 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import environ
 import os
 import re
-from datetime import timedelta
 from pathlib import Path
 
-from django.conf.global_settings import CSRF_COOKIE_NAME, CSRF_COOKIE_HTTPONLY, STORAGES
 from django.utils import timezone
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+env = environ.Env(
+    DJANGO_SETTINGS_DEBUG_MODE=(bool, False),
+    FRONTEND_URL=(str, 'http://localhost:3000')
+)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'czrFjA4W3BaOfKpzo6eiSOiek42BWQN_RQ6fO-jL5yg')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.environ.get('DJANGO_SETTINGS_DEBUG_MODE', 1)))
-PRODUCTION = bool(int(os.environ.get('DJANGO_SETTINGS_PRODUCTION_MODE', 0)))
+DEBUG = env('DJANGO_SETTINGS_DEBUG_MODE')
+
+
+# dotenv
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -55,16 +65,19 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
     'allauth',
     'allauth.account',
-    'allauth.headless',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
     # 2fa
     'django_otp',
     'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_static'
+    'django_otp.plugins.otp_static',
 ]
 
 MIDDLEWARE = [
@@ -117,11 +130,11 @@ elif not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv("POSTGRES_DB_NAME"),
-            'USER': os.getenv("POSTGRES_DB_USER"),
-            'PASSWORD': os.getenv("POSTGRES_DB_PASSWORD"),
-            'HOST': os.getenv("POSTGRES_DB_HOST"),
-            'PORT': os.getenv("POSTGRES_DB_PORT"),
+            'NAME': env("POSTGRES_DB_NAME"),
+            'USER': env("POSTGRES_DB_USER"),
+            'PASSWORD': env("POSTGRES_DB_PASSWORD"),
+            'HOST': env("POSTGRES_DB_HOST"),
+            'PORT': env("POSTGRES_DB_PORT"),
         }
     }
 
@@ -184,33 +197,6 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CUSTOM
-
-# SOCIAL_ACCOUNT
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.getenv("AUTH_GOOGLE_ID"),
-            'client_secret': os.getenv("AUTH_GOOGLE_SECRET"),
-        },
-        'AUTH_PARAMS': {
-            'access_type': 'offline',
-        },
-        'FETCH_USERINFO': True,
-    }
-}
-
-HEADLESS_ONLY = True
-
-HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email"
-}
-
-if DEBUG:
-    SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-    SOCIALACCOUNT_EMAIL_REQUIRED = False
-
 # HTTPS
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -232,27 +218,20 @@ else:
 
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = [
-        "http://localhost:8000",
-        "http://localhost:8080",
-        "http://localhost:8001",
         "http://localhost:3000",
-        "http://localhost:3010",
         "https://localhost",
-        "http://127.0.0.1:8000",
-        "http://127.0.0.1:8080",
-        "http://127.0.0.1:8001",
         "http://127.0.0.1:3000",
         "https://127.0.0.1",
     ]
 else:
-    CSRF_TRUSTED_ORIGINS = re.split(r",|\s", os.getenv("ALLOWED_ORIGINS", ""))
+    CSRF_TRUSTED_ORIGINS = re.split(r",|\s", env("ALLOWED_ORIGINS"))
 
 # CORS
 
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
-    CORS_ALLOWED_ORIGINS = re.split(r",|\s", os.getenv("ALLOWED_ORIGINS", ""))
+    CORS_ALLOWED_ORIGINS = re.split(r",|\s", env("ALLOWED_ORIGINS"))
 
 CORS_ALLOWED_METHODS = ["GET", "POST", "PUT", "OPTIONS", "DELETE"]
 CORS_ALLOW_CREDENTIALS = True
@@ -275,7 +254,7 @@ REST_FRAMEWORK = {
 # JWT
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timezone.timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': timezone.timedelta(hours=12),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -283,8 +262,8 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ['JWT', 'Bearer'],
-    'USER_ID_FIELD': 'userid',
-    'USER_ID_CLAIM': 'userid',
+    'USER_ID_FIELD': 'public_id',
+    'USER_ID_CLAIM': 'public_id',
     'AUTH_TOKEN_CLASSES': ['rest_framework_simplejwt.tokens.AccessToken'],
     'TOKEN_TYPE_CLAIM': 'token_type',
 
@@ -310,3 +289,40 @@ AUTHENTICATION_BACKENDS = (
     'stuff.auth_backends.WalletAuthBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+# dj rest auth
+
+SITE_ID = 1
+
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
+}
+
+# social account
+
+if DEBUG:
+    SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+    SOCIALACCOUNT_EMAIL_REQUIRED = False
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "APP": {
+            "client_id": env("AUTH_GOOGLE_ID"),
+            "secret": env("AUTH_GOOGLE_SECRET"),
+            "key": "",
+        },
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "VERIFIED_EMAIL": True,
+        "FETCH_USERINFO": True,
+    }
+}
+
+FRONTEND_URL = env('FRONTEND_URL')
+

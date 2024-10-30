@@ -1,32 +1,16 @@
-import Submit from "@/app/ui/submit";
-import { auth, signOut } from "@/auth";
 import Client from "@/app/components/dashboard/client";
-import { SessionProvider } from "next-auth/react";
-import { LangProps } from "@/app/lib/types";
-import { redirect, RedirectType } from "next/navigation";
-import { DEFAULT_SIGNED_OUT_PATH } from "@/routes";
+import { auth } from "@/auth";
+import { LocaleProps } from "@/i18n/types";
 
-
-export default async function Page({ params: { lang } }: LangProps) {
-    const session = await auth();
-    return (
-        <div>
-            Dashboard
-            {JSON.stringify(session)}
-            <form action={async() => {
-                "use server"
-                await signOut({ redirect: false });
-                redirect(DEFAULT_SIGNED_OUT_PATH, RedirectType.replace)
-            }}>
-                <Submit>
-                    Sign out
-                </Submit>
-            </form>
-            <div>
-                <SessionProvider>
-                    <Client />
-                </SessionProvider>
-            </div>
-        </div>
-    );
+export default async function Page({ params: { locale } }: LocaleProps) {
+  const session = await auth();
+  return (
+    <div>
+      <div className="p-4">Dashboard</div>
+      <div className="p-4">Server:</div>
+      <div className="break-all max-w-64">{JSON.stringify(session)}</div>
+      <div className="p-4">Client:</div>
+      <Client />
+    </div>
+  );
 }

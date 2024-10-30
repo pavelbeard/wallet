@@ -1,13 +1,21 @@
-import { ReactNode } from "react";
+import { Link } from "@/i18n/routing";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function AuthQuestion({
-  locale,
   href,
-  children,
+  type,
 }: {
-  locale: string;
   href: string;
-  children: ReactNode;
+  type: "with-account" | "without-account";
 }) {
-  return <div></div>;
+  const t = useTranslations('auth')
+  const locale = useLocale();
+  return (
+    <div className="p-2">
+      <Link href={href} locale={locale}>
+        {type === "with-account" && t('form.withAccount')}
+        {type === "without-account" && t('form.withoutAccount')}
+      </Link>
+    </div>
+  );
 }

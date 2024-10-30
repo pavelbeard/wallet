@@ -1,23 +1,54 @@
 {
   "auth": {
-    "title.signIn": "Cartera | Iniciar sesión",
-    "title.signUp": "Cartera | Crear la cuenta",
-    "description.signIn": "Iniciar sesión",
-    "description.signUp": "Crear la cuenta",
-    "form.formTitle.signIn": "Iniciar sesión",
-    "form.formTitle.signUp": "Crear la cuenta",
-    "form.emailInput": "Correo electrónico:",
-    "form.passwordInput": "Contraseña:",
-    "form.confirmPasswordInput": "Repite contraseña:",
-    "form.signIn": "Entrar",
-    "page.signOut": "Cerrando sesión..."
+    "title": {
+      "signIn": "Cartera | Iniciar sesión",
+      "signUp": "Cartera | Crear la cuenta"
+    },
+    "description": {
+      "signIn": "Iniciar sesión",
+      "signUp": "Crear la cuenta"
+    },
+    "form": {
+      "formTitle": {
+        "signIn": "Iniciar sesión",
+        "signUp": "Crear la cuenta"
+      },
+      "emailInput": "Correo electrónico:",
+      "passwordInput": "Contraseña:",
+      "confirmPasswordInput": "Repite contraseña:",
+      "signIn": "Entrar",
+      "signUp": "Crearla",
+      "signInWith": "Entrar con ",
+      "withAccount": "Si tienes una cuenta, inicia sesión.",
+      "withoutAccount": "Si no tienes una cuenta, creála!",
+      "or": "o"
+    },
+    "page": {
+      "signOut": "Cerrando sesión...",
+      "toMainPage": "Al inicio"
+    }
   },
   "mainPage": {
     "title": "Cartera | Inicio",
-    "description": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
-    "page.title": "Bienvenidos y bienvenidas a Cartera!",
-    "page.appDescription": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
-    "page.signIn": "Ir a iniciar sesión",
-    "page.signUp": "In a unirte"
+    "description": "Bienvenidos y bienvenidas a nuestra aplicación para guardar tus secretos!",
+    "page": {
+      "title": "Bienvenidos y bienvenidas a Cartera!",
+      "appDescription": "Bienvenidos y bienvenidas a nuestra aplicación para guardar tus secretos!",
+      "signIn": "Ir a iniciar sesión",
+      "signUp": "In a unirte",
+      "toDashboard": "Al Dashboard"
+    }
+  },
+  "header": {
+    "why": "Por qué es Cartera?",
+    "advantages": "Ventajas",
+    "signIn": "Iniciar sesión"
+  },
+  "sidebar": {
+    "signOut": "Cerrar sesión"
+  },
+  "error": {
+    "error500": "Falla 500",
+    "toMainPage": "Al inicio..."
   }
 }

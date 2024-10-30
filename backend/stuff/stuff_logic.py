@@ -1,9 +1,9 @@
 ### module for complicated logic ###
 import contextlib
-
-import jwt
 from calendar import timegm
 from typing import List, Any
+
+import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
@@ -21,11 +21,12 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import authentication as jwt_authentication
 from rest_framework_simplejwt import tokens
 from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from stuff import qr_generator
 from stuff.models import WalletUser
+from stuff.utils import LOGIN_TYPE, User
 
-User: WalletUser = get_user_model()
 
 @contextlib.contextmanager
 def override_api_settings(**settings):
@@ -89,7 +90,7 @@ def jwt_otp_payload(user: User, device: Device=None) -> dict:
     if settings.SIMPLE_JWT.get('ISSUER'):
         payload['iss'] = settings.SIMPLE_JWT['ISSUER']
 
-    if (user is not None) and( device is not None) and (device.user_id == user.userid) and (device.confirmed is True):
+    if (user is not None) and( device is not None) and (device.user_id == user.public_id) and (device.confirmed is True):
         payload['otp_device_id'] = device.persistent_id
     else:
         payload['otp_device_id'] = None
@@ -99,23 +100,22 @@ def jwt_otp_payload(user: User, device: Device=None) -> dict:
 def jwt_encode_handler(payload):
     """Helps to encode data to JWT"""
     key = settings.SIMPLE_JWT['SIGNING_KEY']
-    return jwt.encode(payload, key, algorithm=settings.SIMPLE_JWT['ALGORITHM']).encode('utf-8')
+    return jwt.encode(payload, key, algorithm=settings.SIMPLE_JWT.get('ALGORITHM')).encode('utf-8')
 
 def jwt_decode_handler(token) -> Any:
     """Helps to decode data from JWT"""
     options = {
         'verify_exp': True,
     }
-    secret_key = settings.SIMPLE_JWT['SECRET_KEY']
+    secret_key = settings.SIMPLE_JWT['SIGNING_KEY']
     return jwt.decode(
-        token,
-        secret_key,
-        settings.SIMPLE_JWT.get('VERIFYING_KEY'),
+        jwt=token,
+        key=secret_key,
         options=options,
-        leeway=settings.SIMPLE_JWT['LEEWAY'],
+        # leeway=settings.SIMPLE_JWT.get('LEEWAY'),
         audience=settings.SIMPLE_JWT.get('AUDIENCE'),
         issuer=settings.SIMPLE_JWT.get('ISSUER'),
-        algorithms=[settings.SIMPLE_JWT['ALGORITHM']],
+        algorithms=settings.SIMPLE_JWT.get('ALGORITHM'),
     )
 
 def get_custom_jwt(user: WalletUser, device: Device=None) -> str:
@@ -136,7 +136,7 @@ def otp_is_verified(request: Request):
 
     if persistent_id:
         device = Device.from_persistent_id(persistent_id=persistent_id)
-        if (device is not None) and (device.user_id != request.user.userid):
+        if (device is not None) and (device.user_id != request.user.public_id):
             return False
         else:
             return True
@@ -149,14 +149,24 @@ def get_user_static_device(user: User, confirmed=None) -> StaticDevice | None:
         if isinstance(device, StaticDevice):
             return device
 
-def signin_logic(validated_data, request):
+def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS):
     response = Response()
-    access_token_obj = tokens.AccessToken(validated_data['access'])
-    user = User.objects.get(pk=access_token_obj.payload['userid'])
+    if login_type == LOGIN_TYPE.OAUTH2:
+        user = request.user
+        jwt_tokens = RefreshToken.for_user(user)
+        access_token = str(jwt_tokens.access_token)
+        refresh_token = str(jwt_tokens)
+    else:
+        access_token = validated_data['access']
+        refresh_token = validated_data['refresh']
+
+        access_token_obj = tokens.AccessToken(validated_data['access'])
+        user = User.objects.get_object_by_public_id(public_id=access_token_obj.payload['public_id'])
+
     if user.is_active:
         response.set_cookie(
             key=settings.SIMPLE_JWT['AUTH_ACCESS_COOKIE'],
-            value=validated_data['access'],
+            value=access_token,
             max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
             secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
@@ -164,7 +174,7 @@ def signin_logic(validated_data, request):
         )
         response.set_cookie(
             key=settings.SIMPLE_JWT['AUTH_REFRESH_COOKIE'],
-            value=validated_data['refresh'],
+            value=refresh_token,
             max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
             secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
@@ -177,7 +187,7 @@ def signin_logic(validated_data, request):
             httponly=settings.CSRF_COOKIE_HTTPONLY,
             samesite=settings.CSRF_COOKIE_SAMESITE,
         )
-        response.data = {'access': validated_data['access']}
+        response.data = {'access': access_token}
         response.status = status.HTTP_200_OK
         return response, None
     else:

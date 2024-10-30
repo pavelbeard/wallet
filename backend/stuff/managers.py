@@ -1,9 +1,12 @@
 from django.apps import apps
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 
+from abstract.managers import AbstractManager
 
-class WalletUserManager(BaseUserManager):
+
+class WalletUserManager(BaseUserManager, AbstractManager):
     def _create_user(
             self, username=None, email=None, password=None, **extra_fields
     ):
@@ -26,8 +29,12 @@ class WalletUserManager(BaseUserManager):
             user_data['email'] = self.normalize_email(email)
 
         user = self.model(**user_data)
-        if password:
+        if password and not extra_fields.get('is_oauth_user'):
             user.password = make_password(password)
+
+        if not password and not extra_fields.get('is_oauth_user'):
+            raise TypeError(_('Password or oauth creation method are required.'))
+
         user.save(using=self._db)
         return user
 
@@ -36,6 +43,7 @@ class WalletUserManager(BaseUserManager):
     ):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_oauth_user', False)
         return self._create_user(username, email, password, **extra_fields)
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):

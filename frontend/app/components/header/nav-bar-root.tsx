@@ -1,29 +1,36 @@
-import { NavBarItemActions, NavBarItems } from "@/app/lib/types";
 import NavBarItem from "@/app/components/header/nav-bar-item";
+import { NavBarItems } from "@/app/lib/types";
+import { clsx } from "clsx";
 
-
-export default function NavBarLeft({
-    leftMenu,
-    visibility,
-    changeVisibility
+export default function NavBarRoot({
+  menu,
+  position,
 }: {
-    leftMenu: NavBarItems
-} & NavBarItemActions) {
-    return (
-        <nav>
-            <ul className="pt-2 flex flex-col lg:flex-row lg:pt-0">
-                {leftMenu.map(navBarItem =>
-                    <NavBarItem
-                        key={navBarItem.title}
-                        level={0}
-                        title={navBarItem.title}
-                        url={navBarItem.url}
-                        subMenu={navBarItem.subMenu}
-                        visibility={visibility}
-                        changeVisibility={changeVisibility}
-                    />
-                )}
-            </ul>
-        </nav>
-    );
+  menu: NavBarItems;
+  position: "left" | "right" | "center";
+}) {
+  return (
+    <nav
+      className={clsx(
+        "max-lg:border-t-[1px] border-slate-800",
+        position !== "center"
+          ? position == "left"
+            ? "justify-self-start"
+            : "justify-self-end"
+          : "justify-self-center",
+      )}
+    >
+      <ul className="pt-4 flex flex-col lg:flex-row lg:pt-0 gap-2">
+        {menu.map((navBarItem) => (
+          <NavBarItem
+            key={navBarItem.title}
+            level={0}
+            title={navBarItem.title}
+            url={navBarItem.url}
+            subMenu={navBarItem.subMenu}
+          />
+        ))}
+      </ul>
+    </nav>
+  );
 }

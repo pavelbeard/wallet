@@ -7,6 +7,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'users', views.WalletUserViewSet)
 router.register(r'auth', views.AuthViewSet, basename='stuff-auth')
+router.register(r'oauth2', views.OAuth2ViewSet, basename='stuff-oauth')
 router.register(r'2fa', views.TwoFactorAuthViewSet, basename='stuff-two-factor')
 
 urlpatterns = [

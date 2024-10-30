@@ -1,15 +1,26 @@
 import logging
 import os
+import environ
 import subprocess
 import sys
 
-import uvicorn
+from pathlib import Path
 from django.core.management import execute_from_command_line, CommandError
 
-SERVER_ADDRESS = os.environ.get('SERVER_ADDRESS', '0.0.0.0')
-SERVER_PORT = os.environ.get('SERVER_PORT', '8000')
-DJANGO_SETTINGS_DEBUG_MODE = bool(os.environ.get('DJANGO_SETTINGS_DEBUG_MODE', 0))
-DJANGO_SETTINGS_PRODUCTION_MODE = bool(os.environ.get('DJANGO_SETTINGS_PRODUCTION_MODE', 0))
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env(
+    DJANGO_SETTINGS_DEBUG_MODE=(bool, False),
+    DJANGO_SUPERUSER_USERNAME=(str, "admin"),
+    DJANGO_SUPERUSER_EMAIL=(str, "admin@example.com"),
+    SERVER_ADDRESS=(str, '0.0.0.0'),
+    SERVER_PORT=(str, "8000")
+
+)
+
+SERVER_ADDRESS = env('SERVER_ADDRESS')
+SERVER_PORT = env('SERVER_PORT')
+DJANGO_SETTINGS_DEBUG_MODE = bool(env('DJANGO_SETTINGS_DEBUG_MODE', 0))
 
 
 def check_db(args, post_args: list | tuple, db: str, seconds: int = 0, attempts: int = 5) -> bool:
@@ -42,11 +53,11 @@ def createsuperuser():
     try:
         from django.contrib.auth import get_user_model
         User = get_user_model()
-        if not User.objects.filter(username=os.getenv('DJANGO_SUPERUSER_USERNAME')).exists():
+        if not User.objects.filter(username=env('DJANGO_SUPERUSER_USERNAME')).exists():
             execute_from_command_line(['manage.py', 'createsuperuser',
-                                       '--username', os.getenv("DJANGO_SUPERUSER_USERNAME", "admin"),
+                                       '--username', env("DJANGO_SUPERUSER_USERNAME"),
                                        '--noinput',
-                                       '--email', os.getenv("DJANGO_SUPERUSER_EMAIL", "admin@example.com")])
+                                       '--email', env("DJANGO_SUPERUSER_EMAIL")])
     except CommandError as e:
         logging.info(f"Info: ", e)
 

@@ -1,24 +1,19 @@
-"use server"
+"use server";
 
-import i18nConfig from "@/i18nConfig";
+import { i18nConfig } from "@/i18n/routing";
 
 export async function localizedRoutes(routes: string[]): Promise<string[]> {
-    const defaultLocale = i18nConfig.defaultLocale;
-    const locales = i18nConfig.locales;
-    const mutatedRoutes: string[] = [];
-    locales.forEach(locale => {
-        routes.forEach(route => {
-            if (locale == defaultLocale) {
-                mutatedRoutes.push(route)
-            } else {
-                mutatedRoutes.push(`/${locale}${route}`);
-            }
-        });
+  const locales = i18nConfig.locales;
+  const mutatedRoutes: string[] = [];
+  locales.forEach((locale) => {
+    routes.forEach((route) => {
+      mutatedRoutes.push(`/${locale}${route}`);
     });
-    return mutatedRoutes;
+  });
+  return mutatedRoutes;
 }
 
 export async function localizedRoute(route: string): Promise<string> {
-    const currentLocale = i18nConfig.defaultLocale;
-    return `/${currentLocale}${route}`
+  const currentLocale = i18nConfig.defaultLocale;
+  return `/${currentLocale}${route}`;
 }

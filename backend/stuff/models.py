@@ -1,30 +1,33 @@
 from datetime import timedelta
 
-import nanoid_field
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from abstract.models import AbstractModel
 from . import managers
 
 
 # Create your models here.
 
-class WalletUser(AbstractUser):
+
+class WalletUser(AbstractModel, AbstractUser):
     username_validator = RegexValidator(
         r'^[a-z0-9_]+$',
         _('Enter a valid username consisting of lowercase letters, number and underscores only.'),
         'invalid'
     )
 
-    userid = nanoid_field.NanoidField(max_length=16, primary_key=True, editable=False, serialize=False)
     username = models.CharField(max_length=250, blank=True, null=True, unique=True, validators=[username_validator])
     password = models.CharField(max_length=250, blank=True, null=True)
     email = models.EmailField(blank=True, null=True, unique=True)
     email_verified = models.BooleanField(default=False)
+    is_oauth_user = models.BooleanField(default=False)
+    provider = models.CharField(max_length=250, blank=True, null=True)
     is_two_factor_enabled = models.BooleanField(default=False)
+    
 
     def save(self, *args, **kwargs):
         if self.username == '':
@@ -49,8 +52,8 @@ class WalletUser(AbstractUser):
     objects = managers.WalletUserManager()
 
 
-class EmailVerificationToken(models.Model):
-    token = nanoid_field.NanoidField(max_length=16, primary_key=True, editable=False, serialize=False)
+class EmailVerificationToken(AbstractModel, models.Model):
+    token = models.UUIDField(max_length=32, editable=False, serialize=False)
     user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     until = models.DateTimeField(blank=True, null=True)
@@ -70,8 +73,8 @@ class EmailVerificationToken(models.Model):
         unique_together = (('user', 'token'),)
 
 
-class PasswordResetToken(models.Model):
-    token = nanoid_field.NanoidField(max_length=16, primary_key=True, editable=False, serialize=False)
+class PasswordResetToken(AbstractModel, models.Model):
+    token = models.UUIDField(max_length=32, editable=False, serialize=False)
     user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     until = models.DateTimeField(blank=True, null=True)

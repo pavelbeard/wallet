@@ -1,9 +1,10 @@
 import "@/app/globals.css";
-import LayoutContainer from "@/app/ui/layout-container";
-import LogoMain from "@/app/ui/logo-main";
+import LayoutPublicContainer from "@/app/ui/layout-public-container";
+import Logo from "@/app/ui/logo";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import React from "react";
+import ToMainPageBtn from "@/app/ui/to-main-page-btn";
 
 type Props = { children: React.ReactNode };
 
@@ -13,10 +14,11 @@ export default async function Layout({ children }: Props) {
 
   return (
     <NextIntlClientProvider locale={lang} messages={messages}>
-      <LayoutContainer color="auth-bg">
-        <LogoMain />
+      <LayoutPublicContainer color="auth-bg">
+        <Logo />
+        <ToMainPageBtn />
         {children}
-      </LayoutContainer>
+      </LayoutPublicContainer>
     </NextIntlClientProvider>
   );
 }

@@ -1,62 +1,42 @@
 from typing import Dict, Any
-
-from django.contrib.auth import get_user_model, authenticate
+from django.utils.translation import gettext_lazy as _
 from django_otp.plugins.otp_email.conf import settings
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
 
+from abstract.serializers import AbstractSerializer
 from stuff import stuff_logic
 
 WalletUser = get_user_model()
 
+class WalletUserSerializer(AbstractSerializer):
+    class Meta:
+        model = WalletUser
+        fields = ('public_id', 'username', 'email', 'email_verified',
+                  'is_two_factor_enabled', 'is_oauth_user', 'is_active', 'date_joined')
+        read_only_fields = ('is_active', )
 
-class SignupSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(style={'input_type': 'password'})
+
+class SignupSerializer(WalletUserSerializer):
+    password2 = serializers.CharField(min_length=8, max_length=32, write_only=True, required=True)
 
     class Meta:
         model = WalletUser
-        fields = ('username', 'email', 'password', 'password2')
-        extra_kwargs = {
-            'password': {'write_only': True},
-            'password2': {'write_only': True}
-        }
+        fields = ('public_id', 'username', 'email', 'password', 'password2')
 
-    def save(self, **kwargs):
-        username = self.validated_data.get('username')
-        password = self.validated_data.get('password')
-        password2 = self.validated_data.get('password2')
-        email = self.validated_data.get('email')
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError(_('Passwords do not match!'))
 
-        if password != password2:
-            raise ValidationError({'detail': 'Passwords don`t match'})
+        del data['password2']
 
-        if username and password:
-            if '@' in username:
-                user = WalletUser(
-                    email=username,
-                    password=password,
-                )
-            else:
-                user = WalletUser(
-                    username=username,
-                    password=password,
-                )
-        elif email and password:
-            user = WalletUser(
-                email=email,
-                password=password,
-            )
-        else:
-            raise ValidationError({'detail': 'You need to provide one of this fields: [username/email]'})
+        return super().validate(data)
 
-        user.set_password(password)
-        user.save()
-
-        return user
+    def create(self, validated_data):
+        return self.Meta.model.objects.create_user(**validated_data)
 
 
 class CustomTokenObtainSerializer(jwt_serializers.TokenObtainSerializer):
@@ -72,11 +52,12 @@ class CustomTokenObtainSerializer(jwt_serializers.TokenObtainSerializer):
             'password': attrs.get('password')
         }
 
-        if attrs.get(self.username_field):
-            authenticate_kwargs[self.username_field] = attrs[self.username_field]
-
-        if attrs.get('email'):
+        if attrs.get(self.username_field) is not None and '@' in attrs.get(self.username_field):
+            authenticate_kwargs['email'] = attrs.get(self.username_field)
+        elif attrs.get('email'):
             authenticate_kwargs['email'] = attrs.get('email')
+        elif attrs.get(self.username_field):
+            authenticate_kwargs[self.username_field] = attrs[self.username_field]
 
         try:
             authenticate_kwargs["request"] = self.context["request"]
@@ -107,11 +88,6 @@ class SigninSerializer(jwt_serializers.TokenObtainPairSerializer, CustomTokenObt
 
         return token
 
-
-class WalletUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WalletUser
-        fields = ('userid', 'username', 'email')
 
 
 class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
