@@ -1,0 +1,23 @@
+{
+  "auth": {
+    "title.signIn": "Cartera | Iniciar sesión",
+    "title.signUp": "Cartera | Crear la cuenta",
+    "description.signIn": "Iniciar sesión",
+    "description.signUp": "Crear la cuenta",
+    "form.formTitle.signIn": "Iniciar sesión",
+    "form.formTitle.signUp": "Crear la cuenta",
+    "form.emailInput": "Correo electrónico:",
+    "form.passwordInput": "Contraseña:",
+    "form.confirmPasswordInput": "Repite contraseña:",
+    "form.signIn": "Entrar",
+    "page.signOut": "Cerrando sesión..."
+  },
+  "mainPage": {
+    "title": "Cartera | Inicio",
+    "description": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
+    "page.title": "Bienvenidos y bienvenidas a Cartera!",
+    "page.appDescription": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
+    "page.signIn": "Ir a iniciar sesión",
+    "page.signUp": "In a unirte"
+  }
+}

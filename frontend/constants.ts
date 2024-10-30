@@ -1,1 +1,0 @@
-export const API_URL = process.env.NEXT_PUBLIC_DRF_API_URL || process.env.NEXT_DRF_API_URL;
