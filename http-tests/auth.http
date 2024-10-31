@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:8000/api/stuff/auth/signin/
+POST http://localhost:8000/api/auth/signin/
 Content-Type: application/json
 #X-Without-SSR:
 
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### REFRESH
-POST localhost:8000/api/stuff/refresh/
+POST localhost:8000/api/refresh/
 Cookie: __rclientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyNzg0NjYwNSwiaWF0IjoxNzI3ODAzNDA1LCJqdGkiOiIyZWEyOTMxMjEyMGE0MWU1YTFkYTUwYzdhYmUzMjRjMSIsInVzZXJpZCI6IllXbzhudUplcHZaQ3hoaDYifQ.Qhz9zn7lhk7AIw_xdSpn-xKDcKyMuQd3puRguq8NKsY
 #Content-Type: application/json
 #
@@ -27,7 +27,7 @@ Content-Type: application/json
 GET http://localhost:3000/api/auth/providers
 
 ###
-POST localhost:8000/api/stuff/refresh/
+POST localhost:8000/api/refresh/
 Content-Type: application/json
 
 {

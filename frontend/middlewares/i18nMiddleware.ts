@@ -9,3 +9,7 @@ export default function i18nMiddleware(middleware: CustomMiddleware) {
     return middleware(request, event, i18nResponse);
   };
 }
+
+// export default async function i18nMiddleware(req: NextRequest, res: NextResponse, next: Callback) {
+//   return createMiddleware(i18nConfig);
+// }

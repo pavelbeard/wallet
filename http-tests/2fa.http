@@ -1,5 +1,5 @@
 ### SIGN IN
-POST http://localhost:8000/api/stuff/auth/signin/
+POST http://localhost:8000/api/auth/signin/
 Content-Type: application/json
 
 {
@@ -8,15 +8,15 @@ Content-Type: application/json
 }
 
 ### CHECK OTP PERMISSION
-GET http://localhost:8000/api/cards/items
+GET http://localhost:8000/apicards/items
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NjA4MTQzLCJpYXQiOjE3Mjc2MDcyNDMsImp0aSI6ImVjZDI3YzgxOTljZTQ3MjE5OTA3ZTc5Zjc5NTA4MThjIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzYwNzI0Mywib3RwX2RldmljZV9pZCI6bnVsbH0.dUTuVPkIbobbM5m6Pe4sM_SHJLF2_MKV0tFUNE4VjZ4
 
 ### CREATE TOTP DEVICE
-GET http://localhost:8000/api/stuff/2fa/create_totp_device/
+GET http://localhost:8000/api/2fa/create_totp_device/
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NjA4MTQzLCJpYXQiOjE3Mjc2MDcyNDMsImp0aSI6ImVjZDI3YzgxOTljZTQ3MjE5OTA3ZTc5Zjc5NTA4MThjIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzYwNzI0Mywib3RwX2RldmljZV9pZCI6bnVsbH0.dUTuVPkIbobbM5m6Pe4sM_SHJLF2_MKV0tFUNE4VjZ4
 
 ### VERIFY/ENABLE TOTP DEVICE
-POST http://localhost:8000/api/stuff/2fa/verify_totp_device/
+POST http://localhost:8000/api/2fa/verify_totp_device/
 Content-Type: application/json
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NTc1MTY1LCJpYXQiOjE3Mjc1NzQyNjUsImp0aSI6ImNlNjc3MzQyNmEyZTQ2NDZiN2VjZTU5YTBkMjk3NjgyIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzU3NDI2NSwib3RwX2RldmljZV9pZCI6bnVsbH0.NdqAejoNjNRDi5DGmqIWJMZcFFc9cmDUmBRDBVbP-cE
 
@@ -25,11 +25,11 @@ Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNj
 }
 
 ### CREATE BACKUP TOKENS
-GET http://localhost:8000/api/stuff/2fa/create_backup_tokens/
+GET http://localhost:8000/api/2fa/create_backup_tokens/
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NTc1MTY1LCJpYXQiOjE3Mjc1NzQyNjUsImp0aSI6ImNlNjc3MzQyNmEyZTQ2NDZiN2VjZTU5YTBkMjk3NjgyIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzU3NDI2NSwib3RwX2RldmljZV9pZCI6bnVsbH0.NdqAejoNjNRDi5DGmqIWJMZcFFc9cmDUmBRDBVbP-cE
 
 ### VERIFY ONE OF THEM
-POST http://localhost:8000/api/stuff/2fa/verify_backup_token/
+POST http://localhost:8000/api/2fa/verify_backup_token/
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NTc1MTY1LCJpYXQiOjE3Mjc1NzQyNjUsImp0aSI6ImNlNjc3MzQyNmEyZTQ2NDZiN2VjZTU5YTBkMjk3NjgyIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzU3NDI2NSwib3RwX2RldmljZV9pZCI6bnVsbH0.NdqAejoNjNRDi5DGmqIWJMZcFFc9cmDUmBRDBVbP-cE
 Content-Type: application/json
 
@@ -38,5 +38,5 @@ Content-Type: application/json
 }
 
 ### DELETE DEVICE FROM 2FA DB
-DELETE http://localhost:8000/api/stuff/2fa/delete_totp_device/
+DELETE http://localhost:8000/api/2fa/delete_totp_device/
 Cookie: __clientid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NTc1MTY1LCJpYXQiOjE3Mjc1NzQyNjUsImp0aSI6ImNlNjc3MzQyNmEyZTQ2NDZiN2VjZTU5YTBkMjk3NjgyIiwidXNlcmlkIjoiWVdvOG51SmVwdlpDeGhoNiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImhlYXZ5Y3JlYW05MDkwQGljbG91ZC5jb20iLCJvcmlnX2lhdCI6MTcyNzU3NDI2NSwib3RwX2RldmljZV9pZCI6bnVsbH0.NdqAejoNjNRDi5DGmqIWJMZcFFc9cmDUmBRDBVbP-cE

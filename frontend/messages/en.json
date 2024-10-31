@@ -25,6 +25,10 @@
     "page": {
       "signOut": "Sign out...",
       "toMainPage": "To main page"
+    },
+    "errors": {
+      "badCredentials": "Bad credentials!",
+      "unknown": "Something went wrong..."
     }
   },
   "mainPage": {

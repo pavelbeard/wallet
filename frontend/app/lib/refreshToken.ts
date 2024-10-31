@@ -17,7 +17,7 @@ export default async function refreshToken(
   refreshTokenValue: string,
 ): Promise<RefreshToken> {
   try {
-    const response = await fetch(`${API_PATH}/api/stuff/refresh/`, {
+    const response = await fetch(`${API_PATH}/api/refresh/`, {
       method: "POST",
       headers: { Cookie: `__rclientid=${refreshTokenValue}` },
       credentials: "include",

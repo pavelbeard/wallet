@@ -1,4 +1,4 @@
-import { InputProps } from "@/app/lib/types";
+import { InputPropsWithRegister } from "@/app/lib/types";
 import { clsx } from "clsx";
 
 export default function EmailInput({
@@ -6,7 +6,9 @@ export default function EmailInput({
   name,
   id,
   labelText,
-}: InputProps) {
+  register,
+  ...rest
+}: InputPropsWithRegister & { [x:string]: any }) {
   return (
     <label className="flex flex-col" htmlFor={htmlFor}>
       <span className="pl-2 pb-1">{labelText}</span>
@@ -17,7 +19,8 @@ export default function EmailInput({
         )}
         type="email"
         id={id}
-        name={name}
+        {...register(name)}
+        {...rest}
       />
     </label>
   );

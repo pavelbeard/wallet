@@ -1,15 +1,21 @@
 import { z } from "zod";
 
 const SignInSchema = z.object({
-  email: z.string().email().min(3, { message: "Provide your email" }),
+  email: z.string().email({ message: "Provide your email!" }),
   password: z.string().min(1, { message: "Provide your password" }),
 });
+
+const enum SignUpSchemaSuperRefineErrors {
+  notUppercase = "notUppercase",
+  notLowercase = "notLowercase",
+  notSpecs = "notSpecs",
+}
 
 const SignUpSchema = z
   .object({
     email: z
       .string()
-      .email()
+      .email({ message: "Provide your email!" })
       .min(10, { message: "Provide your email! e.g: example@domain.com" }),
     password: z.string().min(8, { message: "Provide your password" }).max(20),
     password2: z.string(),
@@ -26,6 +32,7 @@ const SignUpSchema = z
 
     if (!containsUppercase(password)) {
       checkPassComplexity.addIssue({
+        path: [SignUpSchemaSuperRefineErrors.notUppercase],
         code: "custom",
         message: "Your password should contain at least 1 uppercase char!",
       });
@@ -33,6 +40,7 @@ const SignUpSchema = z
 
     if (!containsLowercase(password)) {
       checkPassComplexity.addIssue({
+        path: [SignUpSchemaSuperRefineErrors.notLowercase],
         code: "custom",
         message: "Your password should contain at least 1 lowercase char!",
       });
@@ -40,6 +48,7 @@ const SignUpSchema = z
 
     if (!containsSpecs(password)) {
       checkPassComplexity.addIssue({
+        path: [SignUpSchemaSuperRefineErrors.notSpecs],
         code: "custom",
         message:
           "Your password should contain at least 1 of those special chars: `!@#$%^&*()_\\-+=\\[\\]{};':\"\\\\|,.<>\\/?~",
@@ -47,4 +56,8 @@ const SignUpSchema = z
     }
   });
 
-export { SignInSchema, SignUpSchema };
+
+export type SignInValidator = z.infer<typeof SignInSchema>;
+export type SignUpValidator = z.infer<typeof SignUpSchema>;
+
+export { SignInSchema, SignUpSchema, SignUpSchemaSuperRefineErrors };

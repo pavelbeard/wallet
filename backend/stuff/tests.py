@@ -117,7 +117,7 @@ class StuffTests(APITestCase):
     # check_user
     def test_check_url_wallet_user_list(self):
         url = reverse('walletuser-list')
-        self.assertEqual(url, '/api/stuff/users/')
+        self.assertEqual(url, '/api/users/')
 
     def test_check_user_by_username(self):
         url = reverse('walletuser-check-user-by-username')

@@ -24,7 +24,7 @@ export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
   },
   google: async ({ account }: Provider): Promise<boolean | string> => {
     try {
-      const response = await fetch(`${API_PATH}/api/stuff/oauth2/signin_with_google/`, {
+      const response = await fetch(`${API_PATH}/api/oauth2/signin_with_google/`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ access_token: account?.access_token }),

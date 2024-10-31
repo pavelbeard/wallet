@@ -10,3 +10,8 @@ export type CustomMiddleware = (
 export type MiddlewareFactory = (
   middleware: CustomMiddleware,
 ) => CustomMiddleware;
+
+type Callback = () => void;
+export type Middleware = (
+  req: NextRequest, res: NextResponse, callback: Callback
+) => Promise<Response | NextResponse>

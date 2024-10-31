@@ -2,7 +2,7 @@
 
 import { OAUTH_LOGOS } from "@/app/components/auth/oauth-logos";
 import signInWithOauth from "@/app/lib/signInWithOauth";
-import { oauthProviders } from "@/auth";
+import { oauthProviders } from "@/auth.config";
 import { clsx } from "clsx";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -30,7 +30,8 @@ export default function OauthButtons() {
               "p-4 rounded-xl font-bold",
             )}
           >
-            {t("form.signInWith")} {provider.name} <span className="ml-2">{OAUTH_LOGOS[provider.name]}</span>
+            {t("form.signInWith")} {provider.name}{" "}
+            <span className="ml-2">{OAUTH_LOGOS[provider.name]}</span>
           </button>
         </form>
       ))}

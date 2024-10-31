@@ -26,6 +26,10 @@
     "page": {
       "signOut": "Cerrando sesión...",
       "toMainPage": "Al inicio"
+    },
+    "errors": {
+      "badCredentials": "Credentiales incorrectas!",
+      "unknown": "Algo ha pasado mal..."
     }
   },
   "mainPage": {

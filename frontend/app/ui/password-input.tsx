@@ -1,4 +1,4 @@
-import { InputProps } from "@/app/lib/types";
+import { InputPropsWithRegister } from "@/app/lib/types";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { clsx } from "clsx";
 import { useState } from "react";
@@ -8,7 +8,9 @@ export default function PasswordInput({
   name,
   id,
   labelText,
-}: InputProps) {
+  register,
+  ...rest
+}: InputPropsWithRegister & { [x:string]: any }) {
   const [revealed, setRevealed] = useState<boolean>();
 
   return (
@@ -21,7 +23,8 @@ export default function PasswordInput({
         )}
         type={revealed ? "text" : "password"}
         id={id}
-        name={name}
+        {...register(name)}
+        {...rest}
       />
       {revealed ? (
         <EyeSlashIcon
