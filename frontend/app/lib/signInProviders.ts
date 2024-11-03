@@ -19,18 +19,17 @@ type Handler = ({
 }: Provider) => Promise<boolean | string>;
 
 export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
-  credentials: async (): Promise<boolean | string> => {
+  credentials: async ({ user, account, profile, email, credentials }): Promise<boolean | string> => {
     return true;
   },
   google: async ({ account }: Provider): Promise<boolean | string> => {
     try {
-      const response = await fetch(`${API_PATH}/api/oauth2/signin_with_google/`, {
+      await fetch(`${API_PATH}/api/oauth2/signin_with_google/`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ access_token: account?.access_token }),
       });
 
-      const json = await response.json();
       return true;
     } catch (error) {
       console.error(error);

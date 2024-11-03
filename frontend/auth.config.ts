@@ -40,7 +40,7 @@ const providers = [
       return {
         access_token: access_token,
         refresh_token: refresh_token,
-      };
+      } as User;
     },
   }),
   Google({
@@ -62,7 +62,9 @@ const refresh = async (token: JWT) => {
   const refreshTokenExpiration = token?.refresh_token_exp as number;
   const dateNow = Date.now();
 
-  console.log(accessTokenExpiration);
+  // console.log('refresh() access token age: ', accessTokenExpiration);
+  // console.log('refresh() refresh token age: ', refreshTokenExpiration);
+  
 
   // if the refresh token is expired, the session is down.
   if (dateNow > refreshTokenExpiration * 1000) {
@@ -132,7 +134,7 @@ export const authConfig = {
       });
     },
     async jwt({ token, user, account }) {
-      if (user && account) {
+      if (user && account?.type !== "credentials") {
         const accessTokenMaxAge = account?.expires_in as number;
         const idTokenMaxAge = account?.expires_at as number;
 
@@ -149,11 +151,16 @@ export const authConfig = {
         const accessTokenMaxAge = user?.access_token?.maxAge as number;
         const refreshTokenMaxAge = user.refresh_token?.maxAge as number;
 
+        // console.log("if user (access token age): ", accessTokenMaxAge);
+        // console.log("if user (refresh token age): ", refreshTokenMaxAge);
+
         token.api_access_token = user.access_token?.value;
         token.access_token_exp = getCurrentEpochTime() + accessTokenMaxAge;
+        console.log(token.access_token_exp);
 
         token.api_refresh_token = user.refresh_token?.value;
         token.refresh_token_exp = getCurrentEpochTime() + refreshTokenMaxAge;
+        console.log(token.refresh_token_exp);
 
         token.provider = "credentials";
         return token;
@@ -170,6 +177,7 @@ export const authConfig = {
   providers,
 } satisfies NextAuthConfig;
 
+export const providersList: string[] = providers.map((provider) => provider.id);
 export const oauthProviders = providers.filter(
   (provider) => provider.id !== "credentials",
 );

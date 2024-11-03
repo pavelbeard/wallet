@@ -8,6 +8,9 @@ const nextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
+  experimental: {
+    swcTraceProfiling: true,
+  }
 };
 
 export default i18wrapper(nextConfig);

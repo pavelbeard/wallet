@@ -1,39 +1,52 @@
-import { useHeaderContext } from "@/app/components/header/header-provider";
 import NavBarSubMenuItem from "@/app/components/header/nav-bar-sub-menu-item";
-import type { NavBarItem, NavBarItemLevel } from "@/app/lib/types";
+import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
+import type { NavBarItem } from "@/app/lib/types";
 import { Link } from "@/i18n/routing";
 import { clsx } from "clsx";
 import { useLocale } from "next-intl";
-import { useId } from "react";
+import { useId, useState } from "react";
 
-type NavBarItemProps = NavBarItem & NavBarItemLevel;
+type NavBarItemProps = NavBarItem;
 
-export default function NavBarItem({ title, url, subMenu }: NavBarItemProps) {
+type PropsDesktop = NavBarItemProps & {
+  mouseEnter: () => void;
+  mouseLeave: () => void;
+  isVisible: boolean;
+};
+
+type MobileInteractProps = {
+  isActive: boolean;
+  hasNotActive: boolean;
+  onToggle: () => void;
+};
+
+type PropsMobile = NavBarItemProps & MobileInteractProps;
+
+const HoverUnderline = ({ isVisible }: { isVisible: boolean }) => (
+  <span
+    className={clsx(
+      isVisible ? "max-w-full" : "max-w-0",
+      "block h-[0.8px] bg-slate-800 transition-all duration-500",
+    )}
+  />
+);
+
+function NavBarItemDesktop({
+  mouseEnter,
+  mouseLeave,
+  title,
+  url,
+  subMenu,
+  isVisible,
+}: PropsDesktop) {
   const dropdownId = useId();
   const locale = useLocale();
-  const {
-    isDesktopScreen,
-    visibility,
-    changeVisibility,
-    isVisibleRest,
-    toggleVisibility,
-  } = useHeaderContext();
-  const isVisible = visibility(title);
 
-  const underline = (
-    <span
-      className={clsx(
-        isVisible ? "max-w-full" : "max-w-0",
-        "block h-[0.8px] bg-slate-800 transition-all duration-500",
-      )}
-    />
-  );
-
-  const desktop = (
+  return (
     <li
       className="px-2"
-      onMouseEnter={() => changeVisibility(title, true)}
-      onMouseLeave={() => changeVisibility(title, false)}
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
       id={dropdownId}
       data-dropdown="dropdown-desktop"
       data-dropdown-trigger="hover"
@@ -41,59 +54,111 @@ export default function NavBarItem({ title, url, subMenu }: NavBarItemProps) {
       {url ? (
         <Link className="text-lg font-bold" locale={locale} href={url}>
           {title}
-          {underline}
+          <HoverUnderline isVisible={isVisible} />
         </Link>
       ) : (
         <span className="text-lg block w-fit font-bold">
           {title}
-          {underline}
+          <HoverUnderline isVisible={isVisible} />
         </span>
       )}
       {subMenu && (
         <NavBarSubMenuItem
           parentId={dropdownId}
           parentTitle={title}
-          cb={toggleVisibility}
           subMenu={subMenu}
           isVisible={isVisible}
         />
       )}
     </li>
   );
+}
 
-  const mobile = !isVisible
-    ? isVisibleRest && (
-        <li
-          aria-hidden={isVisibleRest}
-          className="px-10"
-          onClick={() => toggleVisibility(title, true)}
+function NavBarItemMobile({
+  title,
+  url,
+  hasNotActive,
+  onToggle,
+}: PropsMobile) {
+  const dropdownId = useId();
+  const locale = useLocale();
+
+  if (!hasNotActive) return null;
+
+  return (
+    <li
+      className={clsx("px-8")}
+      data-testid={title}
+      onClick={onToggle}
+    >
+      {url ? (
+        <Link className="hover:text-gray-600" locale={locale} href={url}>
+          {title}
+        </Link>
+      ) : (
+        <button
+          className="hover:text-gray-600 text-lg font-bold"
+          id={dropdownId}
+          data-slide="slide-mobile"
+          data-slide-toggle="slide-btn"
+          type="button"
         >
-          {url ? (
-            <Link className="hover:text-gray-100" locale={locale} href={url}>
-              {title}
-            </Link>
-          ) : (
-            <button
-              className="hover:text-gray-100 text-lg font-bold"
-              id={dropdownId}
-              data-dropdown="dropdown-mobile"
-              data-dropdown-toggle="dropdown-btn"
-              type="button"
-            >
-              {title}
-            </button>
-          )}
-        </li>
-      )
-    : subMenu && (
-        <NavBarSubMenuItem
-          parentId={dropdownId}
-          parentTitle={title}
-          cb={toggleVisibility}
-          subMenu={subMenu}
-          isVisible={isVisible}
-        />
-      );
+          {title}
+        </button>
+      )}
+    </li>
+  );
+}
 
-  return isDesktopScreen ? desktop : mobile;
+export default function NavBarItem({
+  isActive,
+  hasNotActive,
+  onToggle,
+  title,
+  url,
+  subMenu,
+}: NavBarItemProps & MobileInteractProps) {
+  const dropdownSubmenuId = useId();
+  const isDesktop = useDesktopBreakpoint();
+  const [drilldownOn, setDrilldown] = useState(false);
+
+  return isDesktop ? (
+    <div data-type="desktop-item">
+      <NavBarItemDesktop
+        mouseEnter={() => setDrilldown(true)}
+        mouseLeave={() => setDrilldown(false)}
+        title={title}
+        url={url}
+        subMenu={subMenu}
+        isVisible={drilldownOn}
+      />
+    </div>
+  ) : (
+    <div data-type="mobile-item" data-testid="mobile-item">
+      {drilldownOn && subMenu ? (
+        <NavBarSubMenuItem
+          parentId={dropdownSubmenuId}
+          parentTitle={title}
+          callback={() => {
+            onToggle();
+            setDrilldown(false);
+          }}
+          subMenu={subMenu}
+          isVisible={drilldownOn}
+        />
+      ) : (
+        <NavBarItemMobile
+          isActive={isActive}
+          hasNotActive={hasNotActive}
+          title={title}
+          url={url}
+          subMenu={subMenu}
+          onToggle={() => {
+            onToggle();
+            setDrilldown(true);
+          }}
+        />
+      )}
+    </div>
+  );
 }

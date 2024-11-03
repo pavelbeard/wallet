@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import { UseFormRegister } from "react-hook-form";
-import { SignInSchema, SignUpSchema } from "./schemas.z";
 
 // style and ui
 export type InputProps = {
@@ -42,4 +41,11 @@ export type SideBarItem = {
   icon: ReactNode;
 };
 
+export type UserMenuItem = {
+  title: string;
+  url?: string;
+};
+
 // data
+
+export type ToggleActiveItem = (index: number) => void;

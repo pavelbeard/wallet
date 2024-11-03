@@ -1,6 +1,6 @@
 {
-    "cSpell.words": [
-        "Cartera",
-        "hookform"
-    ]
+  "cSpell.words": ["Cartera", "drilldown", "hookform", "testid", "zustand"],
+  "i18n-ally.localesPaths": ["./frontend/messages"], // E.g. "./messages"
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.translate.overrideExisting": true
 }

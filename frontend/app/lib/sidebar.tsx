@@ -5,11 +5,11 @@ export const sideMenu: SideBarItem[] = [
   {
     title: "Passwords",
     url: "/passwords",
-    icon: <KeyIcon className="size-6 mr-2 hover:text-black" />,
+    icon: <KeyIcon className="size-6 hover:text-black" />,
   },
   {
     title: "Cards",
     url: "/cards",
-    icon: <CreditCardIcon className="size-6 mr-2 hover:text-black" />,
+    icon: <CreditCardIcon className="size-6 hover:text-black" />,
   },
 ];

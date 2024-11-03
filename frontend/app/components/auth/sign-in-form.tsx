@@ -58,6 +58,7 @@ export default function SignInForm() {
           name="email"
           id="credentials-email"
           register={register}
+          autoComplete="email"
         />
         {errors.email?.message && (
           <p className="field-error">{errors.email.message}</p>
@@ -68,6 +69,7 @@ export default function SignInForm() {
           name="password"
           id="credentials-password"
           register={register}
+          autoComplete="password"
         />
         {errors.password?.message && (
           <p className="field-error">{errors.password.message}</p>

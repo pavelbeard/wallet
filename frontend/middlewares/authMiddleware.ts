@@ -1,14 +1,14 @@
 import { localizedRoute, localizedRoutes } from "@/app/lib/routeActions";
 import { auth } from "@/auth";
-import { authConfig } from "@/auth.config";
 import { CustomMiddleware } from "@/middlewares/types";
 import { AppRouteHandlerFnContext } from "@/node_modules/next-auth/lib/types";
 import {
   DEFAULT_SIGNED_IN_PATH,
   DEFAULT_SIGNED_OUT_PATH,
+  authRoutes,
   protectedRoutes,
+  publicRoutes,
 } from "@/routes";
-import NextAuth from "next-auth";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
 export default function authMiddleware(middleware: CustomMiddleware) {
@@ -24,18 +24,33 @@ export default function authMiddleware(middleware: CustomMiddleware) {
       const isProtectedRoute = (
         await localizedRoutes(protectedRoutes)
       ).includes(currentPath);
+      const isAuthRoute = (await localizedRoutes(authRoutes)).includes(
+        currentPath,
+      );
+      const isPublicRoute = (await localizedRoutes(publicRoutes)).includes(
+        currentPath,
+      );
 
       const signOutPath = await localizedRoute(DEFAULT_SIGNED_OUT_PATH);
       const signInPath = await localizedRoute(DEFAULT_SIGNED_IN_PATH);
 
       if (isProtectedRoute) {
+        console.log("is protected");
+
         if (isAuthenticated) {
+          console.log("is authenticated");
           return response;
         }
 
         return Response.redirect(new URL(signOutPath, req.nextUrl));
       } else if (isAuthenticated) {
-        return Response.redirect(new URL(signInPath, req.nextUrl));
+        if (isPublicRoute) {
+          return response;
+        }
+
+        if (isAuthRoute) {
+          return Response.redirect(new URL(signInPath, req.nextUrl));
+        }
       }
     })(request, event as AppRouteHandlerFnContext)) as NextResponse;
 

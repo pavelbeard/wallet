@@ -1,10 +1,15 @@
 /**
+ * Routes, which middleware should ignore by default
+ */
+export const publicRoutes: string[] = ["/"];
+
+/**
  * Routes, which middleware should protect by default
  */
 export const protectedRoutes: string[] = ["/dashboard"];
 
 /**
- * Routes, which middleware should ignore by default
+ * Routes, which middleware should ignore by default, but if you is authenticated - skip these routes
  */
 export const authRoutes: string[] = ["/auth/sign-in", "/auth/sign-up"];
 

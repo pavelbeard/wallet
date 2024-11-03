@@ -4,7 +4,6 @@ import { pick } from "lodash";
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Suspense } from "react";
 
 export default async function ErrorLayout({ children }: Props) {
   const locale = await getLocale();
@@ -15,18 +14,20 @@ export default async function ErrorLayout({ children }: Props) {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="favicon.ico" />
+        <script
+          data-meta="react-devtools/safari"
+          src="http://localhost:8097"
+        ></script>
       </head>
       <body>
-        <Suspense fallback={<p>...loading...</p>}>
-          <SessionProvider>
-            <NextIntlClientProvider
-              locale={locale}
-              messages={pick(messages, "error")}
-            >
-              {children}
-            </NextIntlClientProvider>
-          </SessionProvider>
-        </Suspense>
+        <SessionProvider>
+          <NextIntlClientProvider
+            locale={locale}
+            messages={pick(messages, "error")}
+          >
+            {children}
+          </NextIntlClientProvider>
+        </SessionProvider>
       </body>
     </html>
   );

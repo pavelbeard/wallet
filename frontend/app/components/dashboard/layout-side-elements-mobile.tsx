@@ -1,65 +1,57 @@
 "use client";
 
-import useBurgerMenu from "@/app/lib/hooks/useBurgerMenu";
+import SideBar from "@/app/components/dashboard/side-bar";
+import UserInfo from "@/app/components/user/user-info";
+import useDashboard from "@/app/lib/hooks/useDashboard";
+import useUser from "@/app/lib/hooks/useUser";
+import useUserMenu from "@/app/lib/hooks/useUserMenu";
 import { LayoutLogo } from "@/app/ui/layout-logo";
 import LogoHeader from "@/app/ui/logo-header";
+import { UserMenuMobile } from "@/app/ui/user-menu";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
-import { useEffect, useRef, useState } from "react";
-import UserInfo from "../user/user-info";
-import SideBar from "./side-bar";
 
 export default function LayoutSideElementsMobile() {
-  const animationRef = useRef<HTMLDivElement>(null);
-  const { isBurgerOpen, toggleBurgerMenu } = useBurgerMenu();
-  const [isAppeared, setAppeared] = useState(false);
-
-  // slide to right side bar (expand) animation (-50ms)
-  useEffect(() => {
-    if (isBurgerOpen) {
-      animationRef.current?.classList.add("animate-medium-slide-to-right");
-      const timer = setTimeout(() => setAppeared(true), 450);
-      return () => clearTimeout(timer);
-    }
-  }, [isBurgerOpen]);
-
-  // slide to left side bar (collapse) animations (-50ms)
-  useEffect(() => {
-    if (!isAppeared && isBurgerOpen) {
-      animationRef.current?.classList.remove("animate-medium-slide-to-right");
-      animationRef.current?.classList.add("animate-medium-slide-to-left");
-      const timer = setTimeout(() => toggleBurgerMenu(), 450);
-      return () => clearTimeout(timer);
-    }
-  }, [isAppeared]);
+  const user = useUser();
+  const { mobileRef, isAppeared, isBurgerOpen, toggleBurgerMenu } =
+    useDashboard();
+  const { isOpenMobile } = useUserMenu();
 
   return (
     <>
       {isBurgerOpen && (
         <div className="absolute z-10 grid grid-cols-[250px_1fr] w-full">
-          <div ref={animationRef} className="flex flex-col min-h-screen">
+          <aside ref={mobileRef} className="flex flex-col min-h-screen">
             <div className="p-4 bg-slate-100 drop-shadow-md shadow-black">
-              <XMarkIcon
-                className="size-6"
-                onClick={() => setAppeared(false)}
-              />
+              <button data-testid="burger-close-btn" onClick={toggleBurgerMenu}>
+                <XMarkIcon className="size-6" />
+              </button>
             </div>
             <LayoutLogo />
-            <UserInfo />
-            <SideBar />
-          </div>
+            {isOpenMobile ? (
+              <UserMenuMobile />
+            ) : (
+              <>
+                <UserInfo user={user} />
+                <SideBar />
+              </>
+            )}
+          </aside>
           {isAppeared && (
             <div
-              className="min-h-screen w-full bg-black/30"
-              onClick={() => setAppeared(false)}
+              data-testid="burger-close-layout-btn"
+              className="w-full bg-black/30"
+              onClick={toggleBurgerMenu}
             />
           )}
         </div>
       )}
 
-      <div className="lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black">
-        <Bars3Icon className="size-6" onClick={toggleBurgerMenu} />
+      <header className="lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black">
+        <button data-testid="burger-open-btn" onClick={toggleBurgerMenu}>
+          <Bars3Icon className="size-6" />
+        </button>
         <LogoHeader position="right" />
-      </div>
+      </header>
     </>
   );
 }

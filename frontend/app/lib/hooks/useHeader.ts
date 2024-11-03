@@ -1,12 +1,57 @@
+import useActiveMenuItem from "@/app/lib/hooks/useActiveMenuItem";
+import useBurgerMenu from "@/app/lib/hooks/useBurgerMenu";
+import {
+  useEffectOverflow,
+  useToggleOverflow,
+} from "@/app/lib/store/useOverflowControlStore";
+import useUserMenuMobileStore from "@/app/lib/store/useUserMenuStore";
 import { NavBarItems } from "@/app/lib/types";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function useHeader() {
   const t = useTranslations("header");
   const session = useSession();
+  const { isBurgerOpen, toggleBurgerMenu: toggleBM } = useBurgerMenu();
+  const { activeItem, handleToggle: toggleActiveItem } = useActiveMenuItem();
+  const isOpenMobile = useUserMenuMobileStore((state) => state.isOpenMobile);
+  const closeMobile = useUserMenuMobileStore((state) => state.closeMobile);
+  const toggleOverflow = useToggleOverflow();
 
+  const mobileRef = useRef<HTMLElement>(null); // for expand/collapse mobile side bar
+  const [isAppeared, setAppeared] = useState(false);
+  const [isDelayActive, setDelay] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    
+    if (isBurgerOpen) {
+      setDelay(true);
+      mobileRef.current?.classList.add("animate-medium-slide-in-right");
+      timer = setTimeout(() => setAppeared(true), 500);
+    } else {
+      setAppeared(false);
+      mobileRef.current?.classList.replace(
+        "animate-medium-slide-in-right",
+        "animate-medium-slide-out-right",
+      );
+      timer = setTimeout(() => setDelay(false), 450);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isBurgerOpen]);
+
+
+  useEffectOverflow();
+
+  const toggleBurgerMenu = () => {
+    toggleBM();
+
+    if (isOpenMobile) closeMobile();
+
+    toggleOverflow();
+  };
   const leftMenu: NavBarItems = useMemo(
     () => [
       {
@@ -28,7 +73,24 @@ export default function useHeader() {
           },
           {
             title: "Cards",
-            url: "/cards",
+            subMenu: [
+              {
+                title: "New card",
+                url: "/new-card",
+              },
+            ],
+          },
+          {
+            title: "About",
+          },
+        ],
+      },
+      {
+        title: "Seguridad",
+        subMenu: [
+          {
+            title: "Como nos preocupamos",
+            url: "/how-we-worry-about",
           },
         ],
       },
@@ -46,35 +108,21 @@ export default function useHeader() {
     } else {
       return [
         {
-          title: t('signIn'),
-          url: "/auth/sign-in"
-        }
+          title: t("signIn"),
+          url: "/auth/sign-in",
+        },
       ];
     }
   }, [t]);
 
-  const [titles, setTitles] = useState<Record<string, boolean>>(
-    Object.fromEntries(leftMenu.concat(rightMenu).map((i) => [i.title, false])),
-  );
-
-  const isVisible = useCallback(
-    (title: string) => {
-      return titles[title];
-    },
-    [titles],
-  );
-
-  const changeVisibility = useCallback((title: string, open: boolean) => {
-    setTitles((prevState) => {
-      let newState = { ...prevState };
-      newState = Object.fromEntries(
-        Object.entries(newState).map((i) => [i[0], false]),
-      );
-      newState[title] = open;
-
-      return newState;
-    });
-  }, []);
-
-  return { leftMenu, rightMenu, visibility: isVisible, changeVisibility };
+  return {
+    mobileRef,
+    isAppeared,
+    leftMenu,
+    rightMenu,
+    isBurgerOpen: isBurgerOpen || isDelayActive,
+    toggleBurgerMenu,
+    activeItem,
+    toggleActiveItem,
+  };
 }

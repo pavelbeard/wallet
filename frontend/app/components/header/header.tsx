@@ -1,48 +1,15 @@
 "use client";
 
-import { useHeaderContext } from "@/app/components/header/header-provider";
 import NavBarRoot from "@/app/components/header/nav-bar-root";
+import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
+import useHeader from "@/app/lib/hooks/useHeader";
 import LogoHeader from "@/app/ui/logo-header";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
-import { useEffect, useRef, useState } from "react";
 
-export default function Header() {
-  const {
-    leftMenu,
-    rightMenu,
-    isBurgerOpen,
-    toggleBurgerMenu,
-    isDesktopScreen,
-  } = useHeaderContext();
-  const animationRef = useRef<HTMLElement>(null);
-  const [isAppeared, setAppeared] = useState(false);
-  const [nextAnimationCollapseRight, setNextAnimation] = useState(false);
-
-  useEffect(() => {
-    let timer;
-
-    if (isBurgerOpen) {
-      setNextAnimation(true);
-      animationRef.current?.classList.add(
-        "animate-medium-slide-from-far-right-to-right",
-      );
-      timer = setTimeout(() => setAppeared(true), 500);
-    } else {
-      setAppeared(false);
-      animationRef.current?.classList.remove(
-        "animate-medium-slide-from-far-right-to-right",
-      );
-      animationRef.current?.classList.add(
-        "animate-medium-slide-from-right-to-far-right",
-      );
-      timer = setTimeout(() => setNextAnimation(false), 420);
-    }
-
-    return () => clearTimeout(timer);
-  }, [isBurgerOpen]);
-
-  const desktopHeader = (
+function DesktopHeader() {
+  const { leftMenu, rightMenu } = useHeader();
+  return (
     <div
       className={clsx(
         "grid relative grid-cols-3",
@@ -55,18 +22,36 @@ export default function Header() {
       <NavBarRoot menu={rightMenu} position="right" />
     </div>
   );
+}
 
-  const mobileHeader = (
+function MobileHeader() {
+  const {
+    mobileRef,
+    isAppeared,
+    leftMenu,
+    rightMenu,
+    isBurgerOpen,
+    toggleBurgerMenu,
+  } = useHeader();
+
+  return (
     <>
-      <aside className="flex items-center justify-between relative bg-slate-300 p-2 h-12">
+      <aside
+        data-type="header-mobile"
+        data-testid="header-mobile"
+        className="flex items-center justify-between relative bg-slate-300 p-2 h-12"
+      >
         <LogoHeader position="center" />
-        <Bars3Icon className="size-6" onClick={toggleBurgerMenu} />
+        <button data-testid="burger-menu-btn" onClick={toggleBurgerMenu}>
+          <Bars3Icon className="size-6" />
+        </button>
       </aside>
 
-      {(isBurgerOpen || nextAnimationCollapseRight) && (
+      {/* side bar */}
+      {isBurgerOpen && (
         <>
           {/* for tablets */}
-          <div className="hidden absolute top-0 z-10 w-full md:grid grid-cols-[1fr_280px]">
+          <div className="hidden absolute top-0 z-10 w-full md:grid grid-cols-[1fr_280px] min-h-screen">
             {isAppeared && (
               <div
                 className="min-h-screen w-full bg-black/30"
@@ -74,8 +59,9 @@ export default function Header() {
               />
             )}
             <aside
-              ref={animationRef}
-              className="flex flex-col min-h-screen w-full bg-slate-300"
+              data-type="header-expanded-md"
+              ref={mobileRef}
+              className="flex flex-col min-h-screen w-full bg-gray-100"
             >
               <div className="flex items-center justify-between p-2">
                 <LogoHeader position="center" />
@@ -87,24 +73,33 @@ export default function Header() {
 
           {/* for smartphone screens */}
           <aside
+            data-type="header-expanded-sm"
             className={clsx(
-              "md:hidden absolute top-0 z-10 flex flex-col w-full bg-slate-300 min-h-[200vh]",
+              "md:hidden absolute top-0 z-10 grid grid-rows-[auto_1fr] overflow-hidden w-full bg-gray-100",
             )}
           >
             <div className="flex items-center justify-between p-2">
               <LogoHeader position="center" />
               <XMarkIcon className="size-6" onClick={toggleBurgerMenu} />
             </div>
-            <NavBarRoot menu={leftMenu} position="center" />
+            <NavBarRoot menu={leftMenu} position="left" />
           </aside>
         </>
       )}
     </>
   );
+}
 
-  return (
-    <header className="w-full lg:py-4 lg:px-12">
-      {isDesktopScreen ? desktopHeader : mobileHeader}
+export default function Header() {
+  const isDesktop = useDesktopBreakpoint();
+
+  return isDesktop ? (
+    <header className="w-full py-4 px-12">
+      <DesktopHeader />
+    </header>
+  ) : (
+    <header className="w-full">
+      <MobileHeader />
     </header>
   );
 }

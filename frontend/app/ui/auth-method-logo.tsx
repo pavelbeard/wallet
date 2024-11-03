@@ -1,11 +1,16 @@
 import wallet from "@/app/assets/wallet.svg";
 import { OAUTH_LOGOS } from "@/app/components/auth/oauth-logos";
+import { providersList } from "@/auth.config";
+import clsx from "clsx";
 import Image from "next/image";
 import { ReactNode } from "react";
 
-function AbsoluteLayout({ children }: { children: ReactNode }) {
+function AbsoluteLayout({ children, position }: { children: ReactNode, position: string }) {
   return (
-    <div className="absolute top-12 left-10 size-6 flex justify-center items-center rounded-full bg-slate-300">
+    <div className={clsx(
+      "absolute size-6 flex justify-center items-center rounded-full bg-slate-300",
+      position, 
+    )}>
       {children}
     </div>
   );
@@ -13,17 +18,24 @@ function AbsoluteLayout({ children }: { children: ReactNode }) {
 
 function CarteraAuthMethodLogo() {
   return (
-    <AbsoluteLayout>
+    <AbsoluteLayout position="top-12 left-10">
       <Image src={wallet} width={20} height={20} alt="auth-method-logo" />
     </AbsoluteLayout>
   );
 }
 
 function OauthAuthMethodLogo({ provider }: { provider: string }) {
-  return <AbsoluteLayout>{OAUTH_LOGOS[provider]}</AbsoluteLayout>;
+  return <AbsoluteLayout position="top-8 left-6 lg:top-12 lg:left-10">{OAUTH_LOGOS[provider]}</AbsoluteLayout>;
 }
 
-export const AUTH_METHOD_LOGO: { [x: string]: ReactNode } = {
-  credentials: <CarteraAuthMethodLogo />,
-  google: <OauthAuthMethodLogo provider="Google" />,
+type Props = {
+  provider: (typeof providersList)[number];
 };
+
+export default function AuthMethodLogo({ provider }: Props) {
+  if (provider == "credentials") {
+    return <CarteraAuthMethodLogo />;
+  }
+
+  return <OauthAuthMethodLogo provider={provider} />;
+}

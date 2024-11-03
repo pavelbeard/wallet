@@ -19,5 +19,6 @@ export default function useBurgerMenu() {
     return {
         isBurgerOpen,
         toggleBurgerMenu,
+        setIsBurgerOpen // in very rare cases it need to use
     }
 }

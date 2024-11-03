@@ -5,6 +5,7 @@ export function LayoutLogo() {
   return (
     <div
       className={clsx(
+        "flex items-center justify-start",
         "p-4 border-b-[1px] border-gray-300 bg-slate-100 drop-shadow-md shadow-black",
         "lg:border-r-[1px]",
       )}

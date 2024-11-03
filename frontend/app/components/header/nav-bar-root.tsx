@@ -1,4 +1,5 @@
 import NavBarItem from "@/app/components/header/nav-bar-item";
+import useHeader from "@/app/lib/hooks/useHeader";
 import { NavBarItems } from "@/app/lib/types";
 import { clsx } from "clsx";
 
@@ -9,10 +10,12 @@ export default function NavBarRoot({
   menu: NavBarItems;
   position: "left" | "right" | "center";
 }) {
+  const { activeItem, toggleActiveItem } = useHeader();
+
   return (
     <nav
       className={clsx(
-        "max-lg:border-t-[1px] border-slate-800",
+        "max-lg:h-screen",
         position !== "center"
           ? position == "left"
             ? "justify-self-start"
@@ -21,10 +24,12 @@ export default function NavBarRoot({
       )}
     >
       <ul className="pt-4 flex flex-col lg:flex-row lg:pt-0 gap-2">
-        {menu.map((navBarItem) => (
+        {menu.map((navBarItem, index) => (
           <NavBarItem
             key={navBarItem.title}
-            level={0}
+            isActive={activeItem == index}
+            hasNotActive={activeItem == null}
+            onToggle={() => toggleActiveItem(index)}
             title={navBarItem.title}
             url={navBarItem.url}
             subMenu={navBarItem.subMenu}

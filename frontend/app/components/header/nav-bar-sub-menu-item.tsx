@@ -1,8 +1,5 @@
-import {
-  ToggleVisibilityMobile,
-  useHeaderContext,
-} from "@/app/components/header/header-provider";
-import { NavBarItem, NavBarItems } from "@/app/lib/types";
+import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
+import { NavBarItem } from "@/app/lib/types";
 import Underline from "@/app/ui/underline";
 import { Link } from "@/i18n/routing";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
@@ -12,52 +9,50 @@ import { useEffect, useRef, useState } from "react";
 
 type Props = {
   parentId: string;
-  subMenu: NavBarItems;
+  subMenu: NavBarItem[];
   isVisible: boolean;
   parentTitle: string;
-  cb: ToggleVisibilityMobile;
+  callback?: () => void;
 };
 
-export default function NavBarSubMenuItem({
+function UnorderedList({
   parentId,
-  subMenu,
   isVisible,
-  parentTitle,
-  cb,
-}: Props) {
+  subMenu,
+}: {
+  parentId: string;
+  isVisible: boolean;
+  subMenu: NavBarItem[];
+}) {
   const animationRef = useRef<HTMLUListElement>(null);
-  const { isDesktopScreen } = useHeaderContext();
   const locale = useLocale();
   const [isAppeared, setAppeared] = useState(false);
-  // it needs for set a wait after closing the expanded menu
-  const [nextAnimationSlideUp, setNextAnimation] = useState(false);
+  const [nextAnimation, setNextAnimation] = useState(false); // it needs for set a wait after closing the expanded menu
 
   useEffect(() => {
+    console.log('is calling?');
+    
     let timer;
 
     if (isVisible) {
-      // set next animation state (slide-up) as true
-      setNextAnimation(true);
+      setNextAnimation(true); // set next animation state (slide-up) as true
       animationRef.current?.classList.add("animate-slide-down");
       timer = setTimeout(() => setAppeared(true), 280);
     } else {
-      // clear appeared state
-      setAppeared(false);
-      // set animation slide up (collapse)
-      animationRef.current?.classList.remove("animate-slide-down");
-      animationRef.current?.classList.add("animate-slide-up");
+      setAppeared(false); // clear appeared state
+      animationRef.current?.classList.replace("animate-slide-down", "animate-slide-up"); // set animation slide up (collapse)
       timer = setTimeout(() => setNextAnimation(false), 230);
     }
 
     return () => clearTimeout(timer);
   }, [isVisible]);
 
-  const unorderedList = (
+  return (
     <ul
       ref={animationRef}
       aria-labelledby={parentId}
       className={clsx(
-        isVisible || nextAnimationSlideUp
+        isVisible || nextAnimation
           ? [
               "h-80",
               "lg:absolute lg:top-0 lg:left-0 lg:w-full lg:mt-8 lg:pt-12",
@@ -70,7 +65,7 @@ export default function NavBarSubMenuItem({
       {isAppeared &&
         subMenu.map((item: NavBarItem) => (
           <li
-            className="animate-short-slide-to-right lg:pl-2 w-80"
+            className="animate-short-slide-out-right lg:pl-2 w-fit lg:w-52"
             key={item.title}
           >
             <span className="py-2 font-bold lg:text-lg">{item.title}</span>
@@ -79,7 +74,7 @@ export default function NavBarSubMenuItem({
                 item.url ? (
                   <li
                     key={item.title}
-                    className="animate-short-slide-to-right w-fit"
+                    className="animate-short-slide-out-right w-fit"
                   >
                     <Link className="group" locale={locale} href={item.url}>
                       {item.title}
@@ -100,27 +95,40 @@ export default function NavBarSubMenuItem({
         ))}
     </ul>
   );
+}
 
-  const desktop = <div>{unorderedList}</div>;
-  const mobile = (
-    <>
+export default function NavBarSubMenuItem({
+  parentId,
+  subMenu,
+  isVisible,
+  parentTitle,
+  callback,
+}: Props) {
+  const isDesktop = useDesktopBreakpoint();
+  return isDesktop ? (
+    <div id="dropdown-desktop" className="pl-8">
+      <UnorderedList
+        parentId={parentId}
+        subMenu={subMenu}
+        isVisible={isVisible}
+      />
+    </div>
+  ) : (
+    <div id="slide-mobile" className="animate-slide pl-8">
       <button
-        onClick={() => cb(parentTitle, false)}
-        className="pb-2 flex items-center hover:text-gray-100"
+        data-type="slide-submenu-mobile"
+        data-testid="slide-submenu-mobile"
+        onClick={callback}
+        className="pb-2 flex items-center hover:text-gray-600"
       >
         <ArrowLeftIcon className="size-6" />
         <span className="ml-2 font-bold text-lg">{parentTitle}</span>
       </button>
-      {unorderedList}
-    </>
-  );
-
-  return (
-    <div
-      id="dropdown"
-      className={clsx(!isDesktopScreen && "animate-slide", "pl-8")}
-    >
-      {isDesktopScreen ? desktop : mobile}
+      <UnorderedList
+        parentId={parentId}
+        subMenu={subMenu}
+        isVisible={isVisible}
+      />
     </div>
   );
 }
