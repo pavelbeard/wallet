@@ -17,7 +17,8 @@ export default function SideBar() {
     <aside
       className={clsx(
         "p-4 border-gray-300 bg-slate-100 drop-shadow-md shadow-black",
-        "lg:border-r-[1px]",
+        "dark:bg-slate-800 dark:text-gray-100",
+        "lg:border-r-[1px] dark:border-slate-600",
         "max-lg:flex-1",
       )}
     >
@@ -28,7 +29,7 @@ export default function SideBar() {
               key={title}
               className={clsx(
                 "group p-2",
-                "hover:bg-white hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
+                "hover:bg-white dark:hover:bg-slate-600 hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
               )}
             >
               <Link className="flex items-center gap-x-2" locale={locale} href={url}>
@@ -41,7 +42,7 @@ export default function SideBar() {
           <li
             className={clsx(
               "group p-2",
-              "hover:bg-white hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
+              "hover:bg-white dark:hover:bg-slate-600 hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
             )}
           >
             <button
@@ -53,7 +54,7 @@ export default function SideBar() {
               }
               type="button"
             >
-              <ArrowLeftStartOnRectangleIcon className="size-6" />
+            <ArrowLeftStartOnRectangleIcon className="size-6" />
               {t("signOut")}
             </button>
           </li>

@@ -19,6 +19,7 @@ export default function PasswordInput({
       <input
         className={clsx(
           "p-4 outline-gray-500 outline-2 border-slate-700 border-[1px]",
+          "dark:outline-gray-100dark:border-gray-300 dark:text-slate-800",
           "rounded-xl",
         )}
         type={revealed ? "text" : "password"}
@@ -29,12 +30,18 @@ export default function PasswordInput({
       {revealed ? (
         <EyeSlashIcon
           onClick={() => setRevealed(false)}
-          className="size-6 hover:stroke-2 absolute right-2 translate-y-[185%]"
+          className={clsx(
+            "size-6 transition-all hover:scale-110 absolute right-2 translate-y-[185%]",
+            "dark:text-slate-800"
+          )}
         />
       ) : (
         <EyeIcon
           onClick={() => setRevealed(true)}
-          className="size-6 hover:stroke-2 absolute right-2 translate-y-[185%]"
+          className={clsx(
+            "size-6 transition-all hover:scale-110 absolute right-2 translate-y-[185%]",
+            "dark:text-slate-800"
+          )}
         />
       )}
     </label>

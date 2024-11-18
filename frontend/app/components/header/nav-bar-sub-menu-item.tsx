@@ -7,6 +7,8 @@ import { clsx } from "clsx";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import "./header-animations.css";
+
 type Props = {
   parentId: string;
   subMenu: NavBarItem[];
@@ -30,17 +32,15 @@ function UnorderedList({
   const [nextAnimation, setNextAnimation] = useState(false); // it needs for set a wait after closing the expanded menu
 
   useEffect(() => {
-    console.log('is calling?');
-    
     let timer;
 
     if (isVisible) {
       setNextAnimation(true); // set next animation state (slide-up) as true
-      animationRef.current?.classList.add("animate-slide-down");
+      animationRef.current?.classList.add("slide-down");
       timer = setTimeout(() => setAppeared(true), 280);
     } else {
       setAppeared(false); // clear appeared state
-      animationRef.current?.classList.replace("animate-slide-down", "animate-slide-up"); // set animation slide up (collapse)
+      animationRef.current?.classList.replace("slide-down", "slide-up"); // set animation slide up (collapse)
       timer = setTimeout(() => setNextAnimation(false), 230);
     }
 
@@ -54,10 +54,11 @@ function UnorderedList({
       className={clsx(
         isVisible || nextAnimation
           ? [
-              "h-80",
-              "lg:absolute lg:top-0 lg:left-0 lg:w-full lg:mt-8 lg:pt-12",
+              "h-80 w-full",
+              "lg:absolute lg:top-0 lg:left-0 lg:w-full lg:mt-10 lg:pt-12",
               "lg:flex lg:bg-slate-300 lg:px-4 lg:pb-4 lg:z-[-1]",
               "lg:rounded-b-[32px]",
+              "dark:lg:bg-slate-800",
             ]
           : "hidden h-0",
       )}
@@ -119,7 +120,7 @@ export default function NavBarSubMenuItem({
         data-type="slide-submenu-mobile"
         data-testid="slide-submenu-mobile"
         onClick={callback}
-        className="pb-2 flex items-center hover:text-gray-600"
+        className="pb-2 flex items-center hover:text-gray-600 dark:hover:text-gray-200"
       >
         <ArrowLeftIcon className="size-6" />
         <span className="ml-2 font-bold text-lg">{parentTitle}</span>

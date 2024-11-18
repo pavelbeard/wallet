@@ -9,17 +9,17 @@
 
 .container-bg {
   /*@apply bg-gradient-to-b from-cyan-300 via-sky-500 to-blue-500;*/
-  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-sky-300;
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-sky-300 dark:from-slate-700 dark:via-gray-600 dark:to-zinc-400 dark:text-gray-100;
 }
 
 .auth-bg {
   /*@apply bg-gradient-to-b from-slate-300 via-slate-400 to-slate-500;*/
-  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-slate-300;
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-slate-300 dark:from-slate-900 dark:via-gray-800 dark:to-zinc-600 dark:text-gray-100;
 }
 
 .dashboard-bg {
   /*@apply bg-gradient-to-b from-green-300/80 via-emerald-300/80 to-emerald-500/80;*/
-  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-green-300;
+  @apply bg-gradient-to-b from-slate-50 via-slate-100 to-green-300 dark:from-slate-800 dark:via-gray-800 dark:to-emerald-900 dark:text-gray-100;
 }
 
 .error-bg {
@@ -41,6 +41,10 @@
 
 .auth-question {
   @apply hover:text-slate-600;
+}
+
+.hover-avatar {
+  @apply hover:scale-110 transition-all hover:duration-300 hover:ease-in-out
 }
 
 @layer utilities {

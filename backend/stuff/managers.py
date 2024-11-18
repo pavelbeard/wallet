@@ -1,9 +1,8 @@
+from abstract.managers import AbstractManager
 from django.apps import apps
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
-
-from abstract.managers import AbstractManager
+from django.utils.translation import gettext_lazy as _
 
 
 class WalletUserManager(BaseUserManager, AbstractManager):

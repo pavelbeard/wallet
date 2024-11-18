@@ -10,7 +10,11 @@ export default function Submit({
 }: Props) {
   return (
     <button
-      className={clsx(color, "text-white p-4 rounded-xl font-bold")}
+      className={clsx(
+        color,
+        "text-white p-4 rounded-xl font-bold",
+        "dark:text-slate-800 dark:bg-gray-100",
+      )}
       type="submit"
       disabled={disabled}
     >

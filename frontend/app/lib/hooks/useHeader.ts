@@ -4,7 +4,7 @@ import {
   useEffectOverflow,
   useToggleOverflow,
 } from "@/app/lib/store/useOverflowControlStore";
-import useUserMenuMobileStore from "@/app/lib/store/useUserMenuStore";
+import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
 import { NavBarItems } from "@/app/lib/types";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
@@ -15,8 +15,8 @@ export default function useHeader() {
   const session = useSession();
   const { isBurgerOpen, toggleBurgerMenu: toggleBM } = useBurgerMenu();
   const { activeItem, handleToggle: toggleActiveItem } = useActiveMenuItem();
-  const isOpenMobile = useUserMenuMobileStore((state) => state.isOpenMobile);
-  const closeMobile = useUserMenuMobileStore((state) => state.closeMobile);
+  const isOpenMobile = useUserMenuStore((state) => state.isOpenMobile);
+  const closeMobile = useUserMenuStore((state) => state.closeMobile);
   const toggleOverflow = useToggleOverflow();
 
   const mobileRef = useRef<HTMLElement>(null); // for expand/collapse mobile side bar

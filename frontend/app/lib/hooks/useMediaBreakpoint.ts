@@ -15,7 +15,7 @@ export default function useMediaBreakpoint(width: number) {
     }
 
     return () => media.removeEventListener("change", updateTarget);
-  }, []);
+  }, [updateTarget, width]);
 
   return targetReached;
 }

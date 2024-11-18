@@ -42,12 +42,24 @@
       "toDashboard": "To Dashboard"
     }
   },
+  "dashboard": {
+    "title": "Cartera | Dashboard",
+    "description": "Cards, passwords, total information"
+  },
+  "profile": {
+    "title": "Cartera | Profile",
+    "description": "User profile"
+  },
   "header": {
     "why": "Why is Cartera?",
     "advantages": "Advantages",
     "signIn": "Sign in"
   },
   "sidebar": {
+    "signOut": "Sign out"
+  },
+  "userMenu": {
+    "profile": "Profile",
     "signOut": "Sign out"
   },
   "error": {

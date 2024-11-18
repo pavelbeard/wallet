@@ -6,11 +6,11 @@ from . import models
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Card
-        fields = '__all__'
+        fields = "__all__"
         depth = 2
 
 
 class StrictCardSerializer(CardSerializer):
     class Meta:
         model = models.Card
-        fields = '__all__'
+        fields = "__all__"

@@ -28,14 +28,14 @@ export default async function Home({ params: { locale } }: LocaleProps) {
   return (
     <div className="flex flex-col items-center h-[800px] mt-12 w-full">
       <section className="flex flex-col items-center gap-4 max-w-[300px] lg:max-w-[600px]">
-        <h1 className="text-xl lg:text-3xl text-slate-800 font-bold text-center">
+        <h1 className="text-xl lg:text-3xl text-slate-800 dark:text-gray-100 font-bold text-center">
           {t("page.title")}
         </h1>
-        <p className="text-xl lg:text-3xl text-slate-800 font-bold text-center">
+        <p className="text-xl lg:text-3xl text-slate-800 dark:text-gray-100 font-bold text-center">
           {t("page.appDescription")}
         </p>
       </section>
-      <Card>
+      <Card className="p-6 my-12 w-3/4 lg:w-1/3">
         <div className="flex flex-col lg:flex-row gap-4 lg:justify-center p-4">
           {session?.expires ? (
             <Link className="main-links group" locale={locale} href={"/dashboard"}>

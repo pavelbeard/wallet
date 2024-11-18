@@ -1,10 +1,15 @@
+import clsx from "clsx";
 import React from "react";
 
-type CardProps = { children: React.ReactNode };
+type CardProps = { children: React.ReactNode, className?: string };
 
-export default function Card({ children }: CardProps) {
+export default function Card({ children, className }: CardProps) {
   return (
-    <div className="shadow-black drop-shadow-2xl bg-white rounded-xl p-6 my-12 w-3/4 lg:w-1/3">
+    <div className={clsx(
+      className,
+      "shadow-black drop-shadow-lg lg:drop-shadow-2xl bg-white rounded-xl",
+      "dark:bg-slate-800 dark:text-gray-100 dark:border-slate-600 dark:border-[1px]"
+    )}>
       {children}
     </div>
   );

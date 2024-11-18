@@ -20,7 +20,7 @@ export default function Page() {
   });
 
   return (
-    <Card>
+    <Card className="p-6 my-12 w-3/4 lg:w-1/3">
       <div className="p-6 flex justify-center">{t("page.signOut")}</div>
     </Card>
   );

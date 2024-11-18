@@ -1,140 +1,105 @@
 # Create your views here.
 import logging
-import re
 import sys
-import uuid
 from typing import Type
 
-import requests
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from dj_rest_auth.registration import views as dj_rest_auth_views
-from django.conf import settings
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
-from django_otp import devices_for_user
-from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
-from rest_framework import status, permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import TokenError, AuthenticationFailed
+from rest_framework_simplejwt.exceptions import AuthenticationFailed, TokenError
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from . import models, serializers, stuff_logic
 from . import permissions as stuff_permissions
-from . import serializers, models, stuff_logic
-from .stuff_logic import get_custom_jwt, signin_logic
-from .utils import User, LOGIN_TYPE
+from .controller import Auth, Oauth2Auth, TOTPDevice, WalletUserController
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class AuthViewSet(viewsets.ViewSet):
-    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def signup(self, request):
         try:
-            username = request.data.get('username')
-            if username is not None and '@' in username:
-                request.data['email'] = request.data['username']
-                del request.data['username']
-            serializer = serializers.SignupSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            instance = serializer.save()
-            if not instance:
-                return AuthenticationFailed(_('Failed to create signup!'))
-
-            user = User.objects.filter(email=instance.email).first()
-            # stuff_logic.verify_email_logic(request, user)
-
-            return Response({"detail": _("You have been registered successfully!")}, status=status.HTTP_201_CREATED)
-        except ValidationError:
-            logger.error(_('Failed to create wallet user'), exc_info=True)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
-    def signin(self, request):
-        try:
-            serializer = serializers.SigninSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            # The result is None and with an error data or Response 200 with a success message
-            result, data = stuff_logic.signin_logic(request, serializer.validated_data)
-
-            if result is None:
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
+            result = Auth.sign_up(request=request)
             return result
-        except AuthenticationFailed:
-            return Response({'error': _('Bad credentials.')}, status=status.HTTP_400_BAD_REQUEST)
-        except ValidationError:
-            logger.error(_('Failed to sign in user'), exc_info=True)
+        except TypeError as e:
+            logger.error(msg=e.args[0], exc_info=True)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.error(_('Something went wrong...'), exc_info=True)
+        except Exception:
+            logger.error(msg=_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['POST'])
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    def signin(self, request):
+        try:
+            result = Auth.sign_in(request=request)
+            return result
+        except AuthenticationFailed as e:
+            logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                {"error": _("Bad credentials.")}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except ValidationError:
+            logger.error(_("Failed to sign in user"), exc_info=True)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=["POST"])
     def signout(self, request):
         try:
             # Push out the user from the system.
             return stuff_logic.signout_logic(request)
         except TokenError:
-            logger.exception(_('Token is blacklisted'), exc_info=True)
-            return JsonResponse({'error': _('Token is blacklisted')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception(_("Token is blacklisted"), exc_info=True)
+            return JsonResponse(
+                {"error": _("Token is blacklisted")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class OAuth2ViewSet(viewsets.ViewSet,  dj_rest_auth_views.SocialLoginView):
+
+class OAuth2ViewSet(viewsets.ViewSet, dj_rest_auth_views.SocialLoginView):
     adapter_class: Type[OAuth2Adapter]
 
-    @action(detail=False, methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def signin_with_google(self, request, *args, **kwargs):
         self.adapter_class = GoogleOAuth2Adapter
         try:
             response = super().post(request, *args, **kwargs)
-            response_user_data = response.data.get('user')
-            user = User.objects.get(pk=response_user_data.get('pk'))
-            if user.is_oauth_user is not True:
-                user.is_oauth_user = True
-                user.is_email_verified = True
-                user.save()
-
-            result, data = stuff_logic.signin_logic(request=request, login_type=LOGIN_TYPE.OAUTH2)
-            if result is None:
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
+            result = Oauth2Auth.signin_with_google(request=request, response=response)
             return result
-        except Exception as e:
-            logger.error(_('Something went wrong...'), exc_info=True)
+        except TypeError as e:
+            logger.error(msg=e.args[0], exc_info=True)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = serializers.CookieTokenRefreshSerializer
 
     def finalize_response(self, request, response, *args, **kwargs):
-        if response.data.get('refresh') and response.status_code == status.HTTP_200_OK:
-            response.set_cookie(
-                key=settings.SIMPLE_JWT['AUTH_ACCESS_COOKIE'],
-                value=response.data['access'],
-                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
-                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
-            )
-            response.set_cookie(
-                key=settings.SIMPLE_JWT['AUTH_REFRESH_COOKIE'],
-                value=response.data['refresh'],
-                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
-            )
-
-            del response.data['refresh']
+        if response.data.get("refresh") and response.status_code == status.HTTP_200_OK:
+            auth_response = stuff_logic.set_auth_cookies(response=response, jwt_tokens={
+                "access": response.data["access"],
+                "refresh": response.data["refresh"]
+            })
+            del auth_response.data["refresh"]
 
         if response.status_code == status.HTTP_401_UNAUTHORIZED:
-            response.data['error'] = _('Token is blacklisted.')
+            response.data["error"] = _("Token is blacklisted.")
 
         return super().finalize_response(request, response, *args, **kwargs)
 
@@ -142,141 +107,107 @@ class CookieTokenRefreshView(TokenRefreshView):
 class WalletUserViewSet(viewsets.ModelViewSet):
     queryset = models.WalletUser.objects.all()
     serializer_class = serializers.WalletUserSerializer
-    lookup_field = 'public_id'
+    lookup_field = "public_id"
 
-    @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
-    def check_user_by_username(self, request, **kwargs):
-        param = request.query_params.get('username')
-        if not param:
-            return Response(
-                data={'error': _('Please provide username in query params')},
-                status=status.HTTP_400_BAD_REQUEST
+    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    def check_user_by_username(self, request):
+        try:
+            result = WalletUserController.check_user_by_username(
+                request=request, qs=self.queryset
             )
-        user = get_object_or_404(self.get_queryset(), username=param)
-        data = serializers.WalletUserSerializer(user).data
-        return Response(data, status=status.HTTP_200_OK)
+            return result
+        except TypeError:
+            return Response(
+                data={"error": _("Please provide username in query params")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
     def check_user_by_email(self, request, **kwargs):
-        param = request.query_params.get('email')
-        if not param:
-            return Response(
-                data={'error': _('Please provide email in query params')},
-                status=status.HTTP_400_BAD_REQUEST
+        try:
+            result = WalletUserController.check_user_by_email(
+                request=request, qs=self.queryset
             )
-        user = get_object_or_404(self.get_queryset(), email=param)
-        data = serializers.WalletUserSerializer(user).data
-        return Response(data, status=status.HTTP_200_OK)
+            return result
+        except TypeError:
+            return Response(
+                data={"error": _("Please provide email in query params")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TwoFactorAuthViewSet(viewsets.ViewSet):
-    @action(detail=False, methods=['GET'])
-    def create_totp_device(self, request, **kwargs):
+    @action(detail=False, methods=["POST"])
+    def create_totp_device(self, request):
         """Set up a new TOTP device."""
         try:
-            # new response
-            response = HttpResponse()
-            # configure device
-            user = request.user
-            device = stuff_logic.get_user_totp_device(user)
-            if not device:
-                device = user.totpdevice_set.create(confirmed=False)
-            url = device.config_url
-            # create qr
-            two_fa_img = stuff_logic.generate_2fa_key_in_qr_code(url)
-            # use it in response
-            response.headers['Content-Type'] = 'multipart/mixed; boundary=boundary'
-            two_fa_img.save(response, "PNG")
-            # user has enable 2fa
-            user.is_two_factor_enabled = True
-            user.save()
-            # last preparations for the response
-            response.status_code = status.HTTP_200_OK
-            # 2fa configuration key is necessary too
-            two_fa_config_key = re.findall(r"secret=(.*)&algorithm", url)[0]
-            response.data = two_fa_config_key
-            return response
-        except Exception as e:
-            logger.exception(_('Something went wrong...'), exc_info=True)
+            result = TOTPDevice.create_totp_device(request=request)
+            return result
+        except Exception:
+            logger.exception(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['POST'])
-    def verify_totp_device(self, request, **kwargs):
+    @action(detail=False, methods=["POST"])
+    def verify_totp_device(self, request):
         """Verify/enable a TOTP device."""
         try:
-            token = request.data.get('token')
-            if not token:
-                return Response({'error': _('Token is missing.')}, status=status.HTTP_400_BAD_REQUEST)
-
-            user = request.user
-            device = stuff_logic.get_user_totp_device(user)
-            if not device is None and device.verify_token(token=token):
-                if not device.confirmed:
-                    device.confirmed = True
-                    device.save()
-                token = stuff_logic.get_custom_jwt(user, device)
-                return Response({'access': token}, status=status.HTTP_200_OK)
-            return Response({'error': _('Invalid TOTP token.')}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.exception(_('Something went wrong...'), exc_info=True)
+            result = TOTPDevice.verify_totp_device(request=request)
+            return result
+        except TypeError:
+            return Response(
+                {"error": _("Invalid TOTP token.")}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception:
+            logger.exception(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['GET'], permission_classes=[
-        permissions.IsAuthenticated,
-        stuff_permissions.IsOtpVerified
-    ])
-    def create_backup_tokens(self, request, **kwargs):
+    @action(
+        detail=False,
+        methods=["POST"],
+        permission_classes=[
+            permissions.IsAuthenticated,
+            stuff_permissions.IsOtpVerified,
+        ],
+    )
+    def create_backup_tokens(self, request):
         try:
-            number_of_codes = 12
-            device = stuff_logic.get_user_static_device(request.user)
-            if not device:
-                device = StaticDevice.objects.create(user=request.user, name="Static")
-
-            device.token_set.all().delete()
-            tokens = []
-            for i in range(number_of_codes):
-                token = StaticToken.random_token()
-                device.token_set.create(token=token)
-                tokens.append(token)
-
-            return Response(tokens, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.exception(_('Something went wrong...'), exc_info=True)
+            result = TOTPDevice.create_backup_tokens(request=request)
+            return result
+        except Exception:
+            logger.exception(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['POST'],)
-    def verify_backup_token(self, request, **kwargs):
+    @action(detail=False, methods=["POST"])
+    def verify_backup_token(self, request):
         try:
-            token = request.data.get('token')
-            if not token:
-                return Response({'error': _('Token is missing.')}, status=status.HTTP_400_BAD_REQUEST)
-
-            user = request.user
-            device = stuff_logic.get_user_static_device(user)
-            if not device is None and device.verify_token(token):
-                token = stuff_logic.get_custom_jwt(user, device)
-                return Response({'access': token}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': _('Invalid token.')}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.exception(_('Something went wrong...'), exc_info=True)
+            result = TOTPDevice.verify_backup_token(request=request)
+            return result
+        except TypeError:
+            return Response(
+                {"error": _("Invalid token.")}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception:
+            logger.exception(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=['DELETE'], permission_classes=[
-        permissions.IsAuthenticated,
-        stuff_permissions.IsOtpVerified
-    ])
-    def delete_totp_device(self, request, **kwargs):
+    @action(
+        detail=False,
+        methods=["DELETE"],
+        permission_classes=[
+            permissions.IsAuthenticated,
+            stuff_permissions.IsOtpVerified,
+        ],
+    )
+    def delete_totp_device(self, request):
         try:
-            user = request.user
-            devices = devices_for_user(user)
-            for device in devices:
-                device.delete()
-
-            user.jwt_secret = uuid.uuid4()
-            user.save()
-            token = get_custom_jwt(user, None)
-            return Response({'access': token, 'detail': _('Device detached from 2FA')}, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.exception(_('Something went wrong...'), exc_info=True)
+            result = TOTPDevice.delete_totp_device(request=request)
+            return result
+        except Exception:
+            logger.exception(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

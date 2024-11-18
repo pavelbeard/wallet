@@ -1,9 +1,17 @@
+import { USER_MENU } from "@/app/components/user/user-menu-icons";
 import useClickOutside from "@/app/lib/hooks/useClickOutside";
 import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
 import { UserMenuItem } from "@/app/lib/types";
+import { useTranslations } from "next-intl";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 
+const EXPAND = "animate-short-expand";
+const COLLAPSE = "animate-short-collapse";
+const SLIDE_IN_LEFT = "animate-short-slide-in-left";
+const SLIDE_OUT_LEFT = "animate-short-slide-out-left";
+
 export default function useUserMenu() {
+  const t = useTranslations("userMenu");
   const isOpenDesktop = useUserMenuStore((state) => state.isOpenDesktop);
   const toggleOpenDesktop = useUserMenuStore(
     (state) => state.toggleOpenDesktop,
@@ -13,47 +21,53 @@ export default function useUserMenu() {
   const toggleOpenMobile = useUserMenuStore((state) => state.toggleOpenMobile);
 
   const desktopRef = useRef<HTMLElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
   const [isDelayActive, setDelay] = useState(false);
   const ref = useClickOutside(closeDesktop) as RefObject<HTMLDivElement>;
 
   useEffect(() => {
     if (isOpenDesktop) {
       setDelay(true);
-      desktopRef.current?.classList.add("animate-short-expand");
+      desktopRef.current?.classList.add(EXPAND);
     } else {
-      desktopRef.current?.classList.replace(
-        "animate-short-expand",
-        "animate-short-collapse",
-      );
+      desktopRef.current?.classList.replace(EXPAND, COLLAPSE);
       const timer = setTimeout(() => setDelay(false), 120);
       return () => clearTimeout(timer);
     }
+
+    return () => desktopRef.current?.classList.remove(COLLAPSE);
   }, [isOpenDesktop]);
 
+  useEffect(() => {
+    if (isOpenMobile) {
+      setDelay(true);
+      mobileRef.current?.classList.add(SLIDE_OUT_LEFT);
+    } else {
+      mobileRef.current?.classList.replace(
+        SLIDE_OUT_LEFT,
+        SLIDE_IN_LEFT,
+      );
+      const timer = setTimeout(() => setDelay(false), 100);
+      return () => {
+        mobileRef.current?.classList.remove(SLIDE_OUT_LEFT)
+        clearTimeout(timer)};
+    }
+
+    return () => mobileRef.current?.classList.remove(SLIDE_OUT_LEFT);
+  }, [isOpenMobile]);
+
   const userMenu: UserMenuItem[] = useMemo(
-    () => [
-      {
-        title: "Settings",
-        url: "/Settings",
-      },
-      {
-        title: "Profile",
-        url: "/Profile",
-      },
-      {
-        title: "Logout",
-        url: "/Logout",
-      },
-    ],
+    () => USER_MENU.map((item) => ({ ...item, title: t(item.title) })),
     [],
   );
 
   return {
     desktopRef,
+    mobileRef,
     ref,
     isOpen: isOpenDesktop || isDelayActive,
     toggleOpen: toggleOpenDesktop,
-    isOpenMobile,
+    isOpenMobile: isOpenMobile || isDelayActive,
     toggleOpenMobile,
     userMenu,
   };

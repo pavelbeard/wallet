@@ -6,11 +6,11 @@ export const publicRoutes: string[] = ["/"];
 /**
  * Routes, which middleware should protect by default
  */
-export const protectedRoutes: string[] = ["/dashboard"];
+export const protectedRoutes: string[] = ["/dashboard", "/profile"];
 
 /**
  * Routes, which middleware should ignore by default, but if you is authenticated - skip these routes
- */
+*/
 export const authRoutes: string[] = ["/auth/sign-in", "/auth/sign-up"];
 
 /**

@@ -27,3 +27,10 @@
     flex: 0.2 0 auto;
     height: 12px;
 }
+
+@media (prefers-color-scheme: dark) {
+    .divider-wrapper::before,
+    .divider-wrapper::after {
+        border-bottom: 1px solid #e4e4e4
+    }
+}

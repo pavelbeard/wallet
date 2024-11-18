@@ -1,24 +1,53 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
+import {
+  useEffectOverflow,
+  useOverflow,
+} from "../store/useOverflowControlStore";
+import useBurgerMenuStore from "./useBurgerMenuStore";
 
 export default function useBurgerMenu() {
-    const [isBurgerOpen, setIsBurgerOpen] = useState(false);
-    const toggleBurgerMenu = () => setIsBurgerOpen(!isBurgerOpen);
+  const { isBurgerOpen, setIsBurgerOpen } = useBurgerMenuStore(
+    useShallow((state) => ({
+      isBurgerOpen: state.isBurgerOpen,
+      setIsBurgerOpen: state.setIsBurgerOpen,
+    })),
+  );
 
-    useEffect(() => {
-        const listenWindowWidth = () => {
-            if (window.innerWidth > 768) setIsBurgerOpen(false);
-         }
+  const { isOverflowHidden, setOverflowAuto, setOverflowHidden } =
+    useOverflow();
 
-        addEventListener('resize', listenWindowWidth);
+  const toggleBurgerMenu = () => setIsBurgerOpen(!isBurgerOpen);
 
-        return () => {
-            window.removeEventListener('resize', listenWindowWidth);
-        }
-    });
+  useEffect(() => {
+    const listenWindowWidth = () => {
+      if (window.innerWidth > 768) setIsBurgerOpen(false);
+    };
 
-    return {
-        isBurgerOpen,
-        toggleBurgerMenu,
-        setIsBurgerOpen // in very rare cases it need to use
+    addEventListener("resize", listenWindowWidth);
+
+    return () => {
+      window.removeEventListener("resize", listenWindowWidth);
+    };
+  });
+
+  useEffect(() => {
+    if (isBurgerOpen) {
+      setOverflowHidden();
+    } else {
+      setOverflowAuto();
     }
+
+    return () => {
+      if (isOverflowHidden) setOverflowAuto();
+    };
+  }, [isBurgerOpen]);
+
+  useEffectOverflow();
+
+  return {
+    isBurgerOpen,
+    toggleBurgerMenu,
+    setIsBurgerOpen, // in very rare cases it need to use
+  };
 }

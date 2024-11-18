@@ -14,7 +14,8 @@ function DesktopHeader() {
       className={clsx(
         "grid relative grid-cols-3",
         "bg-slate-300 rounded-full justify-items-stretch items-center p-4 z-10",
-        "shadow-slate-800 drop-shadow-2xl",
+        // "shadow-slate-800 drop-shadow-2xl",
+        "dark:bg-slate-800 dark:text-gray-100"
       )}
     >
       <NavBarRoot menu={leftMenu} position="left" />
@@ -39,7 +40,10 @@ function MobileHeader() {
       <aside
         data-type="header-mobile"
         data-testid="header-mobile"
-        className="flex items-center justify-between relative bg-slate-300 p-2 h-12"
+        className={clsx(
+          "flex items-center justify-between relative bg-slate-300 p-2 h-12",
+          "dark:bg-slate-800 dark:text-gray-100"
+        )}
       >
         <LogoHeader position="center" />
         <button data-testid="burger-menu-btn" onClick={toggleBurgerMenu}>
@@ -61,7 +65,10 @@ function MobileHeader() {
             <aside
               data-type="header-expanded-md"
               ref={mobileRef}
-              className="flex flex-col min-h-screen w-full bg-gray-100"
+              className={clsx(
+                "flex flex-col min-h-screen w-full bg-gray-100",
+                "dark:bg-slate-600 dark:text-gray-100"
+              )}
             >
               <div className="flex items-center justify-between p-2">
                 <LogoHeader position="center" />
@@ -76,6 +83,7 @@ function MobileHeader() {
             data-type="header-expanded-sm"
             className={clsx(
               "md:hidden absolute top-0 z-10 grid grid-rows-[auto_1fr] overflow-hidden w-full bg-gray-100",
+              "dark:bg-slate-600 dark:text-gray-100"
             )}
           >
             <div className="flex items-center justify-between p-2">

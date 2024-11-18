@@ -9,6 +9,7 @@ import { LayoutLogo } from "@/app/ui/layout-logo";
 import LogoHeader from "@/app/ui/logo-header";
 import { UserMenuMobile } from "@/app/ui/user-menu";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 
 export default function LayoutSideElementsMobile() {
   const user = useUser();
@@ -21,7 +22,7 @@ export default function LayoutSideElementsMobile() {
       {isBurgerOpen && (
         <div className="absolute z-10 grid grid-cols-[250px_1fr] w-full">
           <aside ref={mobileRef} className="flex flex-col min-h-screen">
-            <div className="p-4 bg-slate-100 drop-shadow-md shadow-black">
+            <div className="p-4 bg-slate-100 drop-shadow-md shadow-black dark:bg-slate-800 dark:text-gray-100">
               <button data-testid="burger-close-btn" onClick={toggleBurgerMenu}>
                 <XMarkIcon className="size-6" />
               </button>
@@ -46,7 +47,10 @@ export default function LayoutSideElementsMobile() {
         </div>
       )}
 
-      <header className="lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black">
+      <header className={clsx(
+        "lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black",
+        "dark:bg-slate-800 dark:text-gray-100"
+      )}>
         <button data-testid="burger-open-btn" onClick={toggleBurgerMenu}>
           <Bars3Icon className="size-6" />
         </button>

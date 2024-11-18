@@ -1,6 +1,22 @@
 import Client from "@/app/components/dashboard/client";
 import { auth } from "@/auth";
 import { LocaleProps } from "@/i18n/types";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata({
+  params: { locale },
+}: LocaleProps): Promise<Metadata> {
+  const t = await getTranslations({
+    locale,
+    namespace: "dashboard",
+  });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function Page({ params: { locale } }: LocaleProps) {
   const session = await auth();

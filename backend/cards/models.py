@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.sessions.models import Session
 from django.db import models
 
 from . import managers
@@ -24,19 +23,29 @@ class Card(models.Model):
 
     def get_payment_system(self):
         card_number = self.card_number
-        if card_number[:2] in ['34', '37']:
-            return 'American Express'
-        elif card_number[:2] == '62':
-            return 'UnionPay'
+        if card_number[:2] in ["34", "37"]:
+            return "American Express"
+        elif card_number[:2] == "62":
+            return "UnionPay"
         elif 3528 <= int(card_number[:4]) <= 3589:
-            return 'JCB'
-        elif card_number[:4] in ['5018', '5020', '5038', '5893', '6304', '6759', '6761', '6762', '6763']:
-            return 'Maestro'
+            return "JCB"
+        elif card_number[:4] in [
+            "5018",
+            "5020",
+            "5038",
+            "5893",
+            "6304",
+            "6759",
+            "6761",
+            "6762",
+            "6763",
+        ]:
+            return "Maestro"
         elif 51 <= int(card_number[:2]) <= 55 or 2200 <= int(card_number[:4]) <= 2204:
-            return 'MasterCard'
-        elif card_number[:1] == '4':
-            return 'Visa'
+            return "MasterCard"
+        elif card_number[:1] == "4":
+            return "Visa"
         else:
-            return 'Unknown'
+            return "Unknown"
 
     objects = managers.CardObjectManager()

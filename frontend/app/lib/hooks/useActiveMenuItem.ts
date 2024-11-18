@@ -7,8 +7,6 @@ export default function useActiveMenuItem() {
   const [activeItem, setActiveItem] = useState<number | null>(null);
 
   const handleToggle = (index: number): void => {
-    console.log("working");
-
     setActiveItem((prevState) => {
       if (prevState == index) {
         return null;

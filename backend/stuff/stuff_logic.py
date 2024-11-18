@@ -1,12 +1,12 @@
 ### module for complicated logic ###
 import contextlib
 from calendar import timegm
-from typing import List, Any
+from typing import Any, Dict, List
 
 import jwt
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
+from django.http import HttpRequest
 from django.middleware import csrf
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -25,7 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from stuff import qr_generator
 from stuff.models import WalletUser
-from stuff.utils import LOGIN_TYPE, User
+from stuff.utils import LOGIN_TYPE
 
 
 @contextlib.contextmanager
@@ -62,77 +62,92 @@ def override_api_settings(**settings):
             except AttributeError:
                 pass
 
+
 def get_user_totp_device(user, confirmed=None) -> TOTPDevice | None:
     devices: List[Device] = devices_for_user(user, confirmed=confirmed)
     for device in devices:
         if isinstance(device, TOTPDevice):
             return device
 
-def jwt_otp_payload(user: User, device: Device=None) -> dict:
+
+def jwt_otp_payload(user: WalletUser, device: Device = None) -> dict:
     """Optionally includes an OTP device in JWT"""
     payload = {
-        'username': '',
-        'email': '',
-        'exp': timezone.now() + settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+        "username": "",
+        "email": "",
+        "exp": timezone.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
     }
 
-    if getattr(user, 'username') is not None:
-        payload['username'] = user.username
-    if getattr(user, 'email') is not None:
-        payload['email'] = user.email
+    if getattr(user, "username") is not None:
+        payload["username"] = user.username
+    if getattr(user, "email") is not None:
+        payload["email"] = user.email
 
-    if settings.SIMPLE_JWT.get('ROTATE_REFRESH_TOKENS'):
-        payload['orig_iat'] = timegm(timezone.now().utctimetuple())
+    if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
+        payload["orig_iat"] = timegm(timezone.now().utctimetuple())
 
-    if settings.SIMPLE_JWT.get('AUDIENCE'):
-        payload['aud'] = settings.SIMPLE_JWT['AUDIENCE']
+    if settings.SIMPLE_JWT.get("AUDIENCE"):
+        payload["aud"] = settings.SIMPLE_JWT["AUDIENCE"]
 
-    if settings.SIMPLE_JWT.get('ISSUER'):
-        payload['iss'] = settings.SIMPLE_JWT['ISSUER']
+    if settings.SIMPLE_JWT.get("ISSUER"):
+        payload["iss"] = settings.SIMPLE_JWT["ISSUER"]
 
-    if (user is not None) and( device is not None) and (device.user_id == user.public_id) and (device.confirmed is True):
-        payload['otp_device_id'] = device.persistent_id
+    if (
+        (user is not None)
+        and (device is not None)
+        and (device.user_id == user.public_id)
+        and (device.confirmed is True)
+    ):
+        payload["otp_device_id"] = device.persistent_id
     else:
-        payload['otp_device_id'] = None
+        payload["otp_device_id"] = None
 
     return payload
 
+
 def jwt_encode_handler(payload):
     """Helps to encode data to JWT"""
-    key = settings.SIMPLE_JWT['SIGNING_KEY']
-    return jwt.encode(payload, key, algorithm=settings.SIMPLE_JWT.get('ALGORITHM')).encode('utf-8')
+    key = settings.SIMPLE_JWT["SIGNING_KEY"]
+    return jwt.encode(
+        payload, key, algorithm=settings.SIMPLE_JWT.get("ALGORITHM")
+    ).encode("utf-8")
+
 
 def jwt_decode_handler(token) -> Any:
     """Helps to decode data from JWT"""
     options = {
-        'verify_exp': True,
+        "verify_exp": True,
     }
-    secret_key = settings.SIMPLE_JWT['SIGNING_KEY']
+    secret_key = settings.SIMPLE_JWT["SIGNING_KEY"]
     return jwt.decode(
         jwt=token,
         key=secret_key,
         options=options,
         # leeway=settings.SIMPLE_JWT.get('LEEWAY'),
-        audience=settings.SIMPLE_JWT.get('AUDIENCE'),
-        issuer=settings.SIMPLE_JWT.get('ISSUER'),
-        algorithms=settings.SIMPLE_JWT.get('ALGORITHM'),
+        audience=settings.SIMPLE_JWT.get("AUDIENCE"),
+        issuer=settings.SIMPLE_JWT.get("ISSUER"),
+        algorithms=settings.SIMPLE_JWT.get("ALGORITHM"),
     )
 
-def get_custom_jwt(user: WalletUser, device: Device=None) -> str:
+
+def get_custom_jwt(user: WalletUser, device: Device = None) -> str:
     """Using for include 2FA into JWT"""
     payload = jwt_otp_payload(user, device)
     return jwt_encode_handler(payload)
 
+
 def otp_is_verified(request: Request):
     """Help to determine if user have verified OTP."""
     auth = jwt_authentication.JWTAuthentication()
-    authorization_header = request.headers.get('Authorization') or request.META.get('HTTP_AUTHORIZATION')
+    authorization_header = request.headers.get("Authorization") or request.META.get(
+        "HTTP_AUTHORIZATION"
+    )
     jwt_value = auth.get_raw_token(header=authorization_header)
     if jwt_value is None:
         return False
 
     payload = jwt_decode_handler(jwt_value)
-    persistent_id = payload.get('otp_device_id')
+    persistent_id = payload.get("otp_device_id")
 
     if persistent_id:
         device = Device.from_persistent_id(persistent_id=persistent_id)
@@ -143,77 +158,94 @@ def otp_is_verified(request: Request):
     else:
         return False
 
-def get_user_static_device(user: User, confirmed=None) -> StaticDevice | None:
+
+def get_user_static_device(user: WalletUser, confirmed=None) -> StaticDevice | None:
     devices = devices_for_user(user, confirmed=confirmed)
     for device in devices:
         if isinstance(device, StaticDevice):
             return device
 
+
+def set_auth_cookies(response: Response, jwt_tokens: Dict[str, str]) -> Response:
+    response.set_cookie(
+        key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"],
+        value=jwt_tokens["access"],
+        max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+    )
+    response.set_cookie(
+        key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"],
+        value=jwt_tokens["refresh"],
+        max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+    )
+    response.data = {"access": jwt_tokens["access"]}
+    return response
+
+
+def set_csrf_cookie(response: Response, request: HttpRequest):
+    response.set_cookie(
+        key=settings.CSRF_COOKIE_NAME,
+        value=csrf.get_token(request),
+        secure=settings.CSRF_COOKIE_SECURE,
+        httponly=settings.CSRF_COOKIE_HTTPONLY,
+        samesite=settings.CSRF_COOKIE_SAMESITE,
+    )
+    return response
+
+
 def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS):
     response = Response()
+
     if login_type == LOGIN_TYPE.OAUTH2:
         user = request.user
         jwt_tokens = RefreshToken.for_user(user)
         access_token = str(jwt_tokens.access_token)
         refresh_token = str(jwt_tokens)
     else:
-        access_token = validated_data['access']
-        refresh_token = validated_data['refresh']
+        access_token = validated_data["access"]
+        refresh_token = validated_data["refresh"]
 
-        access_token_obj = tokens.AccessToken(validated_data['access'])
-        user = User.objects.get_object_by_public_id(public_id=access_token_obj.payload['public_id'])
+        access_token_obj = tokens.AccessToken(validated_data["access"])
+        user = WalletUser.objects.get_object_by_public_id(
+            public_id=access_token_obj.payload["public_id"]
+        )
 
     if user.is_active:
-        response.set_cookie(
-            key=settings.SIMPLE_JWT['AUTH_ACCESS_COOKIE'],
-            value=access_token,
-            max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+        auth_response = set_auth_cookies(
+            response=response,
+            jwt_tokens={"access": access_token, "refresh": refresh_token},
         )
-        response.set_cookie(
-            key=settings.SIMPLE_JWT['AUTH_REFRESH_COOKIE'],
-            value=refresh_token,
-            max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
-        )
-        response.set_cookie(
-            key=settings.CSRF_COOKIE_NAME,
-            value=csrf.get_token(request),
-            secure=settings.CSRF_COOKIE_SECURE,
-            httponly=settings.CSRF_COOKIE_HTTPONLY,
-            samesite=settings.CSRF_COOKIE_SAMESITE,
-        )
-        response.data = {'access': access_token}
-        response.status = status.HTTP_200_OK
-        return response, None
+        csrf_response = set_csrf_cookie(request=request, response=auth_response)
+        return csrf_response, None
     else:
         return None, {"error": _("Inactive user")}
 
+
 def signout_logic(request):
-    refresh_token = request.COOKIES.get('__rclientid')
+    refresh_token = request.COOKIES.get("__rclientid")
     token = tokens.RefreshToken(refresh_token)
     token.blacklist()
     response = Response()
-    response.delete_cookie(key=settings.SIMPLE_JWT['AUTH_ACCESS_COOKIE'])
-    response.delete_cookie(key=settings.SIMPLE_JWT['AUTH_REFRESH_COOKIE'])
-    response.delete_cookie(key='csrfmiddlewaretoken')
+    response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"])
+    response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"])
+    response.delete_cookie(key="csrfmiddlewaretoken")
     response.data = {"detail": _("You're logged out!")}
     response.status = status.HTTP_200_OK
     return response
 
-def verify_email_logic(request, user):
-    html_string = render_to_string('')
 
-    email = EmailMessage(
-        subject=_('Welcome'),
-        body=html_string
-    )
+def verify_email_logic(request, user):
+    html_string = render_to_string("")
+
+    email = EmailMessage(subject=_("Welcome"), body=html_string)
     email.from_email = settings.EMAIL_HOST_USER
     email.to = [user.email]
+
 
 def generate_2fa_key_in_qr_code(data):
     """Proxy function"""

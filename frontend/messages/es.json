@@ -43,12 +43,24 @@
       "toDashboard": "Al Dashboard"
     }
   },
+  "dashboard": {
+    "title": "Cartera | Panel de control",
+    "description:": "Tarjetas, contraseñas, información total"
+  },
+  "profile": {
+    "title": "Cartera | Perfil",
+    "description": "Perfil del usuario"
+  }, 
   "header": {
     "why": "Por qué es Cartera?",
     "advantages": "Ventajas",
     "signIn": "Iniciar sesión"
   },
   "sidebar": {
+    "signOut": "Cerrar sesión"
+  },
+  "userMenu": {
+    "profile": "Perfil",
     "signOut": "Cerrar sesión"
   },
   "error": {

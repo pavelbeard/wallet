@@ -6,9 +6,7 @@ export default function useClickOutside(callback: () => void) {
   const ref = useRef<HTMLElement>(null);
 
   const listener = (e: Event) => {
-    if (ref.current && !ref.current.contains(e.target as Node)) {
-      console.log('clicked');
-      
+    if (ref.current && !ref.current.contains(e.target as Node)) {      
       callback();
     }
   };

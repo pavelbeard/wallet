@@ -4,6 +4,8 @@ import { pick } from "lodash";
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Suspense } from "react";
+import NavigationEvents from "./components/layout/navigation-events";
 
 export default async function ErrorLayout({ children }: Props) {
   const locale = await getLocale();
@@ -26,6 +28,9 @@ export default async function ErrorLayout({ children }: Props) {
             messages={pick(messages, "error")}
           >
             {children}
+            <Suspense fallback={null}>
+              <NavigationEvents />
+            </Suspense>
           </NextIntlClientProvider>
         </SessionProvider>
       </body>

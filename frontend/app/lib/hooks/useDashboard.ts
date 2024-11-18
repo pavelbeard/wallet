@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import useUserMenuStore from "../store/useUserMenuStore";
 import useBurgerMenu from "./useBurgerMenu";
-import { useEffectOverflow, useToggleOverflow } from "../store/useOverflowControlStore";
+
+const SLIDE_RIGHT = "animate-medium-slide-to-right";
+const SLIDE_LEFT = "animate-medium-slide-to-left";
 
 export default function useDashboard() {
-  const { isBurgerOpen, toggleBurgerMenu: toggleBM } = useBurgerMenu();
-  const toggleOverflow = useToggleOverflow();
+  const { isBurgerOpen, toggleBurgerMenu, setIsBurgerOpen } = useBurgerMenu();
+  const isOpenMobile = useUserMenuStore((state) => state.isOpenMobile);
+  const closeMobile = useUserMenuStore((state) => state.closeMobile);
   const mobileRef = useRef<HTMLDivElement>(null);
   const [delayIsActive, setDelay] = useState(false);
   const [isAppeared, setAppeared] = useState(false);
@@ -15,28 +19,30 @@ export default function useDashboard() {
     // slide to right side bar (expand) animation (-50ms)
     if (isBurgerOpen) {
       setDelay(true);
-      mobileRef.current?.classList.add("animate-medium-slide-to-right");
+      mobileRef.current?.classList.add(SLIDE_RIGHT);
       timer = setTimeout(() => setAppeared(true), 450);
 
-    // slide to left side bar (collapse) animations (-50ms)
+      // slide to left side bar (collapse) animations (-50ms)
     } else {
       setAppeared(false);
-      mobileRef.current?.classList.replace(
-        "animate-medium-slide-to-right",
-        "animate-medium-slide-to-left",
-      );
+      mobileRef.current?.classList.replace(SLIDE_RIGHT, SLIDE_LEFT);
       timer = setTimeout(() => setDelay(false), 450);
     }
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (isBurgerOpen) setIsBurgerOpen(false);
+      if (isOpenMobile) closeMobile();
+
+      mobileRef.current?.classList.remove(SLIDE_LEFT);
+      clearTimeout(timer);
+    };
   }, [isBurgerOpen]);
 
-  useEffectOverflow();
-
-  const toggleBurgerMenu = () => {
-    toggleBM();
-    toggleOverflow();
-  }
+  // const toggleBurgerMenu = () => {
+  //   toggleBM();
+  //   if (isOpenMobile) closeMobile();
+  //   toggleOverflow();
+  // };
 
   return {
     mobileRef,

@@ -12,7 +12,7 @@ type Action = {
   closeMobile: () => void;
 };
 
-const useUserMenuMobileStore = create<State & Action>((set) => ({
+const useUserMenuStore = create<State & Action>((set) => ({
   isOpenDesktop: false,
   toggleOpenDesktop: () => set((state) => ({ ...state, isOpenDesktop: !state.isOpenDesktop })),
   closeDesktop: () => set((state) => ({ ...state, isOpenDesktop: false })),
@@ -21,4 +21,4 @@ const useUserMenuMobileStore = create<State & Action>((set) => ({
   closeMobile: () => set((state) => ({ ...state, isOpenMobile: false })),
 }));
 
-export default useUserMenuMobileStore;
+export default useUserMenuStore;

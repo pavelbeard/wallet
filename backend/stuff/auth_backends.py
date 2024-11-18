@@ -5,18 +5,12 @@ User = get_user_model()
 
 
 class WalletAuthBackend(ModelBackend):
-    def authenticate(
-            self,
-            username=None,
-            email=None,
-            password=None,
-            **kwargs
-    ):
+    def authenticate(self, username=None, email=None, password=None, **kwargs):
         user = None
 
         if username:
             try:
-                if '@' in username:
+                if "@" in username:
                     user = User.objects.get(email=username)
                 else:
                     user = User.objects.get(username=username)
@@ -34,6 +28,5 @@ class WalletAuthBackend(ModelBackend):
 
         if user and user.password is None:
             return user
-
 
         return None

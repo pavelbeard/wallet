@@ -1,13 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from . import luhn
-from . import models
+
+from . import luhn, models
 
 User = get_user_model()
 
 
 # Create your tests here.
+
 
 class TestCardNumber(TestCase):
     def setUp(self):
@@ -25,19 +26,23 @@ class TestCardNumber(TestCase):
         self.assertEqual(result2, False)
 
     def test_verifier_in_model(self):
-        user = User.objects.create_user(username='pavel', email='user@user.com', password='Admin@123')
+        user = User.objects.create_user(
+            username="pavel", email="user@user.com", password="Admin@123"
+        )
         models.Card.objects.create(
             card_number=self.card_number1,
             card_holder_name="PABLO BARBADO",
             month="01",
             year="2020",
             cvv="111",
-            user=user
+            user=user,
         )
 
         self.assertEqual(models.Card.objects.count(), 1)
 
-        new_user = User.objects.create_user(username='pavel1', email='user@use1.com', password='@dmin123')
+        new_user = User.objects.create_user(
+            username="pavel1", email="user@use1.com", password="@dmin123"
+        )
 
         try:
             models.Card.objects.get_or_create(
@@ -46,27 +51,29 @@ class TestCardNumber(TestCase):
                 month="01",
                 year="2020",
                 cvv="111",
-                user=new_user
+                user=new_user,
             )
         except ValidationError:
             self.assertEqual(True, True)
 
     def test_update_or_create_object(self):
-        user = User.objects.create_user(username='pavel', email='user@user.com', password='Admin@123')
+        user = User.objects.create_user(
+            username="pavel", email="user@user.com", password="Admin@123"
+        )
         obj = models.Card.objects.create(
             card_number=self.card_number1,
             card_holder_name="PABLO BARBADO",
             month="01",
             year="2020",
             cvv="111",
-            user=user
+            user=user,
         )
         print(obj)
 
         try:
             obj, created = models.Card.objects.update_or_create(
                 card_number=self.card_number1,
-                defaults={'card_number': self.card_number2}
+                defaults={"card_number": self.card_number2},
             )
 
         except ValidationError:
@@ -79,7 +86,9 @@ class TestCardNumber(TestCase):
             month="01",
             year="2020",
             cvv="111",
-            user=User.objects.create_user(username='pavel', email='user@user.com', password='Admin@123')
+            user=User.objects.create_user(
+                username="pavel", email="user@user.com", password="Admin@123"
+            ),
         )
         print(obj)
         self.assertEqual(created, True)
@@ -91,7 +100,9 @@ class TestCardNumber(TestCase):
             month="01",
             year="2020",
             cvv="111",
-            user=User.objects.create_user(username='pavel', email='user@user.com', password='Admin@123')
+            user=User.objects.create_user(
+                username="pavel", email="user@user.com", password="Admin@123"
+            ),
         )
 
         self.assertTrue(created)

@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 function AbsoluteLayout({ children, position }: { children: ReactNode, position: string }) {
   return (
     <div className={clsx(
-      "absolute size-6 flex justify-center items-center rounded-full bg-slate-300",
+      "absolute size-6 flex justify-center items-center rounded-full bg-slate-300 dark:text-slate-600",
       position, 
     )}>
       {children}

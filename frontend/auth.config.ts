@@ -7,10 +7,19 @@ import parseCookies from "@/app/lib/parseCookies";
 import { JWT } from "@auth/core/jwt";
 import Credentials from "@auth/core/providers/credentials";
 import Google from "@auth/core/providers/google";
+import { jwtDecode } from "jwt-decode";
 import { NextAuthConfig, User } from "next-auth";
 import getCurrentEpochTime from "./app/lib/getCurrentEpochTime";
 import refreshToken from "./app/lib/refreshToken";
 import { SIGN_IN_HANDLERS, SIGN_IN_PROVIDERS } from "./app/lib/signInProviders";
+
+export interface WalletUser {
+  public_id: string;
+  username: string;
+  email: string;
+  orig_iat: number;
+  otp_device_id: string | null;
+}
 
 const providers = [
   Credentials({
@@ -37,7 +46,19 @@ const providers = [
         }
       });
 
+      const decodedToken = jwtDecode(
+        access_token?.value as string,
+      ) as WalletUser;
+      const walletUser = {
+        public_id: decodedToken.public_id,
+        email: decodedToken.email,
+        username: decodedToken.username,
+        orig_iat: decodedToken.orig_iat,
+        otp_device_id: decodedToken.otp_device_id,
+      } as WalletUser;
+
       return {
+        ...walletUser,
         access_token: access_token,
         refresh_token: refresh_token,
       } as User;
@@ -64,7 +85,6 @@ const refresh = async (token: JWT) => {
 
   // console.log('refresh() access token age: ', accessTokenExpiration);
   // console.log('refresh() refresh token age: ', refreshTokenExpiration);
-  
 
   // if the refresh token is expired, the session is down.
   if (dateNow > refreshTokenExpiration * 1000) {
@@ -151,18 +171,14 @@ export const authConfig = {
         const accessTokenMaxAge = user?.access_token?.maxAge as number;
         const refreshTokenMaxAge = user.refresh_token?.maxAge as number;
 
-        // console.log("if user (access token age): ", accessTokenMaxAge);
-        // console.log("if user (refresh token age): ", refreshTokenMaxAge);
-
         token.api_access_token = user.access_token?.value;
         token.access_token_exp = getCurrentEpochTime() + accessTokenMaxAge;
-        console.log(token.access_token_exp);
 
         token.api_refresh_token = user.refresh_token?.value;
         token.refresh_token_exp = getCurrentEpochTime() + refreshTokenMaxAge;
-        console.log(token.refresh_token_exp);
 
         token.provider = "credentials";
+        token.user = user;
         return token;
       }
 
@@ -171,6 +187,8 @@ export const authConfig = {
     },
     session({ session, token }) {
       session.user.provider = token?.provider as string;
+      const user = token.user as WalletUser;
+      session.user = { ...session.user, ...user };
       return session;
     },
   },

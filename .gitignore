@@ -51,10 +51,14 @@ frontend/.vercel
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
 
+## .DS_Store
+*.DS_Store
+
 ### others
 
 secrets_cartera_app.json
 *.unused
-
-## .DS_Store
-*.DS_Store
+backend/access_timer_middleware
+backend/check_db
+backend/singleton
+.vscode

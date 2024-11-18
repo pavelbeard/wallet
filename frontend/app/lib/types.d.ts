@@ -17,7 +17,11 @@ export type InputPropsWithRegister = {
   id: string;
 };
 
-export type Color = "container-bg" | "auth-bg" | "dashboard-bg" | "error-bg";
+export type Color = 
+"container-bg"
+| "auth-bg" 
+| "dashboard-bg" 
+| "error-bg";
 
 export type Props = { children: React.ReactNode };
 
@@ -42,8 +46,10 @@ export type SideBarItem = {
 };
 
 export type UserMenuItem = {
+  icon: ReactNode;
   title: string;
-  url?: string;
+  url: string;
+  fontBold?: boolean;
 };
 
 // data

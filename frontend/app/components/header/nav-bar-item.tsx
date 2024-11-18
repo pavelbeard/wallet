@@ -27,6 +27,7 @@ const HoverUnderline = ({ isVisible }: { isVisible: boolean }) => (
     className={clsx(
       isVisible ? "max-w-full" : "max-w-0",
       "block h-[0.8px] bg-slate-800 transition-all duration-500",
+      "dark:bg-gray-100",
     )}
   />
 );
@@ -74,12 +75,7 @@ function NavBarItemDesktop({
   );
 }
 
-function NavBarItemMobile({
-  title,
-  url,
-  hasNotActive,
-  onToggle,
-}: PropsMobile) {
+function NavBarItemMobile({ title, url, hasNotActive, onToggle }: PropsMobile) {
   const dropdownId = useId();
   const locale = useLocale();
 
@@ -87,17 +83,21 @@ function NavBarItemMobile({
 
   return (
     <li
-      className={clsx("px-8")}
+      className={clsx("px-8 animate-slide")}
       data-testid={title}
       onClick={onToggle}
     >
       {url ? (
-        <Link className="hover:text-gray-600" locale={locale} href={url}>
+        <Link
+          className="hover:text-gray-600 dark:hover:text-gray-200"
+          locale={locale}
+          href={url}
+        >
           {title}
         </Link>
       ) : (
         <button
-          className="hover:text-gray-600 text-lg font-bold"
+          className="hover:text-gray-600 text-lg font-bold dark:hover:text-gray-200"
           id={dropdownId}
           data-slide="slide-mobile"
           data-slide-toggle="slide-btn"
@@ -126,7 +126,7 @@ export default function NavBarItem({
     <div data-type="desktop-item">
       <NavBarItemDesktop
         mouseEnter={() => setDrilldown(true)}
-        mouseLeave={() => setDrilldown(false)}
+        mouseLeave={() => setTimeout(() => setDrilldown(false), 500)}
         title={title}
         url={url}
         subMenu={subMenu}

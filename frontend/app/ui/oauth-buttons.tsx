@@ -25,8 +25,9 @@ export default function OauthButtons() {
           <button
             type="submit"
             className={clsx(
-              "flex justify-center",
+              "flex items-center justify-center",
               "bg-slate-800 text-white hover:bg-slate-300 hover:text-black",
+              "dark:bg-gray-100 dark:text-slate-800",
               "p-4 rounded-xl font-bold",
             )}
           >
