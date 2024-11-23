@@ -5,21 +5,16 @@ import { useLocale } from "next-intl";
 import Image from "next/image";
 
 export default function LogoHeader({
-  position,
+  className,
 }: {
-  position?: "center" | "left" | "right";
+  className?: string;
 }) {
   const locale = useLocale();
   return (
     <Link
       locale={locale}
       href={"/"}
-      className={clsx(
-        "group relative z-10 flex items-center",
-        position == "center" && "justify-self-center",
-        position == "left" && "justify-self-start",
-        position == "right" && "justify-self-end"
-      )}
+      className={clsx("group relative z-50", className)}
     >
       <Image
         aria-label="Cartera Home Page | desktop"

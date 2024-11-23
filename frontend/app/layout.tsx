@@ -6,20 +6,26 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Suspense } from "react";
 import NavigationEvents from "./components/layout/navigation-events";
+import { Roboto_Mono } from "next/font/google"
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  display: "swap"
+})
 
 export default async function ErrorLayout({ children }: Props) {
   const locale = await getLocale();
   const messages = await getMessages();
   return (
-    <html lang={locale}>
+    <html lang={locale} className={robotoMono.className}>
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="favicon.ico" />
-        <script
+        {/* <script
           data-meta="react-devtools/safari"
           src="http://localhost:8097"
-        ></script>
+        ></script> */}
       </head>
       <body>
         <SessionProvider>

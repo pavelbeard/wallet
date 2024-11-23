@@ -27,6 +27,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.53.1",
     "set-cookie-parser": "^2.7.0",
+    "use-scramble": "^2.2.15",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"
   },

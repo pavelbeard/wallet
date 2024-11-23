@@ -33,14 +33,16 @@
     }
   },
   "mainPage": {
-    "title": "Cartera | Inicio",
+    "title": "Cartera | Pagina principal",
     "description": "Bienvenidos y bienvenidas a nuestra aplicación para guardar tus secretos!",
     "page": {
       "title": "Bienvenidos y bienvenidas a Cartera!",
       "appDescription": "Bienvenidos y bienvenidas a nuestra aplicación para guardar tus secretos!",
       "signIn": "Ir a iniciar sesión",
       "signUp": "In a unirte",
-      "toDashboard": "Al Dashboard"
+      "toDashboard": "Al Dashboard",
+      "text1": "Guarda tus secretos.",
+      "text2": "Una de las mejores y más robustas aplicaciones."
     }
   },
   "dashboard": {
@@ -50,11 +52,12 @@
   "profile": {
     "title": "Cartera | Perfil",
     "description": "Perfil del usuario"
-  }, 
+  },
   "header": {
     "why": "Por qué es Cartera?",
     "advantages": "Ventajas",
-    "signIn": "Iniciar sesión"
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión"
   },
   "sidebar": {
     "signOut": "Cerrar sesión"
@@ -66,5 +69,8 @@
   "error": {
     "error500": "Falla 500",
     "toMainPage": "Al inicio..."
+  },
+  "footer": {
+    "rights": "Reservados todos los derechos"
   }
 }

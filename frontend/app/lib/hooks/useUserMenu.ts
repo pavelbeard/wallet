@@ -19,6 +19,7 @@ export default function useUserMenu() {
   const closeDesktop = useUserMenuStore((state) => state.closeDesktop);
   const isOpenMobile = useUserMenuStore((state) => state.isOpenMobile);
   const toggleOpenMobile = useUserMenuStore((state) => state.toggleOpenMobile);
+  const closeMobile = useUserMenuStore((state) => state.closeMobile);
 
   const desktopRef = useRef<HTMLElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
@@ -39,18 +40,19 @@ export default function useUserMenu() {
   }, [isOpenDesktop]);
 
   useEffect(() => {
+    process.env.NODE_ENV === "development" &&
+      console.log("isOpenMobile", isOpenMobile);
+
     if (isOpenMobile) {
       setDelay(true);
       mobileRef.current?.classList.add(SLIDE_OUT_LEFT);
     } else {
-      mobileRef.current?.classList.replace(
-        SLIDE_OUT_LEFT,
-        SLIDE_IN_LEFT,
-      );
+      mobileRef.current?.classList.replace(SLIDE_OUT_LEFT, SLIDE_IN_LEFT);
       const timer = setTimeout(() => setDelay(false), 100);
       return () => {
-        mobileRef.current?.classList.remove(SLIDE_OUT_LEFT)
-        clearTimeout(timer)};
+        mobileRef.current?.classList.remove(SLIDE_OUT_LEFT);
+        clearTimeout(timer);
+      };
     }
 
     return () => mobileRef.current?.classList.remove(SLIDE_OUT_LEFT);
@@ -69,6 +71,7 @@ export default function useUserMenu() {
     toggleOpen: toggleOpenDesktop,
     isOpenMobile: isOpenMobile || isDelayActive,
     toggleOpenMobile,
+    closeMobile,
     userMenu,
   };
 }

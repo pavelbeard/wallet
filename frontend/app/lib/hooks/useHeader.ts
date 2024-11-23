@@ -25,7 +25,7 @@ export default function useHeader() {
 
   useEffect(() => {
     let timer;
-    
+
     if (isBurgerOpen) {
       setDelay(true);
       mobileRef.current?.classList.add("animate-medium-slide-in-right");
@@ -41,7 +41,6 @@ export default function useHeader() {
 
     return () => clearTimeout(timer);
   }, [isBurgerOpen]);
-
 
   useEffectOverflow();
 
@@ -101,7 +100,7 @@ export default function useHeader() {
     if (session.status == "authenticated") {
       return [
         {
-          title: "Cerrar session",
+          title: t("signOut"),
           url: "/auth/sign-out",
         },
       ];
@@ -113,7 +112,7 @@ export default function useHeader() {
         },
       ];
     }
-  }, [t]);
+  }, [t, session.status]);
 
   return {
     mobileRef,

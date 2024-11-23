@@ -13,7 +13,7 @@ export default function ToMainPageBtn() {
       locale={locale}
       href={'/'}
       className={clsx(
-        "lg:absolute top-24 left-8 h-12 w-32",
+        "lg:absolute top-24 left-8 h-12 w-40",
         "flex justify-center items-center rounded-full",
         "shadow-slate-800 drop-shadow-lg",
         "bg-slate-800 text-white hover:text-slate-800",

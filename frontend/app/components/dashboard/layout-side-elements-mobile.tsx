@@ -47,10 +47,12 @@ export default function LayoutSideElementsMobile() {
         </div>
       )}
 
-      <header className={clsx(
-        "lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black",
-        "dark:bg-slate-800 dark:text-gray-100"
-      )}>
+      <header
+        className={clsx(
+          "lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black",
+          "dark:bg-slate-800 dark:text-gray-100",
+        )}
+      >
         <button data-testid="burger-open-btn" onClick={toggleBurgerMenu}>
           <Bars3Icon className="size-6" />
         </button>

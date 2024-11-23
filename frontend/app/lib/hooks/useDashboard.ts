@@ -26,23 +26,17 @@ export default function useDashboard() {
     } else {
       setAppeared(false);
       mobileRef.current?.classList.replace(SLIDE_RIGHT, SLIDE_LEFT);
-      timer = setTimeout(() => setDelay(false), 450);
+      timer = setTimeout(() => {
+        setDelay(false);
+        closeMobile();
+      }, 450);
     }
 
     return () => {
-      if (isBurgerOpen) setIsBurgerOpen(false);
-      if (isOpenMobile) closeMobile();
-
       mobileRef.current?.classList.remove(SLIDE_LEFT);
       clearTimeout(timer);
     };
-  }, [isBurgerOpen]);
-
-  // const toggleBurgerMenu = () => {
-  //   toggleBM();
-  //   if (isOpenMobile) closeMobile();
-  //   toggleOverflow();
-  // };
+  }, [isOpenMobile, closeMobile, isBurgerOpen, setIsBurgerOpen]);
 
   return {
     mobileRef,

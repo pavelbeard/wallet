@@ -13,5 +13,7 @@ export type MiddlewareFactory = (
 
 type Callback = () => void;
 export type Middleware = (
-  req: NextRequest, res: NextResponse, callback: Callback
-) => Promise<Response | NextResponse>
+  req: NextRequest,
+  res: NextResponse,
+  callback: Callback,
+) => Promise<Response | NextResponse>;

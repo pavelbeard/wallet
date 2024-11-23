@@ -1,6 +1,5 @@
 import getUser from "@/app/lib/getUser";
 import Card from "@/app/ui/card";
-import clsx from "clsx";
 import { User } from "next-auth";
 import ChangeEmailBtn from "./change-email-btn";
 
@@ -21,7 +20,7 @@ const Email = ({ user }: UserProps) => {
 };
 
 const Username = ({ user }: UserProps) => {
-  const username = user?.name ?? user?.username
+  const username = user?.name ?? user?.username;
   if (username) {
     return (
       <>

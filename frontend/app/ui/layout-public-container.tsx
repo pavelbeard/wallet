@@ -6,7 +6,7 @@ export default function LayoutPublicContainer({ children, color }: LayoutProps) 
     <main
       className={clsx(
         color,
-        "grid justify-items-center grid-row-3-auto-1fr-auto min-h-screen w-full mx-auto items-center",
+        "grid justify-items-center grid-row-[auto_1fr_auto] min-h-screen w-full mx-auto items-center",
       )}
     >
       {children}

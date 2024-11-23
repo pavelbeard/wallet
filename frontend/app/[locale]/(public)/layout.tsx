@@ -1,5 +1,5 @@
-import Footer from "@/app/components/footer/footer";
-import Header from "@/app/components/header/header";
+import Footer from "@/app/components/footer";
+import Header from "@/app/components/header";
 import "@/app/globals.css";
 import { Props } from "@/app/lib/types";
 import LayoutPublicContainer from "@/app/ui/layout-public-container";

@@ -11,7 +11,7 @@ import OauthButtons from "@/app/ui/oauth-buttons";
 import PasswordInput from "@/app/ui/password-input";
 import Submit from "@/app/ui/submit";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import FormSuccess from "../form/form-success";
@@ -20,7 +20,6 @@ const signInResolver = zodResolver(SignInSchema);
 
 export default function SignInForm() {
   const t = useTranslations("auth");
-  const locale = useLocale();
   const {
     register,
     handleSubmit,

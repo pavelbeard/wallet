@@ -23,7 +23,7 @@ export default async function Page() {
       <Card className="hidden md:block p-6 my-12 w-3/4 lg:w-1/3">
         <SignUpForm />
       </Card>
-      <div className="md:hidden my-12">
+      <div className="md:hidden max-sm:px-4 my-12">
         <SignUpForm />
       </div>
     </>

@@ -41,7 +41,7 @@ export default function useBurgerMenu() {
     return () => {
       if (isOverflowHidden) setOverflowAuto();
     };
-  }, [isBurgerOpen]);
+  }, [isBurgerOpen, isOverflowHidden, setOverflowAuto, setOverflowHidden]);
 
   useEffectOverflow();
 

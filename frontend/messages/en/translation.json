@@ -10,17 +10,18 @@
     },
     "form": {
       "formTitle": {
-        "signIn": "Iniciar sesión",
+        "signIn": "Sign in",
         "signUp": "Crear la cuenta"
       },
-      "emailInput": "Correo electrónico:",
-      "passwordInput": "Contraseña:",
+      "emailInput": "Email:",
+      "passwordInput": "Password:",
       "confirmPasswordInput": "Repite contraseña:",
-      "signIn": "Entrar",
+      "signIn": "Sign in",
       "signUp": "Crearla",
       "withAccount": "If you have an account, sign in.",
       "withoutAccount": "If you don't have an account, create it!",
-      "or": "or"
+      "or": "or",
+      "signInWith": "Sign in with"
     },
     "page": {
       "signOut": "Sign out...",
@@ -32,14 +33,16 @@
     }
   },
   "mainPage": {
-    "title": "Cartera | Inicio",
+    "title": "Cartera | Main page",
     "description": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
     "page": {
       "title": "Bienvenidos y bienvenidas a Cartera!",
       "appDescription": "Bienvenidos y bienvenidas a nuestra aplicación de guardar tus secretos!",
       "signIn": "Ir a iniciar sesión",
       "signUp": "In a unirte",
-      "toDashboard": "To Dashboard"
+      "toDashboard": "To Dashboard",
+      "text1": "Keep your secrets.",
+      "text2": "One of the best and robust app."
     }
   },
   "dashboard": {
@@ -53,7 +56,8 @@
   "header": {
     "why": "Why is Cartera?",
     "advantages": "Advantages",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "signOut": "Sign out"
   },
   "sidebar": {
     "signOut": "Sign out"
@@ -65,5 +69,8 @@
   "error": {
     "error500": "Error 500",
     "toMainPage": "To main page..."
+  },
+  "footer": {
+    "rights": "All rights reserved"
   }
 }

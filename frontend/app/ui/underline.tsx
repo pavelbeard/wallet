@@ -7,7 +7,7 @@ export default function Underline() {
     <span
       className={clsx(
         "block h-[0.8px] max-w-0 group-hover:max-w-full",
-        "bg-slate-800 transition-all duration-500",
+        "bg-slate-800 dark:bg-slate-100 transition-all duration-500",
       )}
     />
   );
