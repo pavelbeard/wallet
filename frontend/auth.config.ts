@@ -97,6 +97,8 @@ const refresh = async (token: JWT) => {
     refreshTokenValue &&
     dateNow > accessTokenExpiration * 1000
   ) {
+    console.log(refreshTokenValue);
+
     const refreshResult = await refreshToken(refreshTokenValue);
     if (refreshResult.success) {
       const accessTokenMaxAge = refreshResult.tokens?.accessToken
@@ -118,28 +120,6 @@ const refresh = async (token: JWT) => {
 
 export const authConfig = {
   callbacks: {
-    // async authorized({ auth, request: { nextUrl } }) {
-    //   const isAuthenticated = !!auth?.user;
-
-    //   const isProtectedRoute = (
-    //     await localizedRoutes(protectedRoutes)
-    //   ).includes(nextUrl.pathname);
-
-    //   const signOutPath = await localizedRoute(DEFAULT_SIGNED_OUT_PATH);
-    //   const signInPath = await localizedRoute(DEFAULT_SIGNED_IN_PATH);
-
-    //   if (isProtectedRoute) {
-    //     if (isAuthenticated) {
-    //       return true;
-    //     }
-
-    //     return Response.redirect(new URL(signOutPath, nextUrl));
-    //   } else if (isAuthenticated) {
-    //     return Response.redirect(new URL(signInPath, nextUrl));
-    //   }
-
-    //   return true;
-    // },
     async signIn({ user, account, profile, email, credentials }) {
       const provider: string | undefined = account?.provider;
       if (provider == undefined || !account) return false;

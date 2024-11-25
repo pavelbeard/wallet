@@ -1,25 +1,35 @@
 "use client";
+
 import clsx from "clsx";
 import { User } from "next-auth";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import ChangeEmailForm from "./change-email-form";
 
 type Props = { user: User };
 
 export default function ChangeEmailBtn({ user }: Props) {
   const [isOpen, setForm] = useState(false);
-  const toggleForm = () => setForm(!isOpen);
+  const t = useTranslations();
+
   return (
     <>
       <br />
       <button
-        onClick={toggleForm}
+        onClick={() => setForm(true)}
         className={clsx(
-          "text-sm font-light hover:text-gray-100 cursor-pointer justify-self-end",
+          "text-sm font-light hover:text-gray-100 cursor-pointer text-start lg:justify-self-end",
           "dark:hover:text-slate-600",
         )}
       >
-        cambiar email
+        {t("profile.userCard.changeEmail")}
       </button>
+      {isOpen &&
+        createPortal(
+          <ChangeEmailForm closeForm={() => setForm(false)} />,
+          document.body,
+        )}
     </>
   );
 }

@@ -42,7 +42,8 @@
       "signUp": "In a unirte",
       "toDashboard": "Al Dashboard",
       "text1": "Guarda tus secretos.",
-      "text2": "Una de las mejores y más robustas aplicaciones."
+      "text2": "Una de las mejores y más robustas aplicaciones.",
+      "text0": "¡Bienvenido a la aplicación Cartera!"
     }
   },
   "dashboard": {
@@ -51,7 +52,36 @@
   },
   "profile": {
     "title": "Cartera | Perfil",
-    "description": "Perfil del usuario"
+    "description": "Perfil del usuario",
+    "userCard": {
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "changeEmail": "cambiar correo electrónico",
+      "modal": {
+        "close": "Cerrar",
+        "title": "Cambiar correo electrónico",
+        "form": {
+          "emailPlaceholder": "Introduce un nuevo correo electrónico...",
+          "emailField": "Correo electrónico"
+        }
+      }
+    },
+    "useCard": {
+      "modal": {
+        "form": {
+          "submit": "Confirmar cambio de correo electrónico"
+        }
+      }
+    },
+    "twofactor": {
+      "title": "Configurar 2FA",
+      "or": "O sin escáner QR",
+      "copied": "El código 2FA se ha copiado en el portapapeles",
+      "copy": "Copiar al portapapeles",
+      "input": "Tu 2FA",
+      "inputPlaceholder": "Ingrese su código 2FA...",
+      "note": "Copie su 2FA desde su aplicación de contraseña o algo más..."
+    }
   },
   "header": {
     "why": "Por qué es Cartera?",

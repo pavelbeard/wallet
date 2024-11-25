@@ -56,8 +56,23 @@ const SignUpSchema = z
     }
   });
 
+const ChangeEmailSchema = z.object({
+  email: z.string().email({ message: "Provide your email!" }),
+});
+
+const TwoFactorSchema = z.object({
+  token: z.string().min(6, { message: "Provide your token" }),
+});
 
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
+export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
+export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
 
-export { SignInSchema, SignUpSchema, SignUpSchemaSuperRefineErrors };
+export {
+  ChangeEmailSchema,
+  SignInSchema,
+  SignUpSchema,
+  SignUpSchemaSuperRefineErrors,
+  TwoFactorSchema,
+};

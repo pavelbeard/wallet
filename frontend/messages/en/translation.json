@@ -42,7 +42,8 @@
       "signUp": "In a unirte",
       "toDashboard": "To Dashboard",
       "text1": "Keep your secrets.",
-      "text2": "One of the best and robust app."
+      "text2": "One of the best and robust app.",
+      "text0": "Welcome to Cartera app!"
     }
   },
   "dashboard": {
@@ -51,7 +52,36 @@
   },
   "profile": {
     "title": "Cartera | Profile",
-    "description": "User profile"
+    "description": "User profile",
+    "userCard": {
+      "username": "Username",
+      "email": "Email",
+      "changeEmail": "change email",
+      "modal": {
+        "close": "Close",
+        "title": "Change email",
+        "form": {
+          "emailPlaceholder": "Enter a new email...",
+          "emailField": "Email"
+        }
+      }
+    },
+    "useCard": {
+      "modal": {
+        "form": {
+          "submit": "Confirm change email"
+        }
+      }
+    },
+    "twofactor": {
+      "title": "Configurate 2FA",
+      "or": "Or without QR scanner",
+      "copied": "2FA code has copied to the clipboard",
+      "copy": "Copy to clipboard",
+      "input": "Your 2FA",
+      "inputPlaceholder": "Enter your 2FA code...",
+      "note": "Copy your 2FA from your password app or something else..."
+    }
   },
   "header": {
     "why": "Why is Cartera?",

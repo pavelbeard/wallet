@@ -1,3 +1,4 @@
+import { mountStoreDevtool } from "simple-zustand-devtools";
 import { create } from "zustand";
 
 type State = {
@@ -16,6 +17,10 @@ export const useModalStore = create<State & Action>((set) => ({
       isChangeEmailFormOpen: !state.isChangeEmailFormOpen,
     })),
 }));
+
+if (process.env.NODE_ENV === "development") {
+  mountStoreDevtool("useModalStore", useModalStore);
+}
 
 export default function useModals() {
   const isChangeEmailFormOpen = useModalStore(

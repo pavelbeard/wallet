@@ -17,11 +17,7 @@ export type InputPropsWithRegister = {
   id: string;
 };
 
-export type Color = 
-"container-bg"
-| "auth-bg" 
-| "dashboard-bg" 
-| "error-bg";
+export type Color = "container-bg" | "auth-bg" | "dashboard-bg" | "error-bg";
 
 export type Props = { children: React.ReactNode };
 
@@ -55,3 +51,5 @@ export type UserMenuItem = {
 // data
 
 export type ToggleActiveItem = (index: number) => void;
+
+export type TOTPData = { config_key: string; detail?: string };

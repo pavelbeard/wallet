@@ -4,14 +4,14 @@ import { pick } from "lodash";
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Roboto_Mono } from "next/font/google";
 import { Suspense } from "react";
 import NavigationEvents from "./components/layout/navigation-events";
-import { Roboto_Mono } from "next/font/google"
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
-  display: "swap"
-})
+  display: "swap",
+});
 
 export default async function ErrorLayout({ children }: Props) {
   const locale = await getLocale();
@@ -21,11 +21,16 @@ export default async function ErrorLayout({ children }: Props) {
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <link rel="icon" href="favicon.ico" />
-        {/* <script
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
           data-meta="react-devtools/safari"
           src="http://localhost:8097"
-        ></script> */}
+        ></script>
+        {/* Use polyfill for browsers that don't support scroll-timeline */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js"></script>
       </head>
       <body>
         <SessionProvider>

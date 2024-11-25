@@ -1,9 +1,7 @@
 "use client";
 
-import useBurgerMenu from "@/app/lib/hooks/useBurgerMenu";
 import useBurgerMenuStore from "@/app/lib/hooks/useBurgerMenuStore";
-import useUserMenu from "@/app/lib/hooks/useUserMenu";
-import { useOverflow } from "@/app/lib/store/useOverflowControlStore";
+import { useOverflowControlStore } from "@/app/lib/store/useOverflowControlStore";
 import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
 import { usePathname } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
@@ -14,11 +12,26 @@ export default function NavigationEvents() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const { isOverflowHidden, setOverflowAuto } = useOverflow();
+  const { isOverflowHidden, setOverflowAuto } = useOverflowControlStore(
+    useShallow((state) => ({
+      isOverflowHidden: state.isOverflowHidden,
+      setOverflowAuto: state.setOverflowAuto,
+    })),
+  );
 
-  const { isBurgerOpen, setIsBurgerOpen } = useBurgerMenu();
+  const { isBurgerOpen, setIsBurgerOpen } = useBurgerMenuStore(
+    useShallow((state) => ({
+      isBurgerOpen: state.isBurgerOpen,
+      setIsBurgerOpen: state.setIsBurgerOpen,
+    })),
+  );
 
-  const { isOpenMobile, closeMobile } = useUserMenu();
+  const { isOpenMobile, closeMobile } = useUserMenuStore(
+    useShallow((state) => ({
+      isOpenMobile: state.isOpenMobile,
+      closeMobile: state.closeMobile,
+    })),
+  );
 
   useEffect(() => {
     // those things are for close any modal/burger/sidebar while navigation

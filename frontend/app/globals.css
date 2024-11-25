@@ -32,7 +32,7 @@
 }
 
 .main-links {
-  @apply text-center text-lg font-bold
+  @apply text-center text-lg font-bold;
 }
 
 .field-error {
@@ -44,7 +44,7 @@
 }
 
 .hover-avatar {
-  @apply hover:scale-110 transition-all hover:duration-300 hover:ease-in-out
+  @apply hover:scale-110 transition-all hover:duration-300 hover:ease-in-out;
 }
 
 @layer utilities {

@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef } from "react";
 
 type Event = MouseEvent | TouchEvent;
 
-export default function useClickOutside(callback: () => void) {
-  const ref = useRef<HTMLElement>(null);
+export default function useClickOutside<T extends HTMLElement = HTMLElement>(
+  callback: () => void,
+) {
+  const ref = useRef<T>(null);
 
   const listener = useCallback(
     (e: Event) => {

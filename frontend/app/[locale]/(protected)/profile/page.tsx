@@ -1,4 +1,6 @@
+import TwoFactorCard from "@/app/components/profile/two-factor-wrapper";
 import UserCard from "@/app/components/profile/user-card";
+import getTotpData from "@/app/lib/getTotpData";
 import { LocaleProps } from "@/i18n/types";
 import { getTranslations } from "next-intl/server";
 import { Metadata } from "next/types";
@@ -8,19 +10,21 @@ export async function generateMetadata({
 }: LocaleProps): Promise<Metadata> {
   const t = await getTranslations({
     locale,
-    namespace: "profile",
   });
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title: t("profile.title"),
+    description: t("profile.description"),
   };
 }
 
-export default function Page({ params: { locale } }: LocaleProps) {
+export default async function Page() {
+  const totpData = await getTotpData();
+
   return (
-    <div className="flex flex-col lg:grid lg:grid-cols-3">
+    <div className="flex flex-col xl:grid xl:grid-cols-[2fr_1fr_1fr] gap-4">
       <UserCard />
+      <TwoFactorCard totpData={totpData} />
     </div>
   );
 }

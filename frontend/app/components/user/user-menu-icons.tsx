@@ -7,12 +7,12 @@ import {
 export const USER_MENU: UserMenuItem[] = [
   {
     icon: <UserIcon className="size-6" />,
-    title: "profile",
+    title: "userMenu.profile",
     url: "/profile",
   },
   {
     icon: <ArrowLeftStartOnRectangleIcon className="size-6" />,
-    title: "signOut",
+    title: "userMenu.signOut",
     url: "/auth/sign-out",
     fontBold: true,
   },

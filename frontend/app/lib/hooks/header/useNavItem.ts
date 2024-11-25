@@ -3,12 +3,20 @@ import { VisibilityState } from "@/app/lib/types/header/index.d";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import useDesktopBreakpoint from "../useDesktopBreakpoint";
 
+/**
+ * This hook is used to control the opening and closing dropdown menu items
+ * @param children - dropdown menu items
+ * @param animationOrder - timeline animation order
+ */
 const useNavItem = (children: ReactNode, animationOrder?: number) => {
   const navItemRef = useRef<HTMLLIElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const isDesktop = useDesktopBreakpoint();
   const { setVisibilityMain } = useOuterHeaderContext();
 
+  /**
+   * Opens dropdown menu item
+   */
   const opening = () => {
     if (children) {
       setIsVisible(true);
@@ -16,6 +24,9 @@ const useNavItem = (children: ReactNode, animationOrder?: number) => {
     }
   };
 
+  /**
+   * Closes dropdown menu item
+   */
   const closing = () => {
     if (children) {
       setIsVisible(false);
@@ -24,6 +35,7 @@ const useNavItem = (children: ReactNode, animationOrder?: number) => {
   };
 
   useEffect(() => {
+    // Play animation due an animation order while dropdown menu is visible
     if (animationOrder) {
       const navItem = navItemRef.current;
       if (navItem) {

@@ -1,7 +1,17 @@
 "use client";
 
 import useScrambleText from "@/app/lib/hooks/useScrambleText";
+import "./style.css";
 
+/**
+ * 
+ * @param initialText - text that has to be scrambled first
+ * @param textArray - array of texts that will be scrambled
+ * @param className - className for the p tag
+ * @param upperCase - if true, the initialText and textArray will be converted to uppercase
+ * @param lowerCase - if true, the initialText and textArray will be converted to lowercase
+ * @returns 
+ */
 export default function ScrambleText({
   initialText,
   textArray,

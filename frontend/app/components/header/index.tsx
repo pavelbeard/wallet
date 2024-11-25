@@ -4,6 +4,7 @@ import LogoHeader from "@/app/components/header/logo-header";
 import useDropdownMenu from "@/app/lib/hooks/header/useDropdownMenu";
 import useHeader from "@/app/lib/hooks/header/useHeader";
 import useNavItem from "@/app/lib/hooks/header/useNavItem";
+import useUser from "@/app/lib/hooks/useUser";
 import {
   InnerHeaderContext,
   OuterHeaderContext,
@@ -12,7 +13,6 @@ import Underline from "@/app/ui/underline";
 import { Link } from "@/i18n/routing";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { Fragment } from "react";
 import {
@@ -189,7 +189,7 @@ export default function Header() {
     isBurgerOpen,
     toggleBurgerMenu,
   } = useHeader();
-  const auth = useSession();
+  const user = useUser();
 
   return (
     <OuterHeaderContext.Provider
@@ -204,8 +204,8 @@ export default function Header() {
         ref={dropdownMenuRef}
         role="navigation"
         className={clsx(
-          "px-8 py-8 md:px-16 lg:px-32 flex items-center fixed top-0 w-full justify-between",
-          "max-lg:header-mobile-navbar lg:header-desktop-navbar",
+          "px-8 py-8 md:px-16 lg:px-32 flex items-center fixed top-0 w-full justify-between z-10",
+          "blur-scroll appear-from-void lg:header-desktop-navbar",
           visibilityState,
         )}
       >
@@ -250,7 +250,7 @@ export default function Header() {
             </NavBar>
 
             <NavBar className="flex flex-grow justify-end basis-0">
-              {auth?.status === "authenticated" ? (
+              {user ? (
                 <NavItem isOnHeader title="Dashboard" href="/dashboard" />
               ) : (
                 <NavItem isOnHeader title="Sign in" href="/auth/sign-in" />
@@ -260,16 +260,18 @@ export default function Header() {
         ) : (
           <>
             <LogoHeader className="flex flex-grow basis-0 items-center" />
+
             <BurgerButtonMenu
               isBurgerOpen={isBurgerOpen}
               toggleBurgerMenu={toggleBurgerMenu}
             />
+
             {isBurgerOpen && (
               <div
                 ref={sidebarMenuRef}
                 className="header-mobile-accordion-sidebar"
               >
-                <NavBar className="flex px-6 pt-6 h-80 overflow-y-auto border-t border-slate-800 dark:border-slate-300">
+                <NavBar className="flex px-6 pt-6 h-4/5 overflow-y-auto border-t border-slate-800 dark:border-slate-300">
                   {MENU.map(
                     (item) =>
                       item.children && (
@@ -315,8 +317,9 @@ export default function Header() {
                       ),
                   )}
                 </NavBar>
+
                 <NavBar className="flex flex-grow basis-0 p-6 border-t border-slate-800 dark:border-slate-300">
-                  {auth?.status === "authenticated" ? (
+                  {user ? (
                     <NavItem isOnHeader title="Dashboard" href="/dashboard" />
                   ) : (
                     <NavItem isOnHeader title="Sign in" href="/auth/sign-in" />
@@ -329,37 +332,4 @@ export default function Header() {
       </header>
     </OuterHeaderContext.Provider>
   );
-}
-
-// desktop menu example
-{
-  /* <NavBar className="flex">
-  <NavItem isOnHeader title="Why is Cartera?" />
-  <NavItem isOnHeader title="Advantages">
-    <DropdownMenu>
-      <ul className="flex gap-x-8">
-        <NavItem isMenuRoot title="First one">
-          <NavItem animationOrder={1} title="Because we are strong!" />
-          <NavItem animationOrder={2} title="And ferries!" />
-        </NavItem>
-        <NavItem isMenuRoot title="Second one">
-          <NavItem animationOrder={1} title="Because we are robust!" />
-          <NavItem animationOrder={2} title="And penguins!" />
-        </NavItem>
-        <NavItem isMenuRoot title="Next?">
-          <NavItem animationOrder={1} title="What will be next?" />
-          <NavItem animationOrder={2} title="I don't know..." />
-          <NavItem animationOrder={3} title="You're sure?" />
-        </NavItem>
-      </ul>
-    </DropdownMenu>
-  </NavItem>
-  <NavItem isOnHeader title="Passwords">
-    <DropdownMenu>
-      <ul className="flex gap-x-8">
-        <NavItem isMenuRoot title="Create new password" />
-      </ul>
-    </DropdownMenu>
-  </NavItem>
-</NavBar>; */
 }

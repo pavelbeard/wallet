@@ -1,6 +1,15 @@
 import clsx from "clsx";
 import { User } from "next-auth";
-import UserAvatar from "./user-avatar";
+import dynamic from "next/dynamic";
+import UserAvatarSkeleton from "./user-avatar-skeleton";
+
+// Because this component uses the useIsomorphicLayoutEffect hook,
+// that is trying to first render on the server side,
+// and that is provoking the hydration errors, so we need to use dynamic import.
+const UserAvatar = dynamic(() => import("@/app/components/user/user-avatar"), {
+  ssr: false,
+  loading: () => <UserAvatarSkeleton />,
+});
 
 type Props = {
   user: User | undefined;
@@ -8,7 +17,7 @@ type Props = {
 
 function UserInfo({ user }: Props) {
   const image = user?.image;
-  const provider = user?.provider ?? "credentials"
+  const provider = user?.provider ?? "credentials";
 
   return (
     <div
@@ -20,10 +29,7 @@ function UserInfo({ user }: Props) {
       )}
     >
       <span className="hidden lg:block text-lg font-bold">{user?.name}</span>
-      <UserAvatar
-        src={image}
-        provider={provider}
-      />
+      <UserAvatar src={image} provider={provider} />
       <span className="lg:hidden text-lg font-bold">{user?.name}</span>
     </div>
   );

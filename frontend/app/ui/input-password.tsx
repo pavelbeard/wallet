@@ -10,12 +10,12 @@ export default function PasswordInput({
   labelText,
   register,
   ...rest
-}: InputPropsWithRegister & { [x:string]: any }) {
+}: InputPropsWithRegister & { [x:string]: unknown }) {
   const [revealed, setRevealed] = useState<boolean>();
 
   return (
     <label className="flex flex-col relative" htmlFor={htmlFor}>
-      <span className="pl-2 pb-1">{labelText}</span>
+      <span className="px-2 pb-1">{labelText}</span>
       <input
         className={clsx(
           "p-4 outline-gray-500 outline-2 border-slate-700 border-[1px]",

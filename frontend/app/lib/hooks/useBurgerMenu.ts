@@ -13,11 +13,16 @@ export default function useBurgerMenu() {
       setIsBurgerOpen: state.setIsBurgerOpen,
     })),
   );
+  // const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
   const { isOverflowHidden, setOverflowAuto, setOverflowHidden } =
     useOverflow();
 
-  const toggleBurgerMenu = () => setIsBurgerOpen(!isBurgerOpen);
+  const toggleBurgerMenu = () => {
+    console.log("toggleBurgerMenu");
+
+    setIsBurgerOpen(!isBurgerOpen);
+  };
 
   useEffect(() => {
     const listenWindowWidth = () => {

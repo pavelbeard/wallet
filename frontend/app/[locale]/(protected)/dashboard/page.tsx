@@ -9,12 +9,11 @@ export async function generateMetadata({
 }: LocaleProps): Promise<Metadata> {
   const t = await getTranslations({
     locale,
-    namespace: "dashboard",
   });
 
   return {
-    title: t("title"),
-    description: t("description"),
+    title: t("dashboard.title"),
+    description: t("dashboard.description"),
   };
 }
 

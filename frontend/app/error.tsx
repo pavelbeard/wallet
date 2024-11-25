@@ -7,9 +7,12 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { useLocale, useTranslations } from "next-intl";
 
-export default function Error() {
-  window.document.title = "Error";
+export const metadata: Metadata = {
+  title: "Cartera | Error",
+  description: "Cartera | Error",
+};
 
+export default function Error() {
   const locale = useLocale();
   const t = useTranslations("error");
   return (
@@ -23,7 +26,7 @@ export default function Error() {
           <section className="p-4">
             <Link
               className={clsx(
-                "p-4 bg-slate-800 text-white",
+                "p-4 bg-slate-300 dark:bg-slate-800 dark:border-[0.5px] dark:border-slate-600 text-white",
                 "rounded-full mt-4 shadow-slate-800 drop-shadow-lg",
                 "hover:bg-slate-300 hover:text-black",
               )}

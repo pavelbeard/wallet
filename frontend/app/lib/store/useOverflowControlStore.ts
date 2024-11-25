@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { mountStoreDevtool } from "simple-zustand-devtools";
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 
@@ -22,6 +23,10 @@ export const useOverflowControlStore = create<State & Action>((set) => ({
     set((state) => ({ ...state, isOverflowHidden: false })),
 }));
 
+if (process.env.NODE_ENV === "development") {
+  mountStoreDevtool("useOverflowControlStore", useOverflowControlStore);
+}
+
 export function useEffectOverflow() {
   const isOverflowHidden = useOverflowControlStore(
     (state) => state.isOverflowHidden,
@@ -41,13 +46,14 @@ export function useToggleOverflow() {
 }
 
 export function useOverflow() {
-  const { isOverflowHidden, setOverflowAuto, setOverflowHidden } = useOverflowControlStore(
-    useShallow((state) => ({
-      setOverflowAuto: state.setOverflowAuto,
-      setOverflowHidden: state.setOverflowHidden,
-      isOverflowHidden: state.isOverflowHidden,
-    })),
-  );
+  const { isOverflowHidden, setOverflowAuto, setOverflowHidden } =
+    useOverflowControlStore(
+      useShallow((state) => ({
+        setOverflowAuto: state.setOverflowAuto,
+        setOverflowHidden: state.setOverflowHidden,
+        isOverflowHidden: state.isOverflowHidden,
+      })),
+    );
 
   return { isOverflowHidden, setOverflowAuto, setOverflowHidden };
 }

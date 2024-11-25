@@ -7,6 +7,8 @@ type Props = {};
 
 export default async function LayoutSideElementsDesktop({}: Props) {
   const user = await getUser();
+  console.log(user);
+  
   return (
     <>
       <LayoutLogo />

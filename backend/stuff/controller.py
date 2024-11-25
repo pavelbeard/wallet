@@ -1,4 +1,3 @@
-import re
 import uuid
 
 from django.db.models import QuerySet
@@ -96,26 +95,28 @@ class TOTPDevice:
     @staticmethod
     def create_totp_device(request: HttpRequest):
         # new response
-        response = HttpResponse()
+        response = Response()
         # configure device
         user = request.user
         device = stuff_logic.get_user_totp_device(user)
         if not device:
             device = user.totpdevice_set.create(confirmed=False)
         url = device.config_url
+        # DOESN'T WORK IN FRONTEND
         # create qr
-        two_fa_img = stuff_logic.generate_2fa_key_in_qr_code(url)
+        # two_fa_img = stuff_logic.generate_2fa_key_in_qr_code(url)
         # use it in response
-        response.headers["Content-Type"] = "multipart/mixed; boundary=boundary"
-        two_fa_img.save(response, "PNG")
+        # response.headers["Content-Type"] = "multipart/mixed; boundary=boundary"
+        # two_fa_img.save(response, "PNG")
         # user has enable 2fa
         user.is_two_factor_enabled = True
         user.save()
         # last preparations for the response
         response.status_code = status.HTTP_200_OK
         # 2fa configuration key is necessary too
-        two_fa_config_key = re.findall(r"secret=(.*)&algorithm", url)[0]
-        response.data = two_fa_config_key
+        # two_fa_config_key = re.findall(r"secret=(.*)&algorithm", url)[0]
+        response.data = {"config_key": url}
+        print(response.data)
         return response
 
     @staticmethod

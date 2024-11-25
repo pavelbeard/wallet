@@ -36,8 +36,6 @@ export default async function RootProtectedLayout({ children }: Props) {
         <LayoutSideElementsMobile />
         <div className="p-4 h-full">{children}</div>
       </main>
-
-      {/* modals */}
     </NextIntlClientProvider>
   );
 }

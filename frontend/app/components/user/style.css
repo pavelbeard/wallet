@@ -1,0 +1,20 @@
+@config "../../../tailwind.config.ts";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .appear-from-void {
+    animation: appearFromVoid 0.8s ease both;
+  }
+}
+
+@keyframes appearFromVoid {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -6,19 +6,36 @@
 
 :root {
   --dropdown-height: 0;
-  --header-background-color: #f8f9fbc1;
+  --header-background-color: #d6d7d8dd;
+}
+
+@layer utilities {
+  .blur-scroll {
+    animation: blurScroll 0.5s ease both;
+    animation-range-start: cover 2%;
+    animation-range-end: cover 20%;
+    animation-timeline: scroll();
+  }
+}
+
+@layer utilities {
+  .appear-from-void {
+    animation: appearFromVoid 0.5s ease both;
+  }
+}
+
+@keyframes appearFromVoid {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* DESKTOP HEADER */
 
 @layer utilities {
-  .header-desktop-navbar {
-    animation: blurHeader 0.5s ease both;
-    animation-range-start: cover 2%;
-    animation-range-end: cover 20%;
-    animation-timeline: scroll();
-  }
-
   .header-desktop-navbar::before {
     content: "";
     position: absolute;
@@ -119,7 +136,7 @@
   }
 }
 
-@keyframes blurHeader {
+@keyframes blurScroll {
   to {
     backdrop-filter: blur(5px);
     background-color: var(--header-background-color);
@@ -154,15 +171,6 @@
 }
 
 /* MOBILE HEADER */
-
-@layer utilities {
-  .header-mobile-navbar {
-    animation: blurHeader 0.5s ease both;
-    animation-range-start: cover 2%;
-    animation-range-end: cover 20%;
-    animation-timeline: scroll();
-  }
-}
 
 .header-mobile-accordion-sidebar {
   position: absolute;

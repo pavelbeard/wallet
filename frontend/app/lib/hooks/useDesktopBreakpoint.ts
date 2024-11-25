@@ -1,5 +1,7 @@
 import useMediaBreakpoint from "./useMediaBreakpoint";
 
 export default function useDesktopBreakpoint() {
-    return useMediaBreakpoint(1024);
+  const matches = useMediaBreakpoint("(min-width: 1024px)");
+  console.log("useDesktopBreakpoint", matches);
+  return matches;
 }

@@ -4,13 +4,24 @@ import { providersList } from "@/auth.config";
 import clsx from "clsx";
 import Image from "next/image";
 import { ReactNode } from "react";
+import "./style.css";
 
-function AbsoluteLayout({ children, position }: { children: ReactNode, position: string }) {
+export function AbsoluteLayout({
+  children,
+  position,
+}: {
+  children: ReactNode;
+  position: string;
+}) {
   return (
-    <div className={clsx(
-      "absolute size-6 flex justify-center items-center rounded-full bg-slate-300 dark:text-slate-600",
-      position, 
-    )}>
+    <div
+      className={clsx(
+        "appear-from-void",
+        "absolute size-6 flex justify-center items-center rounded-full",
+        "bg-slate-300 dark:text-slate-600",
+        position,
+      )}
+    >
       {children}
     </div>
   );
@@ -25,7 +36,11 @@ function CarteraAuthMethodLogo() {
 }
 
 function OauthAuthMethodLogo({ provider }: { provider: string }) {
-  return <AbsoluteLayout position="top-8 left-6 lg:top-12 lg:left-10">{OAUTH_LOGOS[provider]}</AbsoluteLayout>;
+  return (
+    <AbsoluteLayout position="top-8 left-6 lg:top-12 lg:left-10">
+      {OAUTH_LOGOS[provider]}
+    </AbsoluteLayout>
+  );
 }
 
 type Props = {

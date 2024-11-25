@@ -2,16 +2,17 @@ import { USER_MENU } from "@/app/components/user/user-menu-icons";
 import useClickOutside from "@/app/lib/hooks/useClickOutside";
 import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
 import { UserMenuItem } from "@/app/lib/types";
-import { useTranslations } from "next-intl";
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const EXPAND = "animate-short-expand";
 const COLLAPSE = "animate-short-collapse";
 const SLIDE_IN_LEFT = "animate-short-slide-in-left";
 const SLIDE_OUT_LEFT = "animate-short-slide-out-left";
 
+/**
+ * Manages a state of the user menu, allows to be open to only on menu item.
+ */
 export default function useUserMenu() {
-  const t = useTranslations("userMenu");
   const isOpenDesktop = useUserMenuStore((state) => state.isOpenDesktop);
   const toggleOpenDesktop = useUserMenuStore(
     (state) => state.toggleOpenDesktop,
@@ -24,7 +25,7 @@ export default function useUserMenu() {
   const desktopRef = useRef<HTMLElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
   const [isDelayActive, setDelay] = useState(false);
-  const ref = useClickOutside(closeDesktop) as RefObject<HTMLDivElement>;
+  const ref = useClickOutside<HTMLDivElement>(closeDesktop);
 
   useEffect(() => {
     if (isOpenDesktop) {
@@ -40,7 +41,7 @@ export default function useUserMenu() {
   }, [isOpenDesktop]);
 
   useEffect(() => {
-    process.env.NODE_ENV === "development" &&
+    if (process.env.NODE_ENV === "development")
       console.log("isOpenMobile", isOpenMobile);
 
     if (isOpenMobile) {
@@ -59,7 +60,7 @@ export default function useUserMenu() {
   }, [isOpenMobile]);
 
   const userMenu: UserMenuItem[] = useMemo(
-    () => USER_MENU.map((item) => ({ ...item, title: t(item.title) })),
+    () => USER_MENU.map((item) => ({ ...item, title: item.title })),
     [],
   );
 

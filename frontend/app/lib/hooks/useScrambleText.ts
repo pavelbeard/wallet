@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useScramble } from "use-scramble";
 
+/**
+ * Allow to return each element of the array in turn
+ * @param array - array of strings
+ * @returns generator function
+ */
 function* generatorQueue<T>(array: T[]): Generator<T, void, unknown> {
   let index = 0;
   while (true) {
@@ -12,6 +17,11 @@ function* generatorQueue<T>(array: T[]): Generator<T, void, unknown> {
   }
 }
 
+/**
+ * Allow to scramble text by the turn
+ * @param initialText first text to scramble
+ * @param textArray array of texts to scramble
+ */
 export default function useScrambleText(
   initialText: string,
   textArray: string[],

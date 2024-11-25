@@ -232,6 +232,7 @@ class TokensVerificationTestCase(APITestCase):
         response = self.client.get(totp_device_creation_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(isinstance(response.data, str), True)
+        
         print(response.data)
         print(response.content)
 
