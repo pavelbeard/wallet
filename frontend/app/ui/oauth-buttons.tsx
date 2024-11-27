@@ -1,7 +1,7 @@
 "use client";
 
 import { OAUTH_LOGOS } from "@/app/components/auth/oauth-logos";
-import signInWithOauth from "@/app/lib/signInWithOauth";
+import signInWithOauth from "@/app/lib/auth/signInWithOauth";
 import { oauthProviders } from "@/auth.config";
 import { clsx } from "clsx";
 import { useTranslations } from "next-intl";

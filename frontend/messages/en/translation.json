@@ -56,7 +56,7 @@
     "userCard": {
       "username": "Username",
       "email": "Email",
-      "changeEmail": "change email",
+      "changeEmail": "Change email",
       "modal": {
         "close": "Close",
         "title": "Change email",
@@ -74,13 +74,32 @@
       }
     },
     "twofactor": {
-      "title": "Configurate 2FA",
+      "title": "Configurate 2FA from app.",
+      "description": "Two factor authentication gives your account extra layer of security. We strongly recommend you to enable it. When it is enabled, you will be asked to enter a code from your authenticator app in a new device.",
       "or": "Or without QR scanner",
       "copied": "2FA code has copied to the clipboard",
       "copy": "Copy to clipboard",
-      "input": "Your 2FA",
-      "inputPlaceholder": "Enter your 2FA code...",
-      "note": "Copy your 2FA from your password app or something else..."
+      "input": "Your 2FA for check",
+      "inputPlaceholder": "Enter your password...",
+      "note": "Copy your 2FA from your password app or something else...",
+      "verified": "Success. You're passed 2FA verification!",
+      "notVerified": "Invalid TOTP token!",
+      "delete2fa": "Delete 2FA",
+      "submitDelete2fa": "Delete",
+      "delete2faNote": "It will make your account more vulnerable to hackers.  ",
+      "delete2faNote2": "Are you sure?",
+      "2faState": "Two factor authentication <important>{bold}</important> for your account.",
+      "active": "is active",
+      "notActive": "is not active",
+      "2faStartConfig": "Start configuration",
+      "configure": "Configurate",
+      "appTitle": "Authetication app",
+      "attention": "If you have problems with QR scanner, do this",
+      "added": "Added",
+      "next": "Next"
+    },
+    "main": {
+      "twoFactorBtn": "Two factor authentication management"
     }
   },
   "header": {
@@ -102,5 +121,12 @@
   },
   "footer": {
     "rights": "All rights reserved"
+  },
+  "pageName": {
+    "dashboard": "Dashboard",
+    "passwords": "Passwords",
+    "cards": "Payment cards",
+    "profile": "Profile",
+    "2fa": "Two factor authorization"
   }
 }

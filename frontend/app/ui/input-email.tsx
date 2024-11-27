@@ -10,8 +10,8 @@ export default function EmailInput({
   ...rest
 }: InputPropsWithRegister & { [x:string]: unknown }) {
   return (
-    <label className="flex flex-col" htmlFor={htmlFor}>
-      <span className="px-2 pb-1">{labelText}</span>
+    <label className="flex flex-col w-full" htmlFor={htmlFor}>
+      <span className="pb-1">{labelText}</span>
       <input
         className={clsx(
           "p-4 outline-gray-500 outline-2 border-slate-700 border-[1px]",

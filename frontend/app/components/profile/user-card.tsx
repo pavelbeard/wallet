@@ -2,7 +2,6 @@ import getUser from "@/app/lib/getUser";
 import Card from "@/app/ui/card";
 import { User } from "next-auth";
 import { getLocale, getTranslations } from "next-intl/server";
-import ChangeEmailBtn from "./change-email-btn";
 
 type UserProps = { user?: User; title: string };
 
@@ -12,7 +11,6 @@ const Email = ({ user, title }: UserProps) => {
       <div className="flex flex-col">
         <p>{title}:</p>
         <p className="justify-self-end text-wrap">{user?.email}</p>
-        {user.provider == "credentials" && <ChangeEmailBtn user={user} />}
       </div>
     );
   }

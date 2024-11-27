@@ -1,9 +1,9 @@
 "use server";
 
-import { i18nConfig } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 
 export async function localizedRoutes(routes: string[]): Promise<string[]> {
-  const locales = i18nConfig.locales;
+  const locales = routing.locales;
   const mutatedRoutes: string[] = [];
   locales.forEach((locale) => {
     routes.forEach((route) => {
@@ -14,6 +14,6 @@ export async function localizedRoutes(routes: string[]): Promise<string[]> {
 }
 
 export async function localizedRoute(route: string): Promise<string> {
-  const currentLocale = i18nConfig.defaultLocale;
+  const currentLocale = routing.defaultLocale;
   return `/${currentLocale}${route}`;
 }

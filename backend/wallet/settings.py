@@ -275,7 +275,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_SAMESITE': 'Lax',
 
-    'TOKEN_OBTAIN_SERIALIZER': 'stuff.serializers.SigninSerializer'
+    'TOKEN_OBTAIN_SERIALIZER': 'stuff.serializers.TwoFactorJWTSerializer',
 }
 
 # custom user˘

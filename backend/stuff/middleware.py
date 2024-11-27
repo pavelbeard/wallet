@@ -5,7 +5,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 class HeaderSubstituteMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest):
-        if request.COOKIES.get("__clientid"):
+        if request.COOKIES.get("__clientid"):      
             token = f"Bearer {request.COOKIES.get(settings.SIMPLE_JWT['AUTH_ACCESS_COOKIE'])}"
             request.META["HTTP_AUTHORIZATION"] = token
 

@@ -12,7 +12,7 @@ export default function Submit({
     <button
       className={clsx(
         color,
-        "text-white p-4 rounded-xl font-bold",
+        "text-white w-full p-4 rounded-xl font-bold",
         "dark:text-slate-800 dark:bg-gray-100",
       )}
       type="submit"

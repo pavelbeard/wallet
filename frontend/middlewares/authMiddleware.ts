@@ -35,10 +35,7 @@ export default function authMiddleware(middleware: CustomMiddleware) {
       const signInPath = await localizedRoute(DEFAULT_SIGNED_IN_PATH);
 
       if (isProtectedRoute) {
-        console.log("is protected");
-
         if (isAuthenticated) {
-          console.log("is authenticated");
           return response;
         }
 
@@ -55,10 +52,12 @@ export default function authMiddleware(middleware: CustomMiddleware) {
     })(request, event as AppRouteHandlerFnContext)) as NextResponse;
 
     if (authResponse) {
-      const responseHeaders = response.headers;
-      responseHeaders.forEach((value, key) => {
-        authResponse.headers.set(key, value);
-      });
+      // I have swapped middlewares order, so and locale detection now is working!
+
+      // const responseHeaders = response.headers;
+      // responseHeaders.forEach((value, key) => {
+      //   authResponse.headers.set(key, value);
+      // });
 
       return middleware(request, event, authResponse);
     }

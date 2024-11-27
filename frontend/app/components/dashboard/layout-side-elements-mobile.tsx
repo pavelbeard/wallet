@@ -1,18 +1,17 @@
 "use client";
 
 import SideBar from "@/app/components/dashboard/side-bar";
-import UserInfo from "@/app/components/user/user-info";
+import TopBar from "@/app/components/dashboard/top-bar";
 import useDashboard from "@/app/lib/hooks/useDashboard";
-import useUser from "@/app/lib/hooks/useUser";
 import useUserMenu from "@/app/lib/hooks/useUserMenu";
 import { LayoutLogo } from "@/app/ui/layout-logo";
 import LogoHeader from "@/app/ui/logo-header";
 import { UserMenuMobile } from "@/app/ui/user-menu";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
+import PageName from "./page-name";
 
 export default function LayoutSideElementsMobile() {
-  const user = useUser();
   const { mobileRef, isAppeared, isBurgerOpen, toggleBurgerMenu } =
     useDashboard();
   const { isOpenMobile } = useUserMenu();
@@ -32,7 +31,7 @@ export default function LayoutSideElementsMobile() {
               <UserMenuMobile />
             ) : (
               <>
-                <UserInfo user={user} />
+                <TopBar />
                 <SideBar />
               </>
             )}
@@ -52,10 +51,14 @@ export default function LayoutSideElementsMobile() {
           "lg:hidden p-4 relative z-0 flex justify-between items-center bg-slate-100 drop-shadow-md shadow-black",
           "dark:bg-slate-800 dark:text-gray-100",
         )}
+        aria-label="header-mobile"
       >
-        <button data-testid="burger-open-btn" onClick={toggleBurgerMenu}>
+        <button className="flex flex-grow basis-0" data-testid="burger-open-btn" onClick={toggleBurgerMenu}>
           <Bars3Icon className="size-6" />
         </button>
+
+        <PageName className="flex justify-center items-center font-bold" />
+
         <LogoHeader position="right" />
       </header>
     </>

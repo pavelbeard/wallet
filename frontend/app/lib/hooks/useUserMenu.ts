@@ -41,9 +41,6 @@ export default function useUserMenu() {
   }, [isOpenDesktop]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "development")
-      console.log("isOpenMobile", isOpenMobile);
-
     if (isOpenMobile) {
       setDelay(true);
       mobileRef.current?.classList.add(SLIDE_OUT_LEFT);

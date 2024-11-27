@@ -1,6 +1,6 @@
 "use server";
 
-import { API_PATH } from "../constants";
+import { API_PATH } from "./constants";
 import getAccessToken from "./getAccessToken";
 
 export default async function query({
@@ -24,7 +24,12 @@ export default async function query({
     body: body ? JSON.stringify(body) : undefined,
     credentials: "include",
   })
-    .then((response) => response.json())
+    .then((response) => {
+      return {
+        json: response.json(),
+        response,
+      };
+    })
     .then((data) => data)
     .catch((error) => {
       console.error(error);

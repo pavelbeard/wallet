@@ -33,12 +33,17 @@ function FormComponent() {
   const [formMessages, setFormMessages] = useState({
     success: "",
     error: "",
+    pending: "",
   });
 
   const onSubmit: SubmitHandler<ChangeEmailValidator> = async (data) => {
     startTransition(() => {
       console.log(data);
       // TODO: change email
+      setFormMessages({
+        ...formMessages,
+        pending: "Check your email for confirmation link...",
+      });
     });
   };
   return (
@@ -59,6 +64,7 @@ function FormComponent() {
       {errors.email?.message && (
         <p className="field-error">{errors.email.message}</p>
       )}
+      {formMessages.pending && <p className="field-pending">{formMessages.pending}</p>}
       <FormError message={formMessages.error} />
       <FormSuccess message={formMessages.success} />
       <Submit

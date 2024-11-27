@@ -14,5 +14,5 @@ export default function FormTitle({ textSize = "2xl", children }: Props) {
     xl: "text-xl",
     "2xl": "text-2xl",
   };
-  return <h1 className={clsx(text[textSize], "px-2 font-bold")}>{children}</h1>;
+  return <h1 className={clsx(text[textSize], "font-bold")}>{children}</h1>;
 }

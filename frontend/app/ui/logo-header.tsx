@@ -15,10 +15,10 @@ export default function LogoHeader({
       locale={locale}
       href={"/"}
       className={clsx(
-        "group relative z-10 flex items-center",
-        position == "center" && "justify-self-center",
-        position == "left" && "justify-self-start",
-        position == "right" && "justify-self-end"
+        "group relative z-10 flex flex-grow basis-0 items-center",
+        position == "center" && "justify-center",
+        position == "left" && "justify-start",
+        position == "right" && "justify-end",
       )}
     >
       <Image

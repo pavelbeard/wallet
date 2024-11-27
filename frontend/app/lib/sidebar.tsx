@@ -1,7 +1,12 @@
-import { CreditCardIcon, KeyIcon } from "@heroicons/react/24/solid";
+import { CreditCardIcon, HomeIcon, KeyIcon } from "@heroicons/react/24/solid";
 import { SideBarItem } from "./types";
 
 export const sideMenu: SideBarItem[] = [
+  {
+    title: "Main",
+    url: "/dashboard",
+    icon: <HomeIcon className="size-5 hover:text-black" />
+  },
   {
     title: "Passwords",
     url: "/passwords",

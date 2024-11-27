@@ -64,15 +64,39 @@ const TwoFactorSchema = z.object({
   token: z.string().min(6, { message: "Provide your token" }),
 });
 
+const UpdateSessionSchema = z.object({
+  access_token: z.string().min(1, { message: "Provide your token" }),
+  access_token_exp: z.number().min(1, { message: "Provide token expiration" }),
+  refresh_token: z.string().min(1, { message: "Provide your token" }),
+  refresh_token_exp: z.number().min(1, { message: "Provide token expiration" }),
+  user: z.object({
+    public_id: z.string().min(1, { message: "Public id is required" }),
+    username: z.string().min(1, { message: "Username is required" }),
+    email: z.string().min(1, { message: "Email is required" }),
+    orig_iat: z.number().min(1, { message: "Orig iat is required" }),
+    otp_device_id: z.string().nullable(),
+    created_at: z.string().nullable(),
+    provider: z.string().optional(),
+  }),
+});
+
+const PasswordSchema = z.object({
+  password: z.string().min(1, { message: "Provide your password" }),
+});
+
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
 export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
 export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
+export type UpdateSessionValidator = z.infer<typeof UpdateSessionSchema>;
+export type PasswordValidator = z.infer<typeof PasswordSchema>;
 
 export {
   ChangeEmailSchema,
+  PasswordSchema,
   SignInSchema,
   SignUpSchema,
   SignUpSchemaSuperRefineErrors,
   TwoFactorSchema,
+  UpdateSessionSchema,
 };

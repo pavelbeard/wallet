@@ -71,13 +71,14 @@ const useHeader = () => {
             timeline: new ScrollTimeline({
               source: document.documentElement,
             }),
-            // @ts-expect-error | Linter doesn't know property rangeStart in KeyframeEffectOptions
-            rangeStart: "cover 2%",
           },
         );
       }
       // On safari iOS (17.5), the polyfill doesn't work
-    } catch {}
+    } catch (error) {
+      console.log("Error loading scroll-timeline-polyfill");
+      console.error(error);
+    }
   }, []);
 
   return {

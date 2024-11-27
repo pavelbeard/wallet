@@ -1,17 +1,9 @@
 "use server";
 
-import { API_PATH } from "@/app/lib/constants";
-import parseCookies from "@/app/lib/parseCookies";
+import { API_PATH } from "@/app/lib/helpers/constants";
+import parseCookies from "@/app/lib/helpers/parseCookies";
+import { RefreshToken } from "@/app/lib/types";
 import { Cookie } from "set-cookie-parser";
-
-type RefreshToken = {
-  success: boolean;
-  tokens?: {
-    accessToken: Cookie;
-    refreshToken: Cookie;
-  };
-  error?: string;
-};
 
 export default async function refreshToken(
   refreshTokenValue: string,

@@ -92,10 +92,13 @@ class CookieTokenRefreshView(TokenRefreshView):
 
     def finalize_response(self, request, response, *args, **kwargs):
         if response.data.get("refresh") and response.status_code == status.HTTP_200_OK:
-            stuff_logic.set_auth_cookies(response=response, jwt_tokens={
-                "access": response.data["access"],
-                "refresh": response.data["refresh"]
-            })
+            stuff_logic.set_auth_cookies(
+                response=response,
+                jwt_tokens={
+                    "access": response.data["access"],
+                    "refresh": response.data["refresh"],
+                },
+            )
 
         if response.status_code == status.HTTP_401_UNAUTHORIZED:
             response.data["error"] = _("Token is blacklisted.")

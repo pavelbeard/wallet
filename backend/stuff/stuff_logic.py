@@ -70,8 +70,11 @@ def get_user_totp_device(user, confirmed=None) -> TOTPDevice | None:
             return device
 
 
-def jwt_otp_payload(user: WalletUser, device: Device = None) -> dict:
+def jwt_otp_payload(user: WalletUser, device: TOTPDevice = None) -> dict:
     """Optionally includes an OTP device in JWT"""
+    
+    # generate new pair of keys
+    
     payload = {
         "username": "",
         "email": "",
@@ -82,6 +85,8 @@ def jwt_otp_payload(user: WalletUser, device: Device = None) -> dict:
         payload["username"] = user.username
     if getattr(user, "email") is not None:
         payload["email"] = user.email
+    if getattr(user, "public_id") is not None:
+        payload["public_id"] = user.public_id
 
     if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
         payload["orig_iat"] = timegm(timezone.now().utctimetuple())
@@ -95,22 +100,24 @@ def jwt_otp_payload(user: WalletUser, device: Device = None) -> dict:
     if (
         (user is not None)
         and (device is not None)
-        and (device.user_id == user.public_id)
+        and (device.user_id == user.pk)
         and (device.confirmed is True)
     ):
         payload["otp_device_id"] = device.persistent_id
+        payload["created_at"] = device.created_at.strftime("%d %b %Y")
     else:
         payload["otp_device_id"] = None
+        payload["created_at"] = None
 
     return payload
 
 
-def jwt_encode_handler(payload):
+def jwt_encode_handler(payload) -> str:
     """Helps to encode data to JWT"""
     key = settings.SIMPLE_JWT["SIGNING_KEY"]
     return jwt.encode(
         payload, key, algorithm=settings.SIMPLE_JWT.get("ALGORITHM")
-    ).encode("utf-8")
+    )
 
 
 def jwt_decode_handler(token) -> Any:
@@ -133,7 +140,18 @@ def jwt_decode_handler(token) -> Any:
 def get_custom_jwt(user: WalletUser, device: Device = None) -> str:
     """Using for include 2FA into JWT"""
     payload = jwt_otp_payload(user, device)
-    return jwt_encode_handler(payload)
+    tokens = RefreshToken.for_user(user)
+    
+    for k, v in payload.items():
+        if k == "exp" and tokens.token_type == "refresh":
+            continue
+        tokens[k] = v
+        
+    return {
+        "access": str(tokens.access_token),
+        "refresh": str(tokens),
+    }    
+
 
 
 def otp_is_verified(request: Request):
@@ -167,22 +185,24 @@ def get_user_static_device(user: WalletUser, confirmed=None) -> StaticDevice | N
 
 
 def set_auth_cookies(response: Response, jwt_tokens: Dict[str, str]) -> Response:
-    response.set_cookie(
-        key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"],
-        value=jwt_tokens["access"],
-        max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
-        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-    )
-    response.set_cookie(
-        key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"],
-        value=jwt_tokens["refresh"],
-        max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
-        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-    )
+    if jwt_tokens.get("access"):
+        response.set_cookie(
+            key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"],
+            value=jwt_tokens["access"],
+            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+        )
+    if jwt_tokens.get("refresh"):
+        response.set_cookie(
+            key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"],
+            value=jwt_tokens["refresh"],
+            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],  # type: ignore
+            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+        )
     response.data = {"access": jwt_tokens["access"]}
     return response
 

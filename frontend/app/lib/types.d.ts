@@ -10,11 +10,13 @@ export type InputProps = {
 };
 
 export type InputPropsWithRegister = {
-  labelText: string;
+  labelText?: string;
+  placeholder?: string;
   htmlFor: string;
   name: string;
   register: UseFormRegister;
   id: string;
+  disabled?: boolean;
 };
 
 export type Color = "container-bg" | "auth-bg" | "dashboard-bg" | "error-bg";
@@ -53,3 +55,21 @@ export type UserMenuItem = {
 export type ToggleActiveItem = (index: number) => void;
 
 export type TOTPData = { config_key: string; detail?: string };
+
+export type AuthData = {
+  access_token: string | undefined;
+  access_token_exp: number | undefined;
+  refresh_token: string | undefined;
+  refresh_token_exp: number | undefined;
+};
+
+export type RefreshToken = {
+  success: boolean;
+  tokens?: {
+    accessToken: Cookie;
+    refreshToken: Cookie;
+  };
+  error?: string;
+};
+
+export type Awaitable<T> = T | PromiseLike<T>;

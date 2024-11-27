@@ -1,16 +1,17 @@
-from typing import Dict, Any
-from django.utils.translation import gettext_lazy as _
-from django_otp.plugins.otp_email.conf import settings
-from django.contrib.auth import get_user_model, authenticate
-from rest_framework import serializers
-from rest_framework_simplejwt import serializers as jwt_serializers
-from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
-from rest_framework_simplejwt.settings import api_settings
+from typing import Any, Dict
 
 from abstract.serializers import AbstractSerializer
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
+from django_otp.plugins.otp_email.conf import settings
+from rest_framework import serializers
+from rest_framework_simplejwt import serializers as jwt_serializers
+from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
+from rest_framework_simplejwt.settings import api_settings
+
 from stuff import stuff_logic
 
-WalletUser = get_user_model()
+from .models import WalletUser
 
 
 class WalletUserSerializer(AbstractSerializer):
@@ -88,20 +89,21 @@ class CustomTokenObtainSerializer(jwt_serializers.TokenObtainSerializer):
         return {}
 
 
-class SigninSerializer(
+class TwoFactorJWTSerializer(
     jwt_serializers.TokenObtainPairSerializer, CustomTokenObtainSerializer
 ):
     @classmethod
     def get_token(cls, user):
-        payload = stuff_logic.jwt_otp_payload(user)
-        token = super().get_token(user)
+        device = user.totpdevice_set.first()
+        payload = stuff_logic.jwt_otp_payload(user=user, device=device)
+        tokens = super().get_token(user)
 
         for k, v in payload.items():
-            if k == "exp" and token.token_type == "refresh":
+            if k == "exp" and tokens.token_type == "refresh":
                 continue
-            token[k] = v
+            tokens[k] = v
 
-        return token
+        return tokens
 
 
 class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
@@ -115,3 +117,21 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             return super().validate(attrs)
         else:
             raise InvalidToken("There isn't a refresh token in the cookies.")
+
+
+class PasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(min_length=8, max_length=32, write_only=True)
+    
+    def validate(self, attrs):
+        password = attrs.get("password")
+        if not password:
+            raise serializers.ValidationError("Password is required.")
+        
+        user: WalletUser = self.context["request"].user
+        is_valid = user.check_password(password)
+        
+        if not is_valid:
+            raise serializers.ValidationError("Invalid password.")
+        
+        
+        return attrs

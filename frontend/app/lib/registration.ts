@@ -1,8 +1,7 @@
 "use server";
 
-import { SignUpSchema } from "@/app/lib/schemas.z";
-import { SignUpValidator } from "@/app/lib/types";
-import { API_PATH } from "./constants";
+import { SignUpSchema, SignUpValidator } from "@/app/lib/schemas.z";
+import { API_PATH } from "./helpers/constants";
 
 export default async function registration(values: SignUpValidator) {
   const validatedData = SignUpSchema.safeParse(values);

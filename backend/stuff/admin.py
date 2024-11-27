@@ -11,9 +11,11 @@ from .models import WalletUser
 class UserAdmin(BaseUserAdmin):
     form = WalletUserUpdateForm
     add_form = WalletUserCreationForm
+    
+    list_display = ('username', 'email', 'is_two_factor_enabled', 'is_active', 'is_staff', 'is_superuser')
 
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password',)}),
+        (None, {'fields': ('username', 'email', 'password', 'is_two_factor_enabled')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Groups', {'fields': ('groups', )}),
         ('User permissions', {'fields': ('user_permissions', )}),

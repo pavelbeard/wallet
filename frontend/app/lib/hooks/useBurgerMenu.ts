@@ -19,8 +19,6 @@ export default function useBurgerMenu() {
     useOverflow();
 
   const toggleBurgerMenu = () => {
-    console.log("toggleBurgerMenu");
-
     setIsBurgerOpen(!isBurgerOpen);
   };
 

@@ -1,9 +1,7 @@
 "use server";
 
-import { SignInSchema } from "@/app/lib/schemas.z";
+import { SignInSchema, SignInValidator } from "@/app/lib/schemas.z";
 import { signIn } from "@/auth";
-// import { redirect } from "@/i18n/routing";
-import { SignInValidator } from "@/app/lib/types";
 import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { AuthError } from "next-auth";
 import { getLocale } from "next-intl/server";

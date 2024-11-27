@@ -39,7 +39,7 @@ class Auth:
 
     @staticmethod
     def sign_in(request: HttpRequest):
-        serializer = serializers.SigninSerializer(data=request.data)
+        serializer = serializers.TwoFactorJWTSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # The result is None and with an error data or Response 200 with a success message
         result, data = stuff_logic.signin_logic(request, serializer.validated_data)
@@ -121,8 +121,8 @@ class TOTPDevice:
 
     @staticmethod
     def verify_totp_device(request: HttpRequest):
-        token = request.data.get("token")
-        if not token:
+        otp_token = request.data.get("token")
+        if not otp_token:
             return Response(
                 {"error": _("Token is missing.")},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -130,12 +130,17 @@ class TOTPDevice:
 
         user = request.user
         device = stuff_logic.get_user_totp_device(user)
-        if device is not None and device.verify_token(token=token):
+        if device is not None and device.verify_token(token=otp_token):
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
-            token = stuff_logic.get_custom_jwt(user, device)
-            return Response({"access": token}, status=status.HTTP_200_OK)
+            tokens = stuff_logic.get_custom_jwt(user, device)
+            response = Response(status=status.HTTP_200_OK)
+            new_token_response = stuff_logic.set_auth_cookies(
+                response=response,
+                jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
+            )
+            return new_token_response
 
         raise TypeError()
 
@@ -157,8 +162,8 @@ class TOTPDevice:
 
     @staticmethod
     def verify_backup_token(request: HttpRequest):
-        token = request.data.get("token")
-        if not token:
+        otp_token = request.data.get("token")
+        if not otp_token:
             return Response(
                 {"error": _("Token is missing.")},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -166,23 +171,34 @@ class TOTPDevice:
 
         user = request.user
         device = stuff_logic.get_user_static_device(user)
-        if device is not None and device.verify_token(token):
+        if device is not None and device.verify_token(otp_token):
             token = stuff_logic.get_custom_jwt(user, device)
+            # TODO: update refresh token
             return Response({"access": token}, status=status.HTTP_200_OK)
 
         raise TypeError()
 
     @staticmethod
     def delete_totp_device(request: HttpRequest):
-        user = request.user
+        user: WalletUser = request.user
+        serializer = serializers.PasswordSerializer(data=request.data, context={
+            "request": request
+        }) 
+        serializer.is_valid(raise_exception=True)
+        
         devices = devices_for_user(user)
         for device in devices:
             device.delete()
 
         user.jwt_secret = uuid.uuid4()
+        user.is_two_factor_enabled = False
         user.save()
-        token = stuff_logic.get_custom_jwt(user, None)
-        return Response(
-            {"access": token, "detail": _("Device detached from 2FA")},
-            status=status.HTTP_200_OK,
+        
+        tokens = stuff_logic.get_custom_jwt(user, None)
+        response = Response(status=status.HTTP_200_OK)
+        response.data = {"detail": _("Device detached from 2FA")}
+        new_token_response = stuff_logic.set_auth_cookies(
+            response=response,
+            jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
         )
+        return new_token_response

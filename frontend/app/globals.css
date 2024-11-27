@@ -36,7 +36,11 @@
 }
 
 .field-error {
-  @apply pl-2 font-bold text-red-500;
+  @apply px-2 font-bold text-red-500;
+}
+
+.field-pending {
+  @apply px-2 font-bold text-yellow-500;
 }
 
 .auth-question {

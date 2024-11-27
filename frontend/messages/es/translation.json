@@ -48,7 +48,8 @@
   },
   "dashboard": {
     "title": "Cartera | Panel de control",
-    "description:": "Tarjetas, contraseñas, información total"
+    "description:": "Tarjetas, contraseñas, información total",
+    "description": "Tarjetas, contraseñas, información total."
   },
   "profile": {
     "title": "Cartera | Perfil",
@@ -56,7 +57,7 @@
     "userCard": {
       "username": "Nombre de usuario",
       "email": "Correo electrónico",
-      "changeEmail": "cambiar correo electrónico",
+      "changeEmail": "Cambiar correo electrónico",
       "modal": {
         "close": "Cerrar",
         "title": "Cambiar correo electrónico",
@@ -74,13 +75,32 @@
       }
     },
     "twofactor": {
-      "title": "Configurar 2FA",
+      "title": "Configure 2FA desde la aplicación.",
+      "description": "La autenticación de dos factores le da a su cuenta una capa adicional de seguridad. \nLe recomendamos encarecidamente que lo habilite. \nCuando esté habilitado, se le pedirá que ingrese un código de su aplicación de autenticación en un nuevo dispositivo.",
       "or": "O sin escáner QR",
       "copied": "El código 2FA se ha copiado en el portapapeles",
       "copy": "Copiar al portapapeles",
-      "input": "Tu 2FA",
-      "inputPlaceholder": "Ingrese su código 2FA...",
-      "note": "Copie su 2FA desde su aplicación de contraseña o algo más..."
+      "input": "Tu 2FA para comprobar",
+      "inputPlaceholder": "Introduce tu contraseña...",
+      "note": "Copie su 2FA desde su aplicación de contraseña o algo más...",
+      "notVerified": "¡Token TOTP no válido!",
+      "verified": "Éxito. ¡Has pasado la verificación 2FA!",
+      "delete2fa": "Eliminar 2FA",
+      "delete2faNote": "Hará que su cuenta sea más vulnerable a los piratas informáticos.",
+      "delete2faNote2": "¿Está seguro?",
+      "submitDelete2fa": "Borrar",
+      "2faState": "La autenticación de dos factores <important>{bold}</important> para esta cuenta.",
+      "active": "está activa",
+      "notActive": "no está activa",
+      "2faStartConfig": "Iniciar configuración",
+      "configure": "Configurar",
+      "appTitle": "App de autenticación",
+      "attention": "Si tienes problemas con el escáner QR, haz esto",
+      "added": "Añadido",
+      "next": "Siguente"
+    },
+    "main": {
+      "twoFactorBtn": "Gestión de autenticación de dos factores"
     }
   },
   "header": {
@@ -102,5 +122,12 @@
   },
   "footer": {
     "rights": "Reservados todos los derechos"
+  },
+  "pageName": {
+    "dashboard": "Panel de Control",
+    "passwords": "Contraseñas",
+    "cards": "Tarjetas de pago",
+    "profile": "Perfil",
+    "2fa": "Autorización de dos factores"
   }
 }

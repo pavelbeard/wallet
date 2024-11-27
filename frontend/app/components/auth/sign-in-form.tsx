@@ -4,11 +4,11 @@ import FormError from "@/app/components/form/form-error";
 import authenticate from "@/app/lib/authenticate";
 import { SignInSchema, SignInValidator } from "@/app/lib/schemas.z";
 import AuthQuestion from "@/app/ui/auth-question";
-import EmailInput from "@/app/ui/input-email";
 import FormDivider from "@/app/ui/form-divider";
 import FormTitle from "@/app/ui/form-title";
-import OauthButtons from "@/app/ui/oauth-buttons";
+import EmailInput from "@/app/ui/input-email";
 import PasswordInput from "@/app/ui/input-password";
+import OauthButtons from "@/app/ui/oauth-buttons";
 import Submit from "@/app/ui/submit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -31,18 +31,29 @@ export default function SignInForm() {
       password: "",
     },
   });
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [formMessages, setFormMessages] = useState<{
+    success: string | null;
+    error: string | null;
+  }>({
+    success: null,
+    error: null,
+  });
   const [isPending, startTransition] = useTransition();
 
   const onSubmit: SubmitHandler<SignInValidator> = async (data) => {
-    setAuthError(null);
-    setAuthSuccess(null);
+    setFormMessages({
+      ...formMessages,
+      success: null,
+      error: null,
+    });
 
     startTransition(() => {
       authenticate(data).then((result) => {
-        setAuthSuccess(result?.success);
-        setAuthError(result?.error);
+        setFormMessages({
+          ...formMessages,
+          success: result?.success,
+          error: result?.error,
+        });
       });
     });
   };
@@ -73,8 +84,8 @@ export default function SignInForm() {
         {errors.password?.message && (
           <p className="field-error">{errors.password.message}</p>
         )}
-        <FormError message={authError} />
-        <FormSuccess message={authSuccess} />
+        <FormError message={formMessages.error} />
+        <FormSuccess message={formMessages.success} />
         <Submit
           disabled={isPending}
           color="bg-slate-800 hover:bg-slate-300 hover:text-black"

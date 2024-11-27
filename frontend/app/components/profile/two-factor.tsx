@@ -1,45 +1,55 @@
 "use client";
 
+import useUser from "@/app/lib/hooks/useUser";
 import { TOTPData } from "@/app/lib/types";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { createPortal } from "react-dom";
-import TwoFactorForm from "./two-factor-form";
+import TwoFactorConfiguration from "./two-factor-configuration";
+import TwoFactorDelete from "./two-factor-delete";
+import TwoFactorTemplate from "./two-factor-template";
 
-/**
- * Component for displaying 2fa configuration key
- * @param config_key - totp configuration key
- * @param detail - error message
- */
-export default function TwoFactorConfiguration({
-  config_key,
-  detail,
-}: TOTPData) {
+export default function TwoFactor({ totpData }: { totpData: TOTPData }) {
+  const user = useUser();
   const t = useTranslations();
-  const [isOpen, setForm] = useState(false);
-
+  const active = t("profile.twofactor.active");
+  const notActive = t("profile.twofactor.notActive");
   return (
-    <div className="grid grid-cols-2 grid-rows-2">
-      <button
+    <>
+      <div
         className={clsx(
-          "bg-white hover:bg-slate-300  p-4 rounded-xl font-bold ",
-          "dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-600",
-          "dark:border dark:border-slate-600",
+          "rounded-lg w-full px-4 py-2",
+          "border",
+          user?.otp_device_id
+            ? "border-green-500 bg-green-100 dark:bg-green-500/40"
+            : "border-yellow-500 bg-yellow-100 dark:bg-yellow-500/40",
         )}
-        onClick={() => setForm(true)}
       >
-        {t("profile.twofactor.title")}
-      </button>
-      {isOpen &&
-        createPortal(
-          <TwoFactorForm
-            config_key={config_key}
-            detail={detail}
-            closeForm={() => setForm(false)}
-          />,
-          document.body,
-        )}
-    </div>
+        {t.rich("profile.twofactor.2faState", {
+          bold: user?.otp_device_id ? active : notActive,
+          important: (chunks) => <b>{chunks}</b>,
+        })}
+      </div>
+      {user?.otp_device_id ? (
+        <TwoFactorTemplate>
+          <TwoFactorDelete />
+        </TwoFactorTemplate>
+      ) : (
+        user?.provider == "credentials" && (
+          <div className="flex flex-col gap-4 items-center justify-center">
+            <p className="text-center text-lg font-bold">
+              {t("profile.twofactor.2faStartConfig")}
+            </p>
+            <div className="w-full">
+              <TwoFactorTemplate>
+                <TwoFactorConfiguration
+                  config_key={totpData.config_key}
+                  detail={totpData.detail}
+                />
+              </TwoFactorTemplate>
+            </div>
+          </div>
+        )
+      )}
+    </>
   );
 }
