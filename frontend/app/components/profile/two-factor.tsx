@@ -1,14 +1,13 @@
 "use client";
 
 import useUser from "@/app/lib/hooks/useUser";
-import { TOTPData } from "@/app/lib/types";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import TwoFactorConfiguration from "./two-factor-configuration";
 import TwoFactorDelete from "./two-factor-delete";
 import TwoFactorTemplate from "./two-factor-template";
 
-export default function TwoFactor({ totpData }: { totpData: TOTPData }) {
+export default function TwoFactor() {
   const user = useUser();
   const t = useTranslations();
   const active = t("profile.twofactor.active");
@@ -18,7 +17,7 @@ export default function TwoFactor({ totpData }: { totpData: TOTPData }) {
       <div
         className={clsx(
           "rounded-lg w-full px-4 py-2",
-          "border",
+          "border h-16",
           user?.otp_device_id
             ? "border-green-500 bg-green-100 dark:bg-green-500/40"
             : "border-yellow-500 bg-yellow-100 dark:bg-yellow-500/40",
@@ -41,10 +40,7 @@ export default function TwoFactor({ totpData }: { totpData: TOTPData }) {
             </p>
             <div className="w-full">
               <TwoFactorTemplate>
-                <TwoFactorConfiguration
-                  config_key={totpData.config_key}
-                  detail={totpData.detail}
-                />
+                <TwoFactorConfiguration />
               </TwoFactorTemplate>
             </div>
           </div>

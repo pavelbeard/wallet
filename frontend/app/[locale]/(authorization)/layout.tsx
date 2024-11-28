@@ -1,22 +1,39 @@
 import "@/app/globals.css";
+import getSession from "@/app/lib/helpers/getSession";
 import LayoutPublicContainer from "@/app/ui/layout-public-container";
 import Logo from "@/app/ui/logo";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
-import React from "react";
 import ToMainPageBtn from "@/app/ui/to-main-page-btn";
+import { routing } from "@/i18n/routing";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import React from "react";
 
-type Props = { children: React.ReactNode };
+type RootLayoutProps = {
+  children: React.ReactNode;
+  params: { locale: string };
+};
 
-export default async function Layout({ children }: Props) {
-  const lang = await getLocale();
+export const generateStaticParams = async () => {
+  return routing.locales.map((locale) => ({ locale }));
+};
+
+export default async function Layout({
+  children,
+  params: { locale },
+}: RootLayoutProps) {
   const messages = await getMessages();
+  const session = await getSession();
 
+  // TODO: remove all redirections
   return (
-    <NextIntlClientProvider locale={lang} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <LayoutPublicContainer color="auth-bg">
-        <Logo />
-        <ToMainPageBtn />
+        {!session && (
+          <>
+            <Logo />
+            <ToMainPageBtn />
+          </>
+        )}
         {children}
       </LayoutPublicContainer>
     </NextIntlClientProvider>

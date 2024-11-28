@@ -2,11 +2,13 @@
   "auth": {
     "title": {
       "signIn": "Cartera | Iniciar sesión",
-      "signUp": "Cartera | Crear la cuenta"
+      "signUp": "Cartera | Crear la cuenta",
+      "verify": "Cartera | Verify 2FA"
     },
     "description": {
       "signIn": "Iniciar sesión",
-      "signUp": "Crear la cuenta"
+      "signUp": "Crear la cuenta",
+      "verify": "If user with 2FA, app catches him"
     },
     "form": {
       "formTitle": {
@@ -21,7 +23,10 @@
       "withAccount": "If you have an account, sign in.",
       "withoutAccount": "If you don't have an account, create it!",
       "or": "or",
-      "signInWith": "Sign in with"
+      "signInWith": "Sign in with",
+      "verify2fa": "Verify two factor token",
+      "2faInput": "Your 2FA token",
+      "2faSubmit": "Verify"
     },
     "page": {
       "signOut": "Sign out...",
@@ -63,8 +68,21 @@
         "form": {
           "emailPlaceholder": "Enter a new email...",
           "emailField": "Email"
+        },
+        "changePassword": {
+          "title": "Change password",
+          "form": {
+            "actualPassword": "Your actual password",
+            "newPassword": "New password",
+            "confirmPassword": "Confirm password",
+            "submit": "Change",
+            "passwordNote": "Make it more random. For reliability."
+          }
         }
-      }
+      },
+      "changePassword": "Change password",
+      "twoFactor": "Two factor",
+      "title": "User info"
     },
     "useCard": {
       "modal": {
@@ -96,10 +114,18 @@
       "appTitle": "Authetication app",
       "attention": "If you have problems with QR scanner, do this",
       "added": "Added",
-      "next": "Next"
+      "next": "Next",
+      "change2fa": "Change 2FA",
+      "oauth2note": "Ask your account provider"
     },
     "main": {
-      "twoFactorBtn": "Two factor authentication management"
+      "twoFactorBtn": "2FA management"
+    },
+    "settings": {
+      "title": "Settings"
+    },
+    "devices": {
+      "title": "Linked devices with your account"
     }
   },
   "header": {
@@ -109,7 +135,10 @@
     "signOut": "Sign out"
   },
   "sidebar": {
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "main": "Main",
+    "passwords": "Passwords",
+    "cards": "Cards"
   },
   "userMenu": {
     "profile": "Profile",
@@ -128,5 +157,6 @@
     "cards": "Payment cards",
     "profile": "Profile",
     "2fa": "Two factor authorization"
-  }
+  },
+  "loading": "Loading..."
 }

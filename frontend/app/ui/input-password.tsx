@@ -10,40 +10,56 @@ export default function PasswordInput({
   labelText,
   register,
   ...rest
-}: InputPropsWithRegister & { [x:string]: unknown }) {
+}: InputPropsWithRegister & { [x: string]: unknown }) {
   const [revealed, setRevealed] = useState<boolean>();
 
   return (
-    <label className="flex flex-col w-full relative" htmlFor={htmlFor}>
+    <label
+      aria-label={labelText}
+      className="flex flex-col w-full relative"
+      htmlFor={htmlFor}
+      role="password"
+    >
       <span className="pb-1">{labelText}</span>
-      <input
+      <div
         className={clsx(
-          "p-4 outline-gray-500 outline-2 border-slate-700 border-[1px]",
-          "dark:outline-gray-100dark:border-gray-300 dark:text-slate-800",
-          "rounded-xl",
+          "flex rounded-xl",
+          "outline-gray-500 outline-2 border border-slate-700 bg-white",
+          "dark:outline-gray-100 dark:border-gray-300 dark:text-slate-800",
+          "focus-within:outline"
         )}
-        type={revealed ? "text" : "password"}
-        id={id}
-        {...register(name)}
-        {...rest}
-      />
-      {revealed ? (
-        <EyeSlashIcon
-          onClick={() => setRevealed(false)}
+      >
+        <input
           className={clsx(
-            "size-6 transition-all hover:scale-110 absolute right-2 translate-y-[185%]",
-            "dark:text-slate-800"
+            "flex flex-grow basis-0 p-4 outline-none bg-transparent",
           )}
+          type={revealed ? "text" : "password"}
+          id={id}
+          {...register(name)}
+          {...rest}
         />
-      ) : (
-        <EyeIcon
-          onClick={() => setRevealed(true)}
-          className={clsx(
-            "size-6 transition-all hover:scale-110 absolute right-2 translate-y-[185%]",
-            "dark:text-slate-800"
+        <div className="flex flex-col justify-center pr-4 bg-transparent">
+          {revealed ? (
+            <EyeSlashIcon
+              aria-expanded={revealed}
+              onClick={() => setRevealed(false)}
+              className={clsx(
+                "size-6 transition-all hover:scale-110 input-password-icon",
+                "dark:text-slate-800",
+              )}
+            />
+          ) : (
+            <EyeIcon
+              aria-expanded={revealed}
+              onClick={() => setRevealed(true)}
+              className={clsx(
+                "size-6 transition-all hover:scale-110 input-password-icon",
+                "dark:text-slate-800",
+              )}
+            />
           )}
-        />
-      )}
+        </div>
+      </div>
     </label>
   );
 }

@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
-from . import serializers, stuff_logic
+from . import exceptions, serializers, stuff_logic
 from .models import WalletUser
 from .utils import LOGIN_TYPE
 
@@ -71,6 +71,43 @@ class WalletUserController:
         data = serializers.WalletUserSerializer(user).data
         return Response(data, status=status.HTTP_200_OK)
 
+    @staticmethod
+    def change_email(request: HttpRequest):
+        email = request.data.get("email")
+        if not email:
+            raise TypeError(_("Please provide email in query params"))
+
+        check_email = WalletUser.objects.filter(email=email).first()
+        if check_email:
+            raise TypeError(_("Email is already in use"))
+
+        user = WalletUser.objects.filter(public_id=request.user.public_id).first()
+        if not user:
+            raise TypeError(_("User not found"))
+
+        user.email = email
+        user.save()
+
+        return Response({"new_email": email}, status=status.HTTP_200_OK)
+    
+    @staticmethod
+    def change_password(request: HttpRequest, pk=None):
+        """Change user password."""
+        data = request.data
+        user = WalletUser.objects.filter(public_id=pk).first()
+        if not user:
+            raise TypeError(_("User not found"))
+        
+        if not user.check_password(data.get("actualPassword")):
+            raise TypeError(_("Wrong password"))
+        
+        user.set_password(data.get("password"))
+        user.save()
+        
+        return Response(status=status.HTTP_200_OK)
+        
+        
+
 
 class Oauth2Auth:
     @staticmethod
@@ -91,7 +128,7 @@ class Oauth2Auth:
         return result
 
 
-class TOTPDevice:
+class TOTPDeviceController:
     @staticmethod
     def create_totp_device(request: HttpRequest):
         # new response
@@ -116,7 +153,6 @@ class TOTPDevice:
         # 2fa configuration key is necessary too
         # two_fa_config_key = re.findall(r"secret=(.*)&algorithm", url)[0]
         response.data = {"config_key": url}
-        print(response.data)
         return response
 
     @staticmethod
@@ -142,7 +178,7 @@ class TOTPDevice:
             )
             return new_token_response
 
-        raise TypeError()
+        raise exceptions.VerifyTokenError(_("Invalid token"))
 
     @staticmethod
     def create_backup_tokens(request: HttpRequest):
@@ -176,16 +212,16 @@ class TOTPDevice:
             # TODO: update refresh token
             return Response({"access": token}, status=status.HTTP_200_OK)
 
-        raise TypeError()
+        raise exceptions.VerifyBackupTokenError(_("Invalid token"))
 
     @staticmethod
     def delete_totp_device(request: HttpRequest):
         user: WalletUser = request.user
-        serializer = serializers.PasswordSerializer(data=request.data, context={
-            "request": request
-        }) 
+        serializer = serializers.PasswordSerializer(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
-        
+
         devices = devices_for_user(user)
         for device in devices:
             device.delete()
@@ -193,7 +229,7 @@ class TOTPDevice:
         user.jwt_secret = uuid.uuid4()
         user.is_two_factor_enabled = False
         user.save()
-        
+
         tokens = stuff_logic.get_custom_jwt(user, None)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}

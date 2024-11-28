@@ -1,9 +1,39 @@
 import { z } from "zod";
 
-const SignInSchema = z.object({
-  email: z.string().email({ message: "Provide your email!" }),
-  password: z.string().min(1, { message: "Provide your password" }),
-});
+const passwordComplexityChecker = (
+  { password }: { password: string },
+  checkPassComplexity: any,
+) => {
+  const containsUppercase = (c: string) => /[A-Z]/.test(c);
+  const containsLowercase = (c: string) => /[a-z]/.test(c);
+  const containsSpecs = (c: string) =>
+    /[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~]/.test(c);
+
+  if (!containsUppercase(password)) {
+    checkPassComplexity.addIssue({
+      path: [SignUpSchemaSuperRefineErrors.notUppercase],
+      code: "custom",
+      message: "Your password should contain at least 1 uppercase char!",
+    });
+  }
+
+  if (!containsLowercase(password)) {
+    checkPassComplexity.addIssue({
+      path: [SignUpSchemaSuperRefineErrors.notLowercase],
+      code: "custom",
+      message: "Your password should contain at least 1 lowercase char!",
+    });
+  }
+
+  if (!containsSpecs(password)) {
+    checkPassComplexity.addIssue({
+      path: [SignUpSchemaSuperRefineErrors.notSpecs],
+      code: "custom",
+      message:
+        "Your password should contain at least 1 of those special chars: `!@#$%^&*()_\\-+=\\[\\]{};':\"\\\\|,.<>\\/?~",
+    });
+  }
+};
 
 const enum SignUpSchemaSuperRefineErrors {
   notUppercase = "notUppercase",
@@ -11,6 +41,10 @@ const enum SignUpSchemaSuperRefineErrors {
   notSpecs = "notSpecs",
 }
 
+const SignInSchema = z.object({
+  email: z.string().email({ message: "Provide your email!" }),
+  password: z.string().min(1, { message: "Provide your password" }),
+});
 const SignUpSchema = z
   .object({
     email: z
@@ -24,37 +58,7 @@ const SignUpSchema = z
     message: "Password aren't match.",
     path: ["password2"],
   })
-  .superRefine(({ password }, checkPassComplexity) => {
-    const containsUppercase = (c: string) => /[A-Z]/.test(c);
-    const containsLowercase = (c: string) => /[a-z]/.test(c);
-    const containsSpecs = (c: string) =>
-      /[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~]/.test(c);
-
-    if (!containsUppercase(password)) {
-      checkPassComplexity.addIssue({
-        path: [SignUpSchemaSuperRefineErrors.notUppercase],
-        code: "custom",
-        message: "Your password should contain at least 1 uppercase char!",
-      });
-    }
-
-    if (!containsLowercase(password)) {
-      checkPassComplexity.addIssue({
-        path: [SignUpSchemaSuperRefineErrors.notLowercase],
-        code: "custom",
-        message: "Your password should contain at least 1 lowercase char!",
-      });
-    }
-
-    if (!containsSpecs(password)) {
-      checkPassComplexity.addIssue({
-        path: [SignUpSchemaSuperRefineErrors.notSpecs],
-        code: "custom",
-        message:
-          "Your password should contain at least 1 of those special chars: `!@#$%^&*()_\\-+=\\[\\]{};':\"\\\\|,.<>\\/?~",
-      });
-    }
-  });
+  .superRefine(passwordComplexityChecker);
 
 const ChangeEmailSchema = z.object({
   email: z.string().email({ message: "Provide your email!" }),
@@ -77,6 +81,7 @@ const UpdateSessionSchema = z.object({
     otp_device_id: z.string().nullable(),
     created_at: z.string().nullable(),
     provider: z.string().optional(),
+    verified: z.boolean().nullable(),
   }),
 });
 
@@ -84,15 +89,34 @@ const PasswordSchema = z.object({
   password: z.string().min(1, { message: "Provide your password" }),
 });
 
+const ChangePasswordSchema = z
+  .object({
+    actualPassword: z.string().min(8, { message: "Provide your password" }),
+    password: z.string().min(8, { message: "Provide your password" }),
+    password2: z.string().min(8, { message: "Provide your password" }),
+  })
+  .refine(
+    ({ password: newPassword, password2: confirmPassword }) => {
+      return newPassword == confirmPassword;
+    },
+    {
+      message: "Passwords aren't match.",
+      path: ["confirmPassword"],
+    },
+  )
+  .superRefine(passwordComplexityChecker);
+
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
 export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
 export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
 export type UpdateSessionValidator = z.infer<typeof UpdateSessionSchema>;
 export type PasswordValidator = z.infer<typeof PasswordSchema>;
+export type ChangePasswordValidator = z.infer<typeof ChangePasswordSchema>;
 
 export {
   ChangeEmailSchema,
+  ChangePasswordSchema,
   PasswordSchema,
   SignInSchema,
   SignUpSchema,

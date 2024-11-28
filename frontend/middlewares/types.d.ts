@@ -12,6 +12,7 @@ export type MiddlewareFactory = (
 ) => CustomMiddleware;
 
 type Callback = () => void;
+
 export type Middleware = (
   req: NextRequest,
   res: NextResponse,

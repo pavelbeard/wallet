@@ -2,16 +2,25 @@ import LayoutSideElementsDesktop from "@/app/components/dashboard/layout-side-el
 import LayoutSideElementsMobile from "@/app/components/dashboard/layout-side-elements-mobile";
 import "@/app/globals.css";
 import { Props } from "@/app/lib/types";
+import { routing } from "@/i18n/routing";
 import clsx from "clsx";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getMessages } from "next-intl/server";
 
-export default async function RootProtectedLayout({ children }: Props) {
-  const lang = await getLocale();
+type RootProtectedLayoutProps = {
+  children: React.ReactNode;
+  params: { locale: string };
+};
+
+export const generateStaticParams = async () => {
+  return routing.locales.map((locale) => ({ locale }));
+};
+
+export default async function RootProtectedLayout({ children, params: { locale } }: RootProtectedLayoutProps) {
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={lang} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {/* desktop layout */}
       <main
         className={clsx(
@@ -31,8 +40,9 @@ export default async function RootProtectedLayout({ children }: Props) {
           "lg:hidden",
           "min-h-screen",
           "flex flex-col",
-          "dashboard-bg"
-        )}>
+          "dashboard-bg",
+        )}
+      >
         <LayoutSideElementsMobile />
         <div className="p-4 h-full">{children}</div>
       </main>

@@ -17,7 +17,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import models, serializers, stuff_logic
 from . import permissions as stuff_permissions
-from .controller import Auth, Oauth2Auth, TOTPDevice, WalletUserController
+from .controller import Auth, Oauth2Auth, TOTPDeviceController, WalletUserController
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -128,7 +128,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
-    def check_user_by_email(self, request, **kwargs):
+    def check_user_by_email(self, request):
         try:
             result = WalletUserController.check_user_by_email(
                 request=request, qs=self.queryset
@@ -143,13 +143,43 @@ class WalletUserViewSet(viewsets.ModelViewSet):
             logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=["POST"])
+    def change_email(self, request):
+        try:
+            result = WalletUserController.change_email(request=request)
+            return result
+        except TypeError as e:
+            return Response(
+                data={"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=True, methods=["POST"])
+    def change_password(self, request, **kwargs):
+        """Change user password."""
+        try:
+            pk = kwargs.get("public_id")
+            result = WalletUserController.change_password(request=request, pk=pk)
+            return result
+        except TypeError as e:
+            return Response(
+                data={"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class TwoFactorAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def create_totp_device(self, request):
         """Set up a new TOTP device."""
         try:
-            result = TOTPDevice.create_totp_device(request=request)
+            result = TOTPDeviceController.create_totp_device(request=request)
             return result
         except Exception:
             logger.exception(_("Something went wrong..."), exc_info=True)
@@ -159,7 +189,7 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     def verify_totp_device(self, request):
         """Verify/enable a TOTP device."""
         try:
-            result = TOTPDevice.verify_totp_device(request=request)
+            result = TOTPDeviceController.verify_totp_device(request=request)
             return result
         except TypeError:
             return Response(
@@ -179,7 +209,7 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     )
     def create_backup_tokens(self, request):
         try:
-            result = TOTPDevice.create_backup_tokens(request=request)
+            result = TOTPDeviceController.create_backup_tokens(request=request)
             return result
         except Exception:
             logger.exception(_("Something went wrong..."), exc_info=True)
@@ -188,7 +218,7 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def verify_backup_token(self, request):
         try:
-            result = TOTPDevice.verify_backup_token(request=request)
+            result = TOTPDeviceController.verify_backup_token(request=request)
             return result
         except TypeError:
             return Response(
@@ -208,7 +238,7 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     )
     def delete_totp_device(self, request):
         try:
-            result = TOTPDevice.delete_totp_device(request=request)
+            result = TOTPDeviceController.delete_totp_device(request=request)
             return result
         except Exception:
             logger.exception(_("Something went wrong..."), exc_info=True)

@@ -2,7 +2,6 @@
 
 import { SignInSchema, SignInValidator } from "@/app/lib/schemas.z";
 import { signIn } from "@/auth";
-import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { AuthError } from "next-auth";
 import { getLocale } from "next-intl/server";
 
@@ -20,7 +19,7 @@ export default async function authenticate(values: SignInValidator) {
   try {
     await signIn("credentials", {
       ...validatedData.data,
-      redirectTo: `/${locale}${DEFAULT_SIGNED_IN_PATH}`,
+      // redirectTo: `/${locale}${DEFAULT_SIGNED_IN_PATH}`,
     });
 
     return { success: "Signed in.", error: null };

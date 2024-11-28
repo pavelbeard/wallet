@@ -26,8 +26,13 @@ export const authConfig = {
         session,
         trigger,
       });
-      const newToken = { ...token, ...result };
-      return newToken;
+
+      if (result) {
+        const newToken = { ...token, ...result };
+        return newToken;
+      }
+
+      return null;
     },
     session({ session, token, user, trigger, newSession }) {
       const result = sessionCallback({

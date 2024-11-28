@@ -10,7 +10,7 @@ import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 
 export default function SideBar() {
-  const t = useTranslations("sidebar");
+  const t = useTranslations();
   const locale = useLocale();
 
   return (
@@ -38,7 +38,7 @@ export default function SideBar() {
                 locale={locale}
                 href={url}
               >
-                {icon} {title}
+                {icon} {t(title)}
               </Link>
             </li>
           ))}
@@ -60,7 +60,7 @@ export default function SideBar() {
               type="button"
             >
               <ArrowLeftStartOnRectangleIcon className="size-6" />
-              {t("signOut")}
+              {t("sidebar.signOut")}
             </button>
           </li>
         </ul>

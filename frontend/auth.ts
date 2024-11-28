@@ -9,6 +9,7 @@ export interface WalletUser {
   orig_iat: number;
   otp_device_id: string | null;
   created_at: string | null;
+  verified: boolean;
 }
 
 declare module "next-auth" {
@@ -24,6 +25,7 @@ declare module "next-auth" {
     refresh_token?: string;
     refresh_token_exp?: number;
     user?: User;
+    verified?: boolean;
   }
 
   interface JWT {
@@ -31,6 +33,7 @@ declare module "next-auth" {
     refresh_token: Cookie;
     access_token_exp: number;
     refresh_token_exp: number;
+    user: User;
   }
 }
 
@@ -39,5 +42,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/auth/sign-in",
     newUser: "/auth/sign-up",
+    verifyRequest: "/auth/sign-in/verify",
   },
 });

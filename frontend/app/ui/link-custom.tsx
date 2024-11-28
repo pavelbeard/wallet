@@ -9,6 +9,7 @@ export default function CustomLink({ children, href }: Props) {
   const locale = useLocale();
   return (
     <Link
+      prefetch={true}
       locale={locale}
       href={href}
       className={clsx(

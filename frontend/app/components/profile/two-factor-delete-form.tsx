@@ -1,5 +1,5 @@
 import Modal, { FullscreenModal } from "@/app/components/layout/modal";
-import Messages from "@/app/components/profile/two-factor-form-messages";
+import Messages from "@/app/ui/messages";
 import useTwoFactorAuthDelete from "@/app/lib/hooks/profile/useTwoFactorAuthDelete";
 import useTabletBreakpoint from "@/app/lib/hooks/useTabletBreakpoint";
 import { PasswordSchema, PasswordValidator } from "@/app/lib/schemas.z";
@@ -37,18 +37,22 @@ function FormComponent() {
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={clsx(
-        "px-8 py-4 flex flex-col items-center gap-y-4",
+        "p-8 flex flex-col items-center gap-y-4",
         "text-slate-800 dark:text-slate-300",
         "border-t border-slate-800 dark:border-slate-600",
+        "[&>label>span]:text-sm",
+        "[&>label>div>input]:p-2 [&>label>div>div]:pr-2",
+        "[&>label>div>input]:text-sm",
+        "[&>button]:p-2 [&>button]:text-sm",
       )}
     >
       <div className="flex w-full justify-center md:justify-start">
         <FormTitle textSize="md">{t("profile.twofactor.delete2fa")}</FormTitle>
       </div>
-      <p className="max-md:text-xs text-sm w-80">
+      <p className="max-md:text-center text-sm md:w-80">
         {t("profile.twofactor.delete2faNote")}
       </p>
-      <p className="max-md:text-xs text-sm w-80">
+      <p className="text-sm md:w-80">
         {t("profile.twofactor.delete2faNote2")}
       </p>
 

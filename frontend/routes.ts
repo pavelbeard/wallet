@@ -6,11 +6,20 @@ export const publicRoutes: string[] = ["/"];
 /**
  * Routes, which middleware should protect by default
  */
-export const protectedRoutes: string[] = ["/dashboard", "/profile"];
+export const protectedRoutes: string[] = [
+  "/dashboard",
+  "/profile",
+  "/profile/2fa",
+];
+
+/**
+ * Route, which user should be proceed to verify 2FA
+ */
+export const DEFAULT_VERIFICATION_ROUTE = "/auth/sign-in/verify";
 
 /**
  * Routes, which middleware should ignore by default, but if you is authenticated - skip these routes
-*/
+ */
 export const authRoutes: string[] = ["/auth/sign-in", "/auth/sign-up"];
 
 /**

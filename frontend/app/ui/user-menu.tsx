@@ -66,13 +66,12 @@ export function UserMenuMobile() {
 }
 
 export default function UserMenuDesktop() {
-  const { desktopRef, userMenu } = useUserMenu();
+  const { userMenu } = useUserMenu();
 
   return (
     <nav
-      ref={desktopRef}
       className={clsx(
-        "block absolute right-0 top-24 z-50",
+        "block absolute right-4 top-28 z-50",
         "py-4 p-4 w-64 max-w-96",
         "bg-slate-100 shadow-black drop-shadow-md border-[1px] border-slate-300 rounded-md",
         "dark:bg-slate-800 dark:border-slate-600",

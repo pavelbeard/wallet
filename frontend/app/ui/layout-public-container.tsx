@@ -1,7 +1,7 @@
 import { LayoutProps } from "@/app/lib/types";
 import { clsx } from "clsx";
 
-export default function LayoutPublicContainer({ children, color }: LayoutProps) {
+export default async function LayoutPublicContainer({ children, color }: LayoutProps) {
   return (
     <main
       className={clsx(

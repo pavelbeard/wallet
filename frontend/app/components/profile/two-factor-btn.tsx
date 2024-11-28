@@ -1,12 +1,31 @@
 import { Link } from "@/i18n/routing";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
-type Props = {};
+type TwoFactorBtnProps = {
+  params: { locale: string };
+  disabled: boolean;
+};
 
-export default async function TwoFactorBtn({}: Props) {
-  const locale = await getLocale();
+export default async function TwoFactorBtn({
+  params: { locale },
+  disabled,
+}: TwoFactorBtnProps) {
   const t = await getTranslations({
     locale,
   });
-  return <Link href="/profile/2fa">{t("profile.main.twoFactorBtn")}</Link>;
+  return (
+    <div
+      className="flex items-center"
+      data-testid="two-factor-btn"
+      aria-label="two factor btn"
+    >
+      {disabled ? (
+        <button disabled={disabled}>{t("profile.main.twoFactorBtn")}</button>
+      ) : (
+        <Link locale={locale} href="/profile/2fa">
+          {t("profile.main.twoFactorBtn")}
+        </Link>
+      )}
+    </div>
+  );
 }

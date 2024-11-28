@@ -11,7 +11,7 @@ export default async function query({
   url: string;
   method?: string;
   body?: any;
-}) {
+}): Promise<Error | { json: any; response: Response } | null> {
   const accessToken = await getAccessToken();
 
   return fetch(`${API_PATH}/api${url}`, {

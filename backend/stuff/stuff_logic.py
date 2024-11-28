@@ -1,5 +1,6 @@
 ### module for complicated logic ###
 import contextlib
+import enum
 from calendar import timegm
 from typing import Any, Dict, List
 
@@ -26,6 +27,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from stuff import qr_generator
 from stuff.models import WalletUser
 from stuff.utils import LOGIN_TYPE
+
+
+class Action(enum.Enum):
+    verify = "verify"
+    delete = "delete"
 
 
 @contextlib.contextmanager
@@ -137,10 +143,15 @@ def jwt_decode_handler(token) -> Any:
     )
 
 
-def get_custom_jwt(user: WalletUser, device: Device = None) -> str:
+def get_custom_jwt(user: WalletUser, device: Device = None, action: Action = Action.verify) -> str:
     """Using for include 2FA into JWT"""
     payload = jwt_otp_payload(user, device)
     tokens = RefreshToken.for_user(user)
+    
+    if action == Action.verify:
+        payload["verified"] = True
+    if action == Action.delete:
+        payload["verified"] = False
     
     for k, v in payload.items():
         if k == "exp" and tokens.token_type == "refresh":

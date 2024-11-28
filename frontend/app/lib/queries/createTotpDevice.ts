@@ -7,11 +7,22 @@ import { TOTPData } from "@/app/lib/types";
 export default async function createTotpDevice(): Promise<TOTPData | null> {
   const user = await getUser();
   if (user?.provider == "credentials") {
-    const data = await query({
+    const result = await query({
       url: "/2fa/create_totp_device/",
       method: "POST",
     });
-    return data.json;
+
+    if (result instanceof Error) {
+      return null;
+    }
+
+    if (result?.response.ok) {
+      return result.json;
+    }
+
+    if (result?.response.status === 400) {
+      return null;
+    }
   }
 
   return null;

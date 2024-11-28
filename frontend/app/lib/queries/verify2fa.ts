@@ -18,14 +18,23 @@ export default async function verify2fa(data: TwoFactorValidator) {
     };
   }
 
-  const { response } = await query({
+  const result = await query({
     url: "/2fa/verify_totp_device/",
     method: "POST",
     body: data,
   });
 
-  if (response) {
+  if (result instanceof Error) {
+    return {
+      success: null,
+      error: "profile.twofactor.notVerified",
+      userData: null,
+    };
+  }
+
+  if (result?.response.ok) {
     // TODO: apply new access token with a TOTP device to session
+    const { response } = result;
     const updatedUserData = await updateUserData(response);
     revalidatePath(`/${locale}/profile/2fa`);
     return {

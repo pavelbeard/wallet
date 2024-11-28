@@ -6,8 +6,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 
 export default function ToMainPageBtn() {
-  const t = useTranslations("auth");
+  const t = useTranslations();
   const locale = useLocale();
+
   return (
     <Link
       locale={locale}
@@ -22,7 +23,7 @@ export default function ToMainPageBtn() {
       )}
     >
       <ArrowLeftIcon className="size-4" />
-      <span className="ml-2">{t("page.toMainPage")}</span>
+      <span className="ml-2">{t("auth.page.toMainPage")}</span>
     </Link>
   );
 }

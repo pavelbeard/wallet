@@ -29,7 +29,7 @@ export default function TwoFactorCodeDisplay({
         <p className="font-bold">{code}</p>
         <button
           type="button"
-          className="flex items-center gap-x-2 max-md:text-xs text-sm"
+          className="flex items-center gap-x-2 text-sm"
           onClick={copyToClipboard}
         >
           <ScissorsIcon className="size-6" />

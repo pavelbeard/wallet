@@ -1,9 +1,9 @@
 import "@/app/globals.css";
-import { Props } from "@/app/lib/types";
+import { routing } from "@/i18n/routing";
 import { pick } from "lodash";
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getMessages } from "next-intl/server";
 import { Roboto_Mono } from "next/font/google";
 import { Suspense } from "react";
 import NavigationEvents from "./components/layout/navigation-events";
@@ -13,8 +13,19 @@ const robotoMono = Roboto_Mono({
   display: "swap",
 });
 
-export default async function ErrorLayout({ children }: Props) {
-  const locale = await getLocale();
+type ErrorProps = {
+  children: React.ReactNode;
+  params: { locale: string };
+};
+
+export const generateStaticParams = async () => {
+  return routing.locales.map((locale) => ({ locale }));
+};
+
+export default async function ErrorLayout({
+  children,
+  params: { locale },
+}: ErrorProps) {
   const messages = await getMessages();
   return (
     <html lang={locale} className={robotoMono.className}>

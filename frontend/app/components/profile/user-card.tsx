@@ -1,30 +1,24 @@
+import Email from "@/app/components/profile/user-card-email";
 import getUser from "@/app/lib/getUser";
 import Card from "@/app/ui/card";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, UserIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 import { User } from "next-auth";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 type UserProps = { user?: User; title: string };
 
-const Email = ({ user, title }: UserProps) => {
-  if (user?.email) {
-    return (
-      <div className="flex flex-col">
-        <p>{title}:</p>
-        <p className="justify-self-end text-wrap">{user?.email}</p>
-      </div>
-    );
-  }
-
-  return null;
-};
+const row =
+  "flex flex-col md:flex-row md:justify-between md:items-center [&>span]:h-[20px]";
 
 const Username = ({ user, title }: UserProps) => {
   const username = user?.name ?? user?.username;
   if (username) {
     return (
-      <div className="flex flex-col">
-        <p>{title}:</p>
-        <p className="justify-self-end text-wrap">{username}</p>
+      <div className={row}>
+        <span>{title}:</span>
+        <span>{username}</span>
       </div>
     );
   }
@@ -32,16 +26,69 @@ const Username = ({ user, title }: UserProps) => {
   return null;
 };
 
-export default async function UserCard() {
+function TwoFactorStatus({ user, title, note }: UserProps & { note: string }) {
+  const twoFactorStatus = user?.otp_device_id;
+  const isProviderCredentials = user?.provider == "credentials";
+  return (
+    <div className="flex items-center justify-between">
+      <span>{title}:</span>
+      <span
+        className={clsx(
+          "p-1 rounded-lg flex items-center",
+          twoFactorStatus
+            ? "text-green-500 bg-green-500/40"
+            : isProviderCredentials
+              ? "text-red-500 bg-red-500/40"
+              : "text-yellow-800 bg-yellow-500/40",
+        )}
+      >
+        {twoFactorStatus ? (
+          <CheckIcon className="size-[12px]" />
+        ) : isProviderCredentials ? (
+          <XMarkIcon className="size-[12px]" />
+        ) : (
+          <div className="flex items-center gap-2 h-[12px]">
+            <ExclamationTriangleIcon className="size-[12px]" />
+            {note}
+          </div>
+        )}
+      </span>
+    </div>
+  );
+}
+
+type UserCardProps = {
+  params: { locale: string };
+};
+
+export default async function UserCard({ params: { locale } }: UserCardProps) {
   const user = await getUser();
-  const locale = await getLocale();
   const t = await getTranslations({
     locale,
   });
   return (
-    <Card className="p-6 w-f flex flex-col lg:grid lg:grid-cols-2 gap-y-2">
-      <Username user={user} title={t("profile.userCard.username")} />
-      <Email user={user} title={t("profile.userCard.email")} />
-    </Card>
+    <section className="flex flex-col gap-4">
+      <div className="p-2 flex gap-2 items-center">
+        <UserIcon className="size-6" />
+        <h1 className="text-lg font-bold">{t("profile.userCard.title")}</h1>
+      </div>
+      <Card
+        className={clsx(
+          "w-full flex flex-col lg:grid lg:grid-rows-3",
+          "border border-slate-200",
+          "[&>*]:p-6 [&>*]:text-sm [&>*]:h-20",
+          "[&>*:not(:first-child)]:border-t",
+          "[&>*]:border-slate-200 [&>*]:dark:border-slate-600",
+        )}
+      >
+        <Username user={user} title={t("profile.userCard.username")} />
+        <Email title={t("profile.userCard.email")} />
+        <TwoFactorStatus
+          user={user}
+          title={`${t("profile.userCard.twoFactor")}`}
+          note={t("profile.twofactor.oauth2note")}
+        />
+      </Card>
+    </section>
   );
 }

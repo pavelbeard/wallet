@@ -43,6 +43,7 @@ const providers = [
         orig_iat: decodedToken.orig_iat,
         otp_device_id: decodedToken.otp_device_id,
         created_at: decodedToken.created_at,
+        verified: decodedToken.verified,
       } as WalletUser;
 
       return {

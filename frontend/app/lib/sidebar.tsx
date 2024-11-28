@@ -3,17 +3,17 @@ import { SideBarItem } from "./types";
 
 export const sideMenu: SideBarItem[] = [
   {
-    title: "Main",
+    title: "sidebar.main",
     url: "/dashboard",
     icon: <HomeIcon className="size-5 hover:text-black" />
   },
   {
-    title: "Passwords",
+    title: "sidebar.passwords",
     url: "/passwords",
     icon: <KeyIcon className="size-5 hover:text-black" />,
   },
   {
-    title: "Cards",
+    title: "sidebar.cards",
     url: "/cards",
     icon: <CreditCardIcon className="size-5 hover:text-black" />,
   },

@@ -1,5 +1,7 @@
 from typing import Any, Dict
 
+from aiogram import F
+
 from abstract.serializers import AbstractSerializer
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
@@ -96,6 +98,7 @@ class TwoFactorJWTSerializer(
     def get_token(cls, user):
         device = user.totpdevice_set.first()
         payload = stuff_logic.jwt_otp_payload(user=user, device=device)
+        payload["verified"] = False
         tokens = super().get_token(user)
 
         for k, v in payload.items():

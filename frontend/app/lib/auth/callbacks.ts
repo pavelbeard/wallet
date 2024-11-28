@@ -76,13 +76,13 @@ const jwtCallback: JWTCallback = async ({
   session,
 }) => {
   if (user && account?.type !== "credentials") {
-    return {
-      ...token,
-      provider: account?.provider,
-      access_token: account?.access_token,
-      access_token_exp: getCurrentEpochTime() + (account?.expires_in || 0),
-      refresh_token: account?.refresh_token,
-    };
+    token.user = { ...user, username: user.name };
+    token.provider = account?.provider;
+    token.access_token = account?.access_token;
+    token.access_token_exp = getCurrentEpochTime() + (account?.expires_in || 0);
+    token.refresh_token = account?.refresh_token;
+
+    return token;
   }
 
   if (user) {

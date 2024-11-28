@@ -4,10 +4,10 @@ import parseCookies from "@/app/lib/helpers/parseCookies";
 import { WalletUser } from "@/auth";
 import { jwtDecode } from "jwt-decode";
 
-export default async function updateUserData(data: Response) {
+export default async function updateUserData(response: Response) {
   // if verifying 2fa (creating new token / verifying existing token)
-  if (data.ok) {
-    const parsedCookies = await parseCookies(data);
+  if (response.ok) {
+    const parsedCookies = await parseCookies(response);
     const [access_token, refresh_token] = parsedCookies.map((cookie) => {
       if (cookie.name === "__clientid" || cookie.name === "__rclientid") {
         return cookie;
@@ -23,6 +23,7 @@ export default async function updateUserData(data: Response) {
       orig_iat: decodedToken.orig_iat,
       otp_device_id: decodedToken.otp_device_id,
       created_at: decodedToken.created_at,
+      verified: decodedToken.verified,
     } as WalletUser;
 
     return {

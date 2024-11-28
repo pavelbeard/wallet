@@ -2,11 +2,13 @@
   "auth": {
     "title": {
       "signIn": "Cartera | Iniciar sesión",
-      "signUp": "Cartera | Crear la cuenta"
+      "signUp": "Cartera | Crear la cuenta",
+      "verify": "Cartera | \nVerificar 2FA"
     },
     "description": {
       "signIn": "Iniciar sesión",
-      "signUp": "Crear la cuenta"
+      "signUp": "Crear la cuenta",
+      "verify": "Si el usuario tiene 2FA, la aplicación lo detecta"
     },
     "form": {
       "formTitle": {
@@ -21,7 +23,10 @@
       "signInWith": "Entrar con ",
       "withAccount": "Si tienes una cuenta, inicia sesión.",
       "withoutAccount": "Si no tienes una cuenta, creála!",
-      "or": "o"
+      "or": "o",
+      "verify2fa": "Verificar token de dos factores",
+      "2faInput": "Tu token 2FA",
+      "2faSubmit": "Verificar"
     },
     "page": {
       "signOut": "Cerrando sesión...",
@@ -64,8 +69,21 @@
         "form": {
           "emailPlaceholder": "Introduce un nuevo correo electrónico...",
           "emailField": "Correo electrónico"
+        },
+        "changePassword": {
+          "title": "Cambiar la contraseña",
+          "form": {
+            "actualPassword": "Tu contraseña actual",
+            "newPassword": "Nueva contraseña",
+            "confirmPassword": "Confirmar Contraseña",
+            "submit": "Cambiar",
+            "passwordNote": "Hazla más aleatorio. \nPor confiabilidad."
+          }
         }
-      }
+      },
+      "changePassword": "Cambiar la contraseña",
+      "twoFactor": "Dos factores",
+      "title": "Información de usuario"
     },
     "useCard": {
       "modal": {
@@ -97,10 +115,18 @@
       "appTitle": "App de autenticación",
       "attention": "Si tienes problemas con el escáner QR, haz esto",
       "added": "Añadido",
-      "next": "Siguente"
+      "next": "Siguente",
+      "change2fa": "Cambiar 2FA",
+      "oauth2note": "Pregúntele a su proveedor de cuenta"
     },
     "main": {
-      "twoFactorBtn": "Gestión de autenticación de dos factores"
+      "twoFactorBtn": "Gestión 2FA"
+    },
+    "settings": {
+      "title": "Ajustes"
+    },
+    "devices": {
+      "title": "Dispositivos vinculados con tu cuenta"
     }
   },
   "header": {
@@ -110,7 +136,10 @@
     "signOut": "Cerrar sesión"
   },
   "sidebar": {
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "main": "Inicio",
+    "passwords": "Contraseñas",
+    "cards": "Tarjetas"
   },
   "userMenu": {
     "profile": "Perfil",
@@ -129,5 +158,6 @@
     "cards": "Tarjetas de pago",
     "profile": "Perfil",
     "2fa": "Autorización de dos factores"
-  }
+  },
+  "loading": "Cargando..."
 }

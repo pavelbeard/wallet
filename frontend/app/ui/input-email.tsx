@@ -15,7 +15,7 @@ export default function EmailInput({
       <input
         className={clsx(
           "p-4 outline-gray-500 outline-2 border-slate-700 border-[1px]",
-          "dark:outline-gray-100dark:border-gray-300 dark:text-slate-800",
+          "dark:outline-gray-100 dark:border-gray-300 dark:text-slate-800",
           "rounded-xl",
         )}
         type="email"

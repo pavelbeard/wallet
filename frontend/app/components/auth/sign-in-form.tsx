@@ -1,7 +1,8 @@
 "use client";
 
 import FormError from "@/app/components/form/form-error";
-import authenticate from "@/app/lib/authenticate";
+import FormSuccess from "@/app/components/form/form-success";
+import useSignIn from "@/app/lib/hooks/auth/useSignIn";
 import { SignInSchema, SignInValidator } from "@/app/lib/schemas.z";
 import AuthQuestion from "@/app/ui/auth-question";
 import FormDivider from "@/app/ui/form-divider";
@@ -12,9 +13,7 @@ import OauthButtons from "@/app/ui/oauth-buttons";
 import Submit from "@/app/ui/submit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import FormSuccess from "../form/form-success";
+import { useForm } from "react-hook-form";
 
 const signInResolver = zodResolver(SignInSchema);
 
@@ -31,32 +30,7 @@ export default function SignInForm() {
       password: "",
     },
   });
-  const [formMessages, setFormMessages] = useState<{
-    success: string | null;
-    error: string | null;
-  }>({
-    success: null,
-    error: null,
-  });
-  const [isPending, startTransition] = useTransition();
-
-  const onSubmit: SubmitHandler<SignInValidator> = async (data) => {
-    setFormMessages({
-      ...formMessages,
-      success: null,
-      error: null,
-    });
-
-    startTransition(() => {
-      authenticate(data).then((result) => {
-        setFormMessages({
-          ...formMessages,
-          success: result?.success,
-          error: result?.error,
-        });
-      });
-    });
-  };
+  const { onSubmit, isPending, formMessages } = useSignIn();
 
   return (
     <>
@@ -70,9 +44,7 @@ export default function SignInForm() {
           register={register}
           autoComplete="email"
         />
-        {errors.email?.message && (
-          <p className="field-error">{errors.email.message}</p>
-        )}
+        <FormError message={errors.email?.message as string} />
         <PasswordInput
           labelText={t("form.passwordInput")}
           htmlFor="credentials-password"
@@ -81,9 +53,7 @@ export default function SignInForm() {
           register={register}
           autoComplete="password"
         />
-        {errors.password?.message && (
-          <p className="field-error">{errors.password.message}</p>
-        )}
+        <FormError message={errors.password?.message as string} />
         <FormError message={formMessages.error} />
         <FormSuccess message={formMessages.success} />
         <Submit

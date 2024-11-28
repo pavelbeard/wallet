@@ -76,7 +76,7 @@ export default function UserAvatar({ src, provider }: Props) {
             />
             <AuthMethodLogo provider={provider} />
           </div>
-          {isOpen && <UserMenuDesktop />}
+          {isOpen && createPortal(<UserMenuDesktop />, document.body)}
         </div>
       );
     } else {

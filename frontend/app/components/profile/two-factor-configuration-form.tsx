@@ -1,4 +1,5 @@
 import Modal, { FullscreenModal } from "@/app/components/layout/modal";
+import useTotpData from "@/app/lib/hooks/profile/useTotpData";
 import useTwoFactorAuth from "@/app/lib/hooks/profile/useTwoFactorAuth";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import useTabletBreakpoint from "@/app/lib/hooks/useTabletBreakpoint";
@@ -7,13 +8,14 @@ import Button from "@/app/ui/button-custom";
 import FormTitle from "@/app/ui/form-title";
 import CustomInput from "@/app/ui/input-custom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import Messages from "../../ui/messages";
 import TwoFactorCodeDisplay from "./two-factor-code-display";
-import Messages from "./two-factor-form-messages";
 
-type Props = { config_key: string; detail?: string; closeForm: () => void };
+type Props = { closeForm: () => void };
 
 const twoFactorResolver = zodResolver(TwoFactorSchema);
 
@@ -21,7 +23,7 @@ function FormComponent({
   config_key,
   detail,
 }: {
-  config_key: string;
+  config_key: string | undefined;
   detail?: string;
 }) {
   const t = useTranslations();
@@ -62,69 +64,76 @@ function FormComponent({
   useEffect(() => resetCopied, []);
 
   return (
-    <form className="px-8 py-4 flex flex-col items-center gap-y-4 border-t dark:border-slate-600 dark:text-slate-300">
+    <form
+      className={clsx(
+        "p-8 flex flex-col items-center gap-y-4",
+        "border-t dark:border-slate-600 dark:text-slate-300",
+        "[&>label>span]:text-sm",
+        "[&>label>input]:p-2",
+        "[&>label>input]:text-sm",
+        "[&>button]:p-2 [&>button]:text-sm",
+      )}
+    >
       <div className="flex w-full justify-center md:justify-start">
         <FormTitle textSize="md">{t("profile.twofactor.title")}</FormTitle>
       </div>
 
       {detail ? (
-        <p className="max-md:text-xs text-sm text-red-500">{detail}</p>
+        <p className="text-sm text-red-500">{detail}</p>
       ) : (
-        <>
-          {next ? (
-            <>
-              <CustomInput
-                labelText={`${t("profile.twofactor.input")}:`}
-                placeholder={t("profile.twofactor.inputPlaceholder")}
-                htmlFor="token"
-                name="token"
-                register={register}
-                id="token"
-                disabled={isPending}
-              />
-              <p className="px-2 text-xs">{t("profile.twofactor.note")}</p>
-            </>
-          ) : (
-            <>
-              <TwoFactorCodeDisplay
-                config_key={config_key}
-                copiedMessage={copied}
-                setCopied={setCopied}
-              />
+        config_key && (
+          <>
+            {next ? (
+              <>
+                <CustomInput
+                  labelText={`${t("profile.twofactor.input")}:`}
+                  htmlFor="token"
+                  name="token"
+                  register={register}
+                  id="token"
+                  disabled={isPending}
+                />
+                <p className="text-xs">{t("profile.twofactor.note")}</p>
+              </>
+            ) : (
+              <>
+                <TwoFactorCodeDisplay
+                  config_key={config_key}
+                  copiedMessage={copied}
+                  setCopied={setCopied}
+                />
 
-              <Button onClick={() => setNext(true)}>
-                {t("profile.twofactor.next")}
-              </Button>
-            </>
-          )}
+                <Button onClick={() => setNext(true)}>
+                  {t("profile.twofactor.next")}
+                </Button>
+              </>
+            )}
 
-          <Messages
-            errorMessage={errors?.token?.message || verify2faState.error}
-            successMessage={verify2faState.success}
-          />
-        </>
+            <Messages
+              errorMessage={errors?.token?.message || verify2faState.error}
+              successMessage={verify2faState.success}
+            />
+          </>
+        )
       )}
     </form>
   );
 }
 
-export default function TwoFactorConfigurationForm({
-  closeForm,
-  config_key,
-  detail,
-}: Props) {
+export default function TwoFactorConfigurationForm({ closeForm }: Props) {
   const isTabletBreakpoint = useTabletBreakpoint();
+  const { data } = useTotpData();
 
   if (isTabletBreakpoint)
     return (
       <Modal closeCallback={closeForm}>
-        <FormComponent config_key={config_key} detail={detail} />
+        <FormComponent config_key={data?.config_key} detail={data?.detail} />
       </Modal>
     );
 
   return (
     <FullscreenModal closeCallback={closeForm}>
-      <FormComponent config_key={config_key} detail={detail} />
+      <FormComponent config_key={data?.config_key} detail={data?.detail} />
     </FullscreenModal>
   );
 }
