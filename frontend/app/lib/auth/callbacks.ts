@@ -4,7 +4,6 @@ import {
   SIGN_IN_PROVIDERS,
 } from "@/app/lib/auth/signInProviders";
 import getCurrentEpochTime from "@/app/lib/helpers/getCurrentEpochTime";
-import logger from "@/app/lib/helpers/logger";
 import setAuthData from "@/app/lib/helpers/setAuthData";
 import { UpdateSessionSchema } from "@/app/lib/schemas.z";
 import { Awaitable } from "@/app/lib/types";
@@ -122,9 +121,6 @@ const jwtCallback: JWTCallback = async ({
 };
 
 const sessionCallback: SessionCallback = ({ session, token }) => {
-  logger("session callback | session: ", session);
-  logger("session callback | token: ", token);
-
   return {
     ...session,
     user: {

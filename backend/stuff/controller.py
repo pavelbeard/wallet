@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 from . import exceptions, serializers, stuff_logic
 from .models import WalletUser
-from .utils import LOGIN_TYPE
+from .utils import LOGIN_TYPE, Action
 
 
 class Auth:
@@ -170,7 +170,7 @@ class TOTPDeviceController:
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
-            tokens = stuff_logic.get_custom_jwt(user, device)
+            tokens = stuff_logic.get_custom_jwt(user, device, action=Action.verify)
             response = Response(status=status.HTTP_200_OK)
             new_token_response = stuff_logic.set_auth_cookies(
                 response=response,
@@ -230,7 +230,7 @@ class TOTPDeviceController:
         user.is_two_factor_enabled = False
         user.save()
 
-        tokens = stuff_logic.get_custom_jwt(user, None)
+        tokens = stuff_logic.get_custom_jwt(user, None, Action.delete)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
         new_token_response = stuff_logic.set_auth_cookies(

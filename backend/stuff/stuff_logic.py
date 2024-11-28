@@ -1,6 +1,5 @@
 ### module for complicated logic ###
 import contextlib
-import enum
 from calendar import timegm
 from typing import Any, Dict, List
 
@@ -26,12 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from stuff import qr_generator
 from stuff.models import WalletUser
-from stuff.utils import LOGIN_TYPE
-
-
-class Action(enum.Enum):
-    verify = "verify"
-    delete = "delete"
+from stuff.utils import LOGIN_TYPE, Action
 
 
 @contextlib.contextmanager

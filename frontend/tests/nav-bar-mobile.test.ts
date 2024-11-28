@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+// DEPRECATED
+
 test("Mobile menu", async ({ browser }) => {
   const ctx = await browser.newContext();
   ctx.addCookies([
@@ -19,13 +21,13 @@ test("Mobile menu", async ({ browser }) => {
 
     const dropdownMobile = page.locator("#dropdown-mobile");
     expect(dropdownMobile).toBeTruthy();
-    
+
     const menuItems = await page.getByTestId("mobile-item").all();
-    
+
     expect(menuItems.at(0)?.isVisible()).toBeTruthy();
 
     const btn = menuItems.at(0)?.getByTestId("dropdown-submenu-mobile");
-    
+
     expect(btn?.isVisible).toBeTruthy();
   });
 });

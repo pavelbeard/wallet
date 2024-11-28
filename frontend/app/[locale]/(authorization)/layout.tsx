@@ -1,5 +1,4 @@
 import "@/app/globals.css";
-import getSession from "@/app/lib/helpers/getSession";
 import LayoutPublicContainer from "@/app/ui/layout-public-container";
 import Logo from "@/app/ui/logo";
 import ToMainPageBtn from "@/app/ui/to-main-page-btn";
@@ -22,18 +21,12 @@ export default async function Layout({
   params: { locale },
 }: RootLayoutProps) {
   const messages = await getMessages();
-  const session = await getSession();
 
-  // TODO: remove all redirections
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LayoutPublicContainer color="auth-bg">
-        {!session && (
-          <>
-            <Logo />
-            <ToMainPageBtn />
-          </>
-        )}
+        <Logo />
+        <ToMainPageBtn />
         {children}
       </LayoutPublicContainer>
     </NextIntlClientProvider>

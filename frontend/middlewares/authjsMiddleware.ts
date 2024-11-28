@@ -2,6 +2,7 @@ import { routing } from "@/i18n/routing";
 import { Locales } from "@/i18n/types";
 import {
   authRoutes,
+  DEFAULT_SIGNED_IN_PATH,
   DEFAULT_VERIFICATION_ROUTE,
   protectedRoutes,
 } from "@/routes";
@@ -52,43 +53,30 @@ export default function authjsMiddleware(middleware: CustomMiddleware) {
     const isVerificationRoute = verificationIntlRoutes.includes(pathname);
     const isAuthRoute = authIntlRoutes.includes(pathname);
 
-    // If user is authenticated with 2FA but without verification
+    // ** CASE 1: User is authenticated with 2FA and verified **
+    if (token && (isAuthRoute || (user?.verified && isVerificationRoute))) {
+      return NextResponse.redirect(
+        new URL(DEFAULT_SIGNED_IN_PATH, request.url),
+      );
+    }
+
+    // ** CASE 2: User is authenticated with 2FA but without verification **
     if (user?.otp_device_id && !user?.verified && isProtectedRoute) {
       const tokenVerifyPath = new URL(DEFAULT_VERIFICATION_ROUTE, request.url);
       tokenVerifyPath.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(tokenVerifyPath);
     }
 
-    // If user is not authenticated
+    // ** CASE 3: User is not authenticated **
     if (!token && (isProtectedRoute || isVerificationRoute)) {
       const unauthenticatedPath = new URL("/api/auth/signin", request.url);
       unauthenticatedPath.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(unauthenticatedPath);
     }
 
-    // if (token && (isAuthRoute || isVerificationRoute)) {
-    //   // User with 2FA and verified
-    //   if (user.otp_device_id && user.verified) {
-    //     const authenticatedPath = new URL(DEFAULT_SIGNED_IN_PATH, request.url);
-    //     authenticatedPath.searchParams.set("callbackUrl", pathname);
-    //     return NextResponse.redirect(authenticatedPath);
-    //   }
-
-    //   // User with 2FA and not verified
-    //   if (user.otp_device_id && !user.verified) {
-    //     const unverifiedPath = new URL(DEFAULT_VERIFICATION_ROUTE, request.url);
-    //     unverifiedPath.searchParams.set("callbackUrl", pathname);
-    //     return NextResponse.redirect(unverifiedPath);
-    //   }
-
-    //   if (!user.otp_device_id) {
-    //     // User without 2FA
-    //     const authenticatedPath = new URL(DEFAULT_SIGNED_IN_PATH, request.url);
-    //     authenticatedPath.searchParams.set("callbackUrl", pathname);
-    //     return NextResponse.redirect(authenticatedPath);
-    //   }
-    // }
-
+    // ** CASE 4: User is accessing public route **
+    // ** CASE 5: User is accessing protected route **
+    // ** CASE 6: Fallback **
     return middleware(request, event, response);
   };
 }

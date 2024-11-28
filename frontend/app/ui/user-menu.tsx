@@ -45,7 +45,10 @@ export function UserMenuMobile() {
 
   return (
     <nav
-      className={clsx("w-full p-2 flex-1 bg-slate-100", "dark:bg-slate-800")}
+      className={clsx(
+        "w-full p-2 flex-1 text-slate-800 bg-slate-100",
+        "dark:bg-slate-800 dark:text-slate-100",
+      )}
     >
       <div ref={mobileRef}>
         <button
@@ -74,7 +77,7 @@ export default function UserMenuDesktop() {
         "block absolute right-4 top-28 z-50",
         "py-4 p-4 w-64 max-w-96",
         "bg-slate-100 shadow-black drop-shadow-md border-[1px] border-slate-300 rounded-md",
-        "dark:bg-slate-800 dark:border-slate-600",
+        "dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-slate-100",
       )}
     >
       <ul>

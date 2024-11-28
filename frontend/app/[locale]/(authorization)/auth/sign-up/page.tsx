@@ -1,9 +1,7 @@
 import SignUpForm from "@/app/components/auth/sign-up-form";
-import getSession from "@/app/lib/helpers/getSession";
 import Card from "@/app/ui/card";
-import { redirect, routing } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
-import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -24,12 +22,6 @@ export const generateStaticParams = async () => {
 };
 
 export default async function Page({ params: { locale } }: LocaleProps) {
-  const session = await getSession();
-
-  if (session?.user) {
-    redirect({ href: DEFAULT_SIGNED_IN_PATH, locale });
-  }
-
   return (
     <>
       <Card className="hidden md:block p-6 my-12 w-3/4 lg:w-1/3">

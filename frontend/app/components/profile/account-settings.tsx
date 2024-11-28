@@ -30,7 +30,7 @@ export default async function AccountSettings({
           "[&>div>*]:p-2 [&>div>*]:rounded-lg",
           "[&>div>*:not(:disabled):hover]:bg-slate-300 dark:[&>div>*:not(:disabled):hover]:bg-slate-700",
           "[&>div>*:disabled]:bg-slate-500 [&>div>*:disabled]:text-slate-300",
-          "[&>*]:text-sm dark:[&>*]:bg-slate-800 dark:text-gray-100",
+          "[&>*]:text-sm dark:text-gray-100",
           "[&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-slate-200 ",
           "dark:[&>*:not(:first-child)]:border-slate-600",
         )}

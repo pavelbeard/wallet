@@ -31,7 +31,7 @@ export default async function RootProtectedLayout({ children, params: { locale }
         )}
       >
         <LayoutSideElementsDesktop />
-        <div className="p-4 h-full">{children}</div>
+        <div className="p-4 h-full lg:mx-32">{children}</div>
       </main>
 
       {/* mobile layout */}

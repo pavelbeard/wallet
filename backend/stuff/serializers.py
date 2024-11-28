@@ -1,7 +1,5 @@
 from typing import Any, Dict
 
-from aiogram import F
-
 from abstract.serializers import AbstractSerializer
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
@@ -124,17 +122,16 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
 
 class PasswordSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, max_length=32, write_only=True)
-    
+
     def validate(self, attrs):
         password = attrs.get("password")
         if not password:
             raise serializers.ValidationError("Password is required.")
-        
+
         user: WalletUser = self.context["request"].user
         is_valid = user.check_password(password)
-        
+
         if not is_valid:
             raise serializers.ValidationError("Invalid password.")
-        
-        
+
         return attrs
