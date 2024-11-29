@@ -11,7 +11,9 @@ export default function TwoFactorTemplate({
     <div
       className={clsx(
         "h-16 flex flex-col items-start md:grid",
-        user?.otp_device_id ? "md:grid-cols-[80px_1fr_120px_120px]" : "md:grid-cols-[80px_1fr_120px]",
+        user?.is_two_factor_enabled
+          ? "md:grid-cols-[80px_1fr_120px_120px]"
+          : "md:grid-cols-[80px_1fr_120px]",
         "md:grid-rows-1 md:items-center gap-4 p-2 ",
         "border border-slate-600 bg-slate-100 dark:bg-slate-500/40 rounded-lg",
         "[&>button]:text-sm",

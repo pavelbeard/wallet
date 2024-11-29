@@ -1,3 +1,4 @@
+import { WalletUser } from "@/auth";
 import { routing } from "@/i18n/routing";
 import { Locales } from "@/i18n/types";
 import {
@@ -6,7 +7,6 @@ import {
   DEFAULT_VERIFICATION_ROUTE,
   protectedRoutes,
 } from "@/routes";
-import { User } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import {
   NextResponse,
@@ -39,7 +39,7 @@ export default function authjsMiddleware(middleware: CustomMiddleware) {
     request.nextauth = request.nextauth ?? {};
     // @ts-ignore
     request.nextauth.token = token;
-    const user = token?.user as User;
+    const walletUser = token?.user as WalletUser;
     const pathname = request.nextUrl.pathname;
 
     const protectedIntlRoutes = rewriteRoutes(protectedRoutes, routing.locales);
@@ -54,14 +54,21 @@ export default function authjsMiddleware(middleware: CustomMiddleware) {
     const isAuthRoute = authIntlRoutes.includes(pathname);
 
     // ** CASE 1: User is authenticated with 2FA and verified **
-    if (token && (isAuthRoute || (user?.verified && isVerificationRoute))) {
+    if (
+      token &&
+      (isAuthRoute || (walletUser?.verified && isVerificationRoute))
+    ) {
       return NextResponse.redirect(
         new URL(DEFAULT_SIGNED_IN_PATH, request.url),
       );
     }
 
     // ** CASE 2: User is authenticated with 2FA but without verification **
-    if (user?.otp_device_id && !user?.verified && isProtectedRoute) {
+    if (
+      walletUser?.is_two_factor_enabled &&
+      !walletUser?.verified &&
+      isProtectedRoute
+    ) {
       const tokenVerifyPath = new URL(DEFAULT_VERIFICATION_ROUTE, request.url);
       tokenVerifyPath.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(tokenVerifyPath);

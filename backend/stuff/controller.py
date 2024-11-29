@@ -3,6 +3,7 @@ import uuid
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_otp import devices_for_user
 from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
@@ -11,7 +12,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
 from . import exceptions, serializers, stuff_logic
-from .models import WalletUser
+from .models import WalletUser, WalletUserDevice
 from .utils import LOGIN_TYPE, Action
 
 
@@ -48,65 +49,6 @@ class Auth:
             return AuthenticationFailed(data)
 
         return result
-
-
-class WalletUserController:
-    @staticmethod
-    def check_user_by_username(
-        request: HttpRequest, qs: QuerySet[WalletUser], **kwargs
-    ):
-        param = request.query_params.get("username")
-        if not param:
-            raise TypeError()
-        user = get_object_or_404(qs, username=param)
-        data = serializers.WalletUserSerializer(user).data
-        return Response(data, status=status.HTTP_200_OK)
-
-    @staticmethod
-    def check_user_by_email(request: HttpRequest, qs: QuerySet[WalletUser], **kwargs):
-        param = request.query_params.get("email")
-        if not param:
-            raise TypeError()
-        user = get_object_or_404(qs, email=param)
-        data = serializers.WalletUserSerializer(user).data
-        return Response(data, status=status.HTTP_200_OK)
-
-    @staticmethod
-    def change_email(request: HttpRequest):
-        email = request.data.get("email")
-        if not email:
-            raise TypeError(_("Please provide email in query params"))
-
-        check_email = WalletUser.objects.filter(email=email).first()
-        if check_email:
-            raise TypeError(_("Email is already in use"))
-
-        user = WalletUser.objects.filter(public_id=request.user.public_id).first()
-        if not user:
-            raise TypeError(_("User not found"))
-
-        user.email = email
-        user.save()
-
-        return Response({"new_email": email}, status=status.HTTP_200_OK)
-    
-    @staticmethod
-    def change_password(request: HttpRequest, pk=None):
-        """Change user password."""
-        data = request.data
-        user = WalletUser.objects.filter(public_id=pk).first()
-        if not user:
-            raise TypeError(_("User not found"))
-        
-        if not user.check_password(data.get("actualPassword")):
-            raise TypeError(_("Wrong password"))
-        
-        user.set_password(data.get("password"))
-        user.save()
-        
-        return Response(status=status.HTTP_200_OK)
-        
-        
 
 
 class Oauth2Auth:
@@ -238,3 +180,79 @@ class TOTPDeviceController:
             jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
         )
         return new_token_response
+
+
+class WalletUserController:
+    @staticmethod
+    def check_user_by_username(
+        request: HttpRequest, qs: QuerySet[WalletUser], **kwargs
+    ):
+        param = request.query_params.get("username")
+        if not param:
+            raise TypeError()
+        user = get_object_or_404(qs, username=param)
+        data = serializers.WalletUserSerializer(user).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def check_user_by_email(request: HttpRequest, qs: QuerySet[WalletUser], **kwargs):
+        param = request.query_params.get("email")
+        if not param:
+            raise TypeError()
+        user = get_object_or_404(qs, email=param)
+        data = serializers.WalletUserSerializer(user).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def change_email(request: HttpRequest):
+        email = request.data.get("email")
+        if not email:
+            raise TypeError(_("Please provide email in query params"))
+
+        check_email = WalletUser.objects.filter(email=email).first()
+        if check_email:
+            raise TypeError(_("Email is already in use"))
+
+        user = WalletUser.objects.filter(public_id=request.user.public_id).first()
+        if not user:
+            raise TypeError(_("User not found"))
+
+        user.email = email
+        user.save()
+
+        return Response({"new_email": email}, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def change_password(request: HttpRequest, pk=None):
+        """Change user password."""
+        data = request.data
+        user = WalletUser.objects.filter(public_id=pk).first()
+        if not user:
+            raise TypeError(_("User not found"))
+
+        if not user.check_password(data.get("actualPassword")):
+            raise TypeError(_("Wrong password"))
+
+        user.set_password(data.get("password"))
+        user.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class WalletUserDeviceController:
+    @staticmethod
+    def create_wallet_user_device(request: HttpRequest):
+        
+        
+        device, created = WalletUserDevice.objects.get_or_create(
+            user=request.user,
+            device=request.data.get("device"),
+            name=request.data.get("name"),
+            type=request.data.get("type"),
+            created_at=timezone.now(),
+            last_access=timezone.now(),
+        )
+
+    @staticmethod
+    def delete_wallet_user_device(request: HttpRequest):
+        pass

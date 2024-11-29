@@ -15,6 +15,7 @@ export default async function AccountSettings({
   const t = await getTranslations({
     locale,
   });
+  const isProviderCredentials = session?.user?.provider != "credentials";
   return (
     <section className="flex flex-col gap-4">
       <div className="p-2 flex gap-2 items-center">
@@ -35,12 +36,12 @@ export default async function AccountSettings({
           "dark:[&>*:not(:first-child)]:border-slate-600",
         )}
       >
-        <ChangeEmailBtn disabled={session?.user?.provider != "credentials"} />
+        <ChangeEmailBtn disabled={isProviderCredentials} />
         <ChangePasswordBtn
-          disabled={session?.user?.provider != "credentials"}
+          disabled={isProviderCredentials}
         />
         <TwoFactorBtn
-          disabled={session?.user?.provider != "credentials"}
+          disabled={isProviderCredentials}
           params={{ locale }}
         />
       </div>

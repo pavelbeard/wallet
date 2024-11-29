@@ -1,3 +1,4 @@
+import { JWT } from "next-auth";
 import React, { ReactNode } from "react";
 import { UseFormRegister } from "react-hook-form";
 
@@ -65,10 +66,7 @@ export type AuthData = {
 
 export type RefreshToken = {
   success: boolean;
-  tokens?: {
-    accessToken: Cookie;
-    refreshToken: Cookie;
-  };
+  tokens: JWT | null;
   error?: string;
 };
 

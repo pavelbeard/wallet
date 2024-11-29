@@ -15,6 +15,7 @@ from django_otp import devices_for_user
 from django_otp.models import Device
 from django_otp.plugins.otp_static.models import StaticDevice
 from django_otp.plugins.otp_totp.models import TOTPDevice
+from requests import get
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -70,11 +71,14 @@ def get_user_totp_device(user, confirmed=None) -> TOTPDevice | None:
             return device
 
 
-def jwt_otp_payload(user: WalletUser, device: TOTPDevice = None) -> dict:
-    """Optionally includes an OTP device in JWT"""
-    
+def jwt_custom_payload(
+    user: WalletUser, device: TOTPDevice = None, Action: Action = Action.verify
+) -> dict:
+    """Optionally includes an OTP device in JWT,
+    2FA verification, is user an Oauth user and is user having email verified"""
+
     # generate new pair of keys
-    
+
     payload = {
         "username": "",
         "email": "",
@@ -87,6 +91,12 @@ def jwt_otp_payload(user: WalletUser, device: TOTPDevice = None) -> dict:
         payload["email"] = user.email
     if getattr(user, "public_id") is not None:
         payload["public_id"] = user.public_id
+    if getattr(user, "is_oauth_user") is not None:
+        payload["is_oauth_user"] = user.is_oauth_user
+    if getattr(user, "is_two_factor_enabled") is not None:
+        payload["is_two_factor_enabled"] = user.is_two_factor_enabled
+    if getattr(user, "email_verified") is not None:
+        payload["is_email_verified"] = user.email_verified
 
     if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
         payload["orig_iat"] = timegm(timezone.now().utctimetuple())
@@ -102,12 +112,15 @@ def jwt_otp_payload(user: WalletUser, device: TOTPDevice = None) -> dict:
         and (device is not None)
         and (device.user_id == user.pk)
         and (device.confirmed is True)
+        and (Action == Action.verify)
     ):
         payload["otp_device_id"] = device.persistent_id
         payload["created_at"] = device.created_at.strftime("%d %b %Y")
+        payload["verified"] = True
     else:
         payload["otp_device_id"] = None
         payload["created_at"] = None
+        payload["verified"] = False
 
     return payload
 
@@ -115,9 +128,7 @@ def jwt_otp_payload(user: WalletUser, device: TOTPDevice = None) -> dict:
 def jwt_encode_handler(payload) -> str:
     """Helps to encode data to JWT"""
     key = settings.SIMPLE_JWT["SIGNING_KEY"]
-    return jwt.encode(
-        payload, key, algorithm=settings.SIMPLE_JWT.get("ALGORITHM")
-    )
+    return jwt.encode(payload, key, algorithm=settings.SIMPLE_JWT.get("ALGORITHM"))
 
 
 def jwt_decode_handler(token) -> Any:
@@ -137,26 +148,22 @@ def jwt_decode_handler(token) -> Any:
     )
 
 
-def get_custom_jwt(user: WalletUser, device: Device = None, action: Action = Action.verify) -> str:
+def get_custom_jwt(
+    user: WalletUser, device: Device = None, action: Action = Action.verify
+) -> str:
     """Using for include 2FA into JWT"""
-    payload = jwt_otp_payload(user, device)
+    payload = jwt_custom_payload(user, device)
     tokens = RefreshToken.for_user(user)
-    
-    if action == Action.verify:
-        payload["verified"] = True
-    if action == Action.delete:
-        payload["verified"] = False
-    
+
     for k, v in payload.items():
         if k == "exp" and tokens.token_type == "refresh":
             continue
         tokens[k] = v
-        
+
     return {
         "access": str(tokens.access_token),
         "refresh": str(tokens),
-    }    
-
+    }
 
 
 def otp_is_verified(request: Request):
@@ -225,7 +232,7 @@ def set_csrf_cookie(response: Response, request: HttpRequest):
 
 def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS):
     response = Response()
-
+    
     if login_type == LOGIN_TYPE.OAUTH2:
         user = request.user
         jwt_tokens = RefreshToken.for_user(user)
@@ -246,6 +253,10 @@ def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS
             jwt_tokens={"access": access_token, "refresh": refresh_token},
         )
         csrf_response = set_csrf_cookie(request=request, response=auth_response)
+        
+        # device section
+        
+        
         return csrf_response, None
     else:
         return None, {"error": _("Inactive user")}

@@ -17,7 +17,13 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import models, serializers, stuff_logic
 from . import permissions as stuff_permissions
-from .controller import Auth, Oauth2Auth, TOTPDeviceController, WalletUserController
+from .controller import (
+    Auth,
+    Oauth2Auth,
+    TOTPDeviceController,
+    WalletUserController,
+    WalletUserDeviceController,
+)
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -106,74 +112,6 @@ class CookieTokenRefreshView(TokenRefreshView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
-class WalletUserViewSet(viewsets.ModelViewSet):
-    queryset = models.WalletUser.objects.all()
-    serializer_class = serializers.WalletUserSerializer
-    lookup_field = "public_id"
-
-    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
-    def check_user_by_username(self, request):
-        try:
-            result = WalletUserController.check_user_by_username(
-                request=request, qs=self.queryset
-            )
-            return result
-        except TypeError:
-            return Response(
-                data={"error": _("Please provide username in query params")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
-    def check_user_by_email(self, request):
-        try:
-            result = WalletUserController.check_user_by_email(
-                request=request, qs=self.queryset
-            )
-            return result
-        except TypeError:
-            return Response(
-                data={"error": _("Please provide email in query params")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @action(detail=False, methods=["POST"])
-    def change_email(self, request):
-        try:
-            result = WalletUserController.change_email(request=request)
-            return result
-        except TypeError as e:
-            return Response(
-                data={"error": e.args[0]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-    @action(detail=True, methods=["POST"])
-    def change_password(self, request, **kwargs):
-        """Change user password."""
-        try:
-            pk = kwargs.get("public_id")
-            result = WalletUserController.change_password(request=request, pk=pk)
-            return result
-        except TypeError as e:
-            return Response(
-                data={"error": e.args[0]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 class TwoFactorAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def create_totp_device(self, request):
@@ -242,4 +180,72 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
             return result
         except Exception:
             logger.exception(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class WalletUserViewSet(viewsets.ModelViewSet):
+    queryset = models.WalletUser.objects.all()
+    serializer_class = serializers.WalletUserSerializer
+    lookup_field = "public_id"
+
+    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    def check_user_by_username(self, request):
+        try:
+            result = WalletUserController.check_user_by_username(
+                request=request, qs=self.queryset
+            )
+            return result
+        except TypeError:
+            return Response(
+                data={"error": _("Please provide username in query params")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    def check_user_by_email(self, request):
+        try:
+            result = WalletUserController.check_user_by_email(
+                request=request, qs=self.queryset
+            )
+            return result
+        except TypeError:
+            return Response(
+                data={"error": _("Please provide email in query params")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=["POST"])
+    def change_email(self, request):
+        try:
+            result = WalletUserController.change_email(request=request)
+            return result
+        except TypeError as e:
+            return Response(
+                data={"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=["POST"])
+    def change_password(self, request, **kwargs):
+        """Change user password."""
+        try:
+            pk = kwargs.get("public_id")
+            result = WalletUserController.change_password(request=request, pk=pk)
+            return result
+        except TypeError as e:
+            return Response(
+                data={"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

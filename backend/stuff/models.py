@@ -7,7 +7,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-
 from . import managers
 
 # Create your models here.
@@ -15,29 +14,36 @@ from . import managers
 
 class WalletUser(AbstractModel, AbstractUser):
     username_validator = RegexValidator(
-        r'^[a-z0-9_]+$',
-        _('Enter a valid username consisting of lowercase letters, number and underscores only.'),
-        'invalid'
+        r"^[a-z0-9_]+$",
+        _(
+            "Enter a valid username consisting of lowercase letters, number and underscores only."
+        ),
+        "invalid",
     )
 
-    username = models.CharField(max_length=250, blank=True, null=True, unique=True, validators=[username_validator])
+    username = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        unique=True,
+        validators=[username_validator],
+    )
     password = models.CharField(max_length=250, blank=True, null=True)
     email = models.EmailField(blank=True, null=True, unique=True)
     email_verified = models.BooleanField(default=False)
     is_oauth_user = models.BooleanField(default=False)
     provider = models.CharField(max_length=250, blank=True, null=True)
     is_two_factor_enabled = models.BooleanField(default=False)
-    
 
     def save(self, *args, **kwargs):
-        if self.username == '':
+        if self.username == "":
             self.username = None
 
-        if self.email == '':
+        if self.email == "":
             self.email = None
 
         if not (self.username or self.email):
-            raise ValueError('Username or Email must be set')
+            raise ValueError("Username or Email must be set")
 
         super().save(*args, **kwargs)
 
@@ -68,9 +74,9 @@ class EmailVerificationToken(AbstractModel, models.Model):
         return timezone.now() > self.until
 
     class Meta:
-        verbose_name = _('Email Verification Token')
-        verbose_name_plural = _('Email Verification Tokens')
-        unique_together = (('user', 'token'),)
+        verbose_name = _("Email Verification Token")
+        verbose_name_plural = _("Email Verification Tokens")
+        unique_together = (("user", "token"),)
 
 
 class PasswordResetToken(AbstractModel, models.Model):
@@ -89,6 +95,36 @@ class PasswordResetToken(AbstractModel, models.Model):
         return timezone.now() > self.until
 
     class Meta:
-        verbose_name = _('Password Reset Token')
-        verbose_name_plural = _('Password Reset Tokens')
-        unique_together = (('user', 'token'),)
+        verbose_name = _("Password Reset Token")
+        verbose_name_plural = _("Password Reset Tokens")
+        unique_together = (("user", "token"),)
+
+
+class DDevice(models.Model):
+    d_name = models.CharField(max_length=250, blank=True, null=True)
+    icon = models.ImageField(upload_to="device_icons", blank=True, null=True)
+
+    def __str__(self):
+        return self.d_name
+
+    class Meta:
+        verbose_name = _("Device")
+        verbose_name_plural = _("Devices")
+
+
+class WalletUserDevice(models.Model):
+    wallet_user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
+    d_device = models.ForeignKey(DDevice, on_delete=models.CASCADE)
+    operational_system = models.CharField(max_length=250, blank=True, null=True)
+    d_ip_address = models.GenericIPAddressField(protocol="IPv4")
+    location = models.CharField(max_length=250, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_access = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.d_device.d_name
+
+    class Meta:
+        unique_together = (("wallet_user", "d_device"),)
+        verbose_name = _("Wallet User Device")
+        verbose_name_plural = _("Wallet User Devices")

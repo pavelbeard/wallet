@@ -24,8 +24,6 @@ export default function useTwoFactorAuthDelete() {
         userData,
       } = await delete2fa(data);
 
-      logger("delete2fa: ", delete2faSuccess, delete2faError, userData);
-
       if (delete2faSuccess && userData) {
         update({ ...userData });
       }

@@ -1,5 +1,4 @@
-import NextAuth, { type DefaultSession } from "next-auth";
-import { Cookie } from "set-cookie-parser";
+import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 
 export interface WalletUser {
@@ -7,33 +6,36 @@ export interface WalletUser {
   username: string;
   email: string;
   orig_iat: number;
-  otp_device_id: string | null;
-  created_at: string | null;
-  verified: boolean;
+  otp_device_id?: string;
+  created_at?: string;
+  verified?: boolean;
+  provider?: string;
+  is_oauth_user: boolean;
+  is_two_factor_enabled: boolean;
+  is_email_verified: boolean;
+}
+
+export interface AuthTokens {
+  access_token: string;
+  access_token_exp: number;
+  refresh_token: string;
+  refresh_token_exp: number;
 }
 
 declare module "next-auth" {
-  interface User extends WalletUser {
-    access_token?: Cookie;
-    refresh_token?: Cookie;
-    provider?: string;
+  interface User extends AuthTokens {
+    user: WalletUser;
   }
 
-  interface Session extends DefaultSession {
-    access_token?: string;
-    access_token_exp?: number;
-    refresh_token?: string;
-    refresh_token_exp?: number;
-    user?: User;
-    verified?: boolean;
+  interface Session extends AuthTokens {
+    user: WalletUser;
+    refresh_token_err?: "RefreshTokenError";
   }
 
-  interface JWT {
-    access_token: Cookie;
-    refresh_token: Cookie;
-    access_token_exp: number;
-    refresh_token_exp: number;
-    user: User;
+  interface JWT extends AuthTokens {
+    token: { username: string; provider: string | undefined };
+    user: WalletUser;
+    refresh_token_err?: "RefreshTokenError";
   }
 }
 

@@ -11,9 +11,10 @@ import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Messages from "../../ui/messages";
+import FormError from "../form/form-error";
 
 const twoFactorResolver = zodResolver(TwoFactorSchema);
 
@@ -33,6 +34,10 @@ export default function VerifyTwoFactorForm({
   });
   const { update } = useSession();
   const router = useRouter();
+  const [formMessages, setFormMessages] = useState({
+    success: null as string | null,
+    error: null as string | null,
+  });
   const [isPending, startTransition] = useTransition();
   const onSubmit: SubmitHandler<TwoFactorValidator> = (data) => {
     startTransition(async () => {
@@ -43,6 +48,12 @@ export default function VerifyTwoFactorForm({
           () => router.push(DEFAULT_SIGNED_IN_PATH),
         );
       }
+
+      setFormMessages({
+        ...formMessages,
+        success: success || null,
+        error: error || null,
+      });
     });
   };
 
@@ -58,6 +69,7 @@ export default function VerifyTwoFactorForm({
         disabled={isPending}
       />
       <Messages errorMessage={errors?.token?.message} />
+      <FormError message={formMessages.error} />
       <Submit color="bg-slate-800 hover:bg-slate-300 hover:text-black">
         {t("auth.form.2faSubmit")}
       </Submit>

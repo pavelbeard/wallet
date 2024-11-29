@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.db import models
+from stuff.models import WalletUser
 
 from . import managers
-
-User = get_user_model()
 
 # Create your models here.
 
@@ -15,7 +13,7 @@ class Card(models.Model):
     year = models.CharField(max_length=4)
     cvv = models.CharField(max_length=3, blank=True, null=True)
     note = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
     payment_system = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

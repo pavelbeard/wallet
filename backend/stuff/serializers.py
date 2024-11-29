@@ -9,9 +9,10 @@ from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
+from stuff.utils import Action
 from stuff import stuff_logic
 
-from .models import WalletUser
+from .models import WalletUser, WalletUserDevice
 
 
 class WalletUserSerializer(AbstractSerializer):
@@ -28,6 +29,35 @@ class WalletUserSerializer(AbstractSerializer):
             "date_joined",
         )
         read_only_fields = ("is_active",)
+
+
+class WalletUserDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WalletUserDevice
+        fields = (
+            "wallet_user",
+            "d_device",
+            "operational_system",
+            "d_ip_address",
+            "location",
+            "created_at",
+            "last_access",
+        )
+        depth = 2
+
+
+class WalletUserDeviceSerializerCreate(serializers.ModelSerializer):
+    class Meta:
+        model = WalletUserDevice
+        fields = (
+            "wallet_user",
+            "d_device",
+            "operational_system",
+            "d_ip_address",
+            "location",
+            "created_at",
+            "last_access",
+        )
 
 
 class SignupSerializer(WalletUserSerializer):
@@ -95,8 +125,9 @@ class TwoFactorJWTSerializer(
     @classmethod
     def get_token(cls, user):
         device = user.totpdevice_set.first()
-        payload = stuff_logic.jwt_otp_payload(user=user, device=device)
-        payload["verified"] = False
+        payload = stuff_logic.jwt_custom_payload(
+            user=user, device=device, Action=Action.verify
+        )
         tokens = super().get_token(user)
 
         for k, v in payload.items():
@@ -115,7 +146,8 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"]
         )
         if attrs["refresh"]:
-            return super().validate(attrs)
+            tokens = super().validate(attrs) 
+            return tokens
         else:
             raise InvalidToken("There isn't a refresh token in the cookies.")
 

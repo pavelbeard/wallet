@@ -4,11 +4,17 @@ import {
   SIGN_IN_PROVIDERS,
 } from "@/app/lib/auth/signInProviders";
 import getCurrentEpochTime from "@/app/lib/helpers/getCurrentEpochTime";
-import setAuthData from "@/app/lib/helpers/setAuthData";
-import { UpdateSessionSchema } from "@/app/lib/schemas.z";
+import { NextAuthUserSchema, UpdateSessionSchema } from "@/app/lib/schemas.z";
 import { Awaitable } from "@/app/lib/types";
-import { JWT } from "@auth/core/jwt";
-import { Account, DefaultSession, Profile, Session, User } from "next-auth";
+import { WalletUser } from "@/auth";
+import {
+  Account,
+  DefaultSession,
+  JWT,
+  Profile,
+  Session,
+  User,
+} from "next-auth";
 import { AdapterSession, AdapterUser } from "next-auth/adapters";
 import { CredentialInput } from "next-auth/providers";
 
@@ -30,7 +36,7 @@ type JWTCallback = (params: {
   trigger?: "signIn" | "signUp" | "update";
   isNewUser?: boolean;
   session?: Session;
-}) => Awaitable<JWT | null>;
+}) => Promise<JWT | null>;
 
 type SessionCallback = (
   params: ({
@@ -75,25 +81,27 @@ const jwtCallback: JWTCallback = async ({
   session,
 }) => {
   if (user && account?.type !== "credentials") {
-    token.user = { ...user, username: user.name };
-    token.provider = account?.provider;
-    token.access_token = account?.access_token;
+    token.user = {
+      ...user,
+      username: user.name as string,
+      provider: account?.provider,
+    };
+    token.access_token = account?.access_token as string;
     token.access_token_exp = getCurrentEpochTime() + (account?.expires_in || 0);
-    token.refresh_token = account?.refresh_token;
+    token.refresh_token = account?.refresh_token as string;
 
     return token;
   }
 
   if (user) {
-    const { access_token, access_token_exp, refresh_token, refresh_token_exp } =
-      setAuthData({ user });
+    const validatedData = NextAuthUserSchema.safeParse(user);
+    if (!validatedData.success) return token;
 
-    token.user = user;
-    token.provider = "credentials";
-    token.access_token = access_token;
-    token.access_token_exp = access_token_exp;
-    token.refresh_token = refresh_token;
-    token.refresh_token_exp = refresh_token_exp;
+    token.user = { ...validatedData.data?.user, provider: "credentials" };
+    token.access_token = validatedData.data.access_token;
+    token.access_token_exp = validatedData.data.access_token_exp;
+    token.refresh_token = validatedData.data.refresh_token;
+    token.refresh_token_exp = validatedData.data.refresh_token_exp;
 
     return token;
   }
@@ -103,15 +111,11 @@ const jwtCallback: JWTCallback = async ({
     const validatedSession = UpdateSessionSchema.safeParse(session);
     if (!validatedSession.success) return token;
 
-    const { access_token, access_token_exp, refresh_token, refresh_token_exp } =
-      setAuthData({ session: validatedSession.data });
-
-    token.user = validatedSession.data.user;
-    token.provider = "credentials";
-    token.access_token = access_token;
-    token.access_token_exp = access_token_exp;
-    token.refresh_token = refresh_token || session?.refresh_token;
-    token.refresh_token_exp = refresh_token_exp || session?.refresh_token_exp;
+    token.user = { ...validatedSession.data.user, provider: "credentials" };
+    token.access_token = validatedSession.data.access_token;
+    token.access_token_exp = validatedSession.data.access_token_exp;
+    token.refresh_token = validatedSession.data.refresh_token;
+    token.refresh_token_exp = validatedSession.data.refresh_token_exp;
 
     return token;
   }
@@ -121,17 +125,13 @@ const jwtCallback: JWTCallback = async ({
 };
 
 const sessionCallback: SessionCallback = ({ session, token }) => {
-  return {
-    ...session,
-    user: {
-      ...(token?.user as User),
-      provider: token?.provider as string,
-    },
-    access_token: token?.access_token as string,
-    access_token_exp: token?.access_token_exp as number,
-    refresh_token: token?.refresh_token as string,
-    refresh_token_exp: token?.refresh_token_exp as number,
-  };
+  session.user = token.user as WalletUser & AdapterUser;
+  session.access_token = token?.access_token as string;
+  session.access_token_exp = token?.access_token_exp as number;
+  session.refresh_token = token?.refresh_token as string;
+  session.refresh_token_exp = token?.refresh_token_exp as number;
+
+  return session;
 };
 
 export { jwtCallback, sessionCallback, signInCallback };

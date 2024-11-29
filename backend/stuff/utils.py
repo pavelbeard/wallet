@@ -3,6 +3,7 @@ from enum import Enum
 
 
 class Action(enum.Enum):
+    sign_in = "sign_in"
     verify = "verify"
     delete = "delete"
 

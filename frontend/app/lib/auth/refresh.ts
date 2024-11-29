@@ -1,8 +1,7 @@
 import refreshToken from "@/app/lib/auth/refreshToken";
-import setAuthData from "@/app/lib/helpers/setAuthData";
-import { JWT } from "@auth/core/jwt";
+import { JWT } from "next-auth";
 
-const refresh = async (token: JWT) => {
+const refresh = async (token: JWT): Promise<JWT | null> => {
   const now = Date.now() / 1000;
   const { access_token_exp, refresh_token, refresh_token_exp } = token as {
     access_token_exp: number;
@@ -16,19 +15,15 @@ const refresh = async (token: JWT) => {
   // it necessary to have access token exp and refresh token value
   if (now > access_token_exp) {
     const refreshResult = await refreshToken(refresh_token);
-    if (refreshResult.success) {
-      return {
-        ...token,
-        ...setAuthData({
-          refreshResult: refreshResult.tokens,
-        }),
-      };
+    if (refreshResult.success && refreshResult.tokens) {
+      const { tokens } = refreshResult;
+      return tokens;
     } else {
       return null;
     }
   }
 
-  return token;
+  return token as JWT;
 };
 
 export default refresh;

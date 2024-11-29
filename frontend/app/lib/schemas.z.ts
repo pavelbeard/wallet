@@ -78,10 +78,13 @@ const UpdateSessionSchema = z.object({
     username: z.string().min(1, { message: "Username is required" }),
     email: z.string().min(1, { message: "Email is required" }),
     orig_iat: z.number().min(1, { message: "Orig iat is required" }),
-    otp_device_id: z.string().nullable(),
-    created_at: z.string().nullable(),
+    otp_device_id: z.string().optional(),
+    created_at: z.string().optional(),
     provider: z.string().optional(),
-    verified: z.boolean().nullable(),
+    verified: z.boolean().optional(),
+    is_two_factor_enabled: z.boolean(),
+    is_email_verified: z.boolean(),
+    is_oauth_user: z.boolean(),
   }),
 });
 
@@ -106,6 +109,9 @@ const ChangePasswordSchema = z
   )
   .superRefine(passwordComplexityChecker);
 
+const NextAuthUserSchema = UpdateSessionSchema;
+const SessionSchema = UpdateSessionSchema;
+
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
 export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
@@ -113,11 +119,15 @@ export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
 export type UpdateSessionValidator = z.infer<typeof UpdateSessionSchema>;
 export type PasswordValidator = z.infer<typeof PasswordSchema>;
 export type ChangePasswordValidator = z.infer<typeof ChangePasswordSchema>;
+export type NextAuthUserValidator = z.infer<typeof NextAuthUserSchema>;
+export type SessionValidator = z.infer<typeof SessionSchema>;
 
 export {
   ChangeEmailSchema,
   ChangePasswordSchema,
+  NextAuthUserSchema,
   PasswordSchema,
+  SessionSchema,
   SignInSchema,
   SignUpSchema,
   SignUpSchemaSuperRefineErrors,

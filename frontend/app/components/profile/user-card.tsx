@@ -1,19 +1,19 @@
 import Email from "@/app/components/profile/user-card-email";
 import getUser from "@/app/lib/getUser";
 import Card from "@/app/ui/card";
+import { WalletUser } from "@/auth";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CheckIcon, UserIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { User } from "next-auth";
 import { getTranslations } from "next-intl/server";
 
-type UserProps = { user?: User; title: string };
+type UserProps = { user?: WalletUser; title: string };
 
 const row =
   "flex flex-col md:flex-row md:justify-between md:items-center [&>span]:h-[20px]";
 
 const Username = ({ user, title }: UserProps) => {
-  const username = user?.name ?? user?.username;
+  const username = user?.username;
   if (username) {
     return (
       <div className={row}>
@@ -27,7 +27,7 @@ const Username = ({ user, title }: UserProps) => {
 };
 
 function TwoFactorStatus({ user, title, note }: UserProps & { note: string }) {
-  const twoFactorStatus = user?.otp_device_id;
+  const twoFactorStatus = user?.is_two_factor_enabled;
   const isProviderCredentials = user?.provider == "credentials";
   return (
     <div className="flex items-center justify-between">
@@ -39,7 +39,7 @@ function TwoFactorStatus({ user, title, note }: UserProps & { note: string }) {
             ? "text-green-500 bg-green-500/40"
             : isProviderCredentials
               ? "text-red-500 bg-red-500/40"
-              : "text-yellow-800 bg-yellow-500/40",
+              : "text-yellow-800 dark:text-yellow-300 bg-yellow-500/40",
         )}
       >
         {twoFactorStatus ? (
