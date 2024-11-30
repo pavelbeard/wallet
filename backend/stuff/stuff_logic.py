@@ -15,7 +15,6 @@ from django_otp import devices_for_user
 from django_otp.models import Device
 from django_otp.plugins.otp_static.models import StaticDevice
 from django_otp.plugins.otp_totp.models import TOTPDevice
-from requests import get
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -152,7 +151,7 @@ def get_custom_jwt(
     user: WalletUser, device: Device = None, action: Action = Action.verify
 ) -> str:
     """Using for include 2FA into JWT"""
-    payload = jwt_custom_payload(user, device)
+    payload = jwt_custom_payload(user, device, action)
     tokens = RefreshToken.for_user(user)
 
     for k, v in payload.items():

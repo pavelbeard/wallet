@@ -8,8 +8,8 @@ export interface WalletUser {
   email: string;
   image?: string;
   orig_iat: number;
-  otp_device_id?: string;
-  created_at?: string;
+  otp_device_id?: string | null;
+  created_at?: string | null;
   verified?: boolean;
   provider?: string;
   is_oauth_user: boolean;

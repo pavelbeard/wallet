@@ -17,6 +17,7 @@ export const authConfig = {
         email,
         credentials,
       });
+
       return result;
     },
     async jwt({ token, user, account, session, trigger }) {

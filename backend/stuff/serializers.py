@@ -126,7 +126,7 @@ class TwoFactorJWTSerializer(
     def get_token(cls, user):
         device = user.totpdevice_set.first()
         payload = stuff_logic.jwt_custom_payload(
-            user=user, device=device, Action=Action.verify
+            user=user, device=device, Action=Action.sign_in
         )
         tokens = super().get_token(user)
 

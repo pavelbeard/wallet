@@ -3,10 +3,8 @@
 import { SignInSchema, SignInValidator } from "@/app/lib/schemas.z";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { getLocale } from "next-intl/server";
 
 export default async function authenticate(values: SignInValidator) {
-  const locale = await getLocale();
   const validatedData = SignInSchema.safeParse(values);
 
   if (validatedData.error) {
@@ -19,7 +17,6 @@ export default async function authenticate(values: SignInValidator) {
   try {
     await signIn("credentials", {
       ...validatedData.data,
-      // redirectTo: `/${locale}${DEFAULT_SIGNED_IN_PATH}`,
     });
 
     return { success: "Signed in.", error: null };

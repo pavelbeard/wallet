@@ -35,9 +35,9 @@ export default function authjsMiddleware(middleware: CustomMiddleware) {
       secret: process.env.AUTH_SECRET,
     });
 
-    // @ts-ignore
+    // @ts-expect-error nextauth is not typed
     request.nextauth = request.nextauth ?? {};
-    // @ts-ignore
+    // @ts-expect-error nextauth is not typed
     request.nextauth.token = token;
     const walletUser = token?.user as WalletUser;
     const pathname = request.nextUrl.pathname;

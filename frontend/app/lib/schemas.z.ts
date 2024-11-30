@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { RefinementCtx, z } from "zod";
 
 const passwordComplexityChecker = (
   { password }: { password: string },
-  checkPassComplexity: any,
+  checkPassComplexity: RefinementCtx,
 ) => {
   const containsUppercase = (c: string) => /[A-Z]/.test(c);
   const containsLowercase = (c: string) => /[a-z]/.test(c);
@@ -68,7 +68,7 @@ const TwoFactorSchema = z.object({
   token: z.string().min(6, { message: "Provide your token" }),
 });
 
-const UpdateSessionSchema = z.object({
+const AuthDataSchema = z.object({
   access_token: z.string().min(1, { message: "Provide your token" }),
   access_token_exp: z.number().min(1, { message: "Provide token expiration" }),
   refresh_token: z.string().min(1, { message: "Provide your token" }),
@@ -78,8 +78,8 @@ const UpdateSessionSchema = z.object({
     username: z.string().min(1, { message: "Username is required" }),
     email: z.string().min(1, { message: "Email is required" }),
     orig_iat: z.number().min(1, { message: "Orig iat is required" }),
-    otp_device_id: z.string().optional(),
-    created_at: z.string().optional(),
+    otp_device_id: z.string().optional().nullable(),
+    created_at: z.string().optional().nullable(),
     provider: z.string().optional(),
     verified: z.boolean().optional(),
     is_two_factor_enabled: z.boolean(),
@@ -109,14 +109,14 @@ const ChangePasswordSchema = z
   )
   .superRefine(passwordComplexityChecker);
 
-const NextAuthUserSchema = UpdateSessionSchema;
-const SessionSchema = UpdateSessionSchema;
+const NextAuthUserSchema = AuthDataSchema;
+const SessionSchema = AuthDataSchema;
 
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
 export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
 export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
-export type UpdateSessionValidator = z.infer<typeof UpdateSessionSchema>;
+export type UpdateSessionValidator = z.infer<typeof AuthDataSchema>;
 export type PasswordValidator = z.infer<typeof PasswordSchema>;
 export type ChangePasswordValidator = z.infer<typeof ChangePasswordSchema>;
 export type NextAuthUserValidator = z.infer<typeof NextAuthUserSchema>;
@@ -132,5 +132,5 @@ export {
   SignUpSchema,
   SignUpSchemaSuperRefineErrors,
   TwoFactorSchema,
-  UpdateSessionSchema,
+  AuthDataSchema as UpdateSessionSchema,
 };
