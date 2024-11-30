@@ -31,14 +31,14 @@ const providers = [
         access_token,
         refresh_token,
         access_token_exp,
-        refresh_token_exp,
+        expires_at,
       } = await getUserData(cookies);
 
       return {
         access_token,
         refresh_token,
         access_token_exp,
-        refresh_token_exp,
+        expires_at,
         user: {
           ...walletUser,
         },

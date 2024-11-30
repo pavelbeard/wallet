@@ -20,25 +20,21 @@ export default async function refreshToken(
     if (!response.ok) throw new Error();
 
     const responseCookies = await parseCookies(response);
-    const {
-      user,
-      access_token,
-      refresh_token,
-      access_token_exp,
-      refresh_token_exp,
-    } = await getUserData(responseCookies);
+    const { user, access_token, refresh_token, access_token_exp, expires_at } =
+      await getUserData(responseCookies);
 
     const tokens = {
       user: user as WalletUser,
       access_token,
       refresh_token,
       access_token_exp,
-      refresh_token_exp,
+      expires_at,
     } as JWT;
 
     return {
       success: true,
       tokens,
+      error: undefined,
     };
   } catch (error) {
     console.error(error);

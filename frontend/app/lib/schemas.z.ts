@@ -72,7 +72,7 @@ const UpdateSessionSchema = z.object({
   access_token: z.string().min(1, { message: "Provide your token" }),
   access_token_exp: z.number().min(1, { message: "Provide token expiration" }),
   refresh_token: z.string().min(1, { message: "Provide your token" }),
-  refresh_token_exp: z.number().min(1, { message: "Provide token expiration" }),
+  expires_at: z.number().min(1, { message: "Provide token expiration" }),
   user: z.object({
     public_id: z.string().min(1, { message: "Public id is required" }),
     username: z.string().min(1, { message: "Username is required" }),

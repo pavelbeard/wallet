@@ -5,6 +5,7 @@ import {
 } from "@/app/lib/auth/callbacks";
 import providers from "@/app/lib/auth/providers";
 import { NextAuthConfig } from "next-auth";
+import { JWT as NextAuthJWT } from "next-auth/jwt";
 
 export const authConfig = {
   callbacks: {
@@ -27,12 +28,7 @@ export const authConfig = {
         trigger,
       });
 
-      if (result) {
-        const newToken = { ...token, ...result };
-        return newToken;
-      }
-
-      return null;
+      return result ? (result as NextAuthJWT) : null;
     },
     session({ session, token, user, trigger, newSession }) {
       const result = sessionCallback({

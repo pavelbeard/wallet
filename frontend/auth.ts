@@ -2,9 +2,11 @@ import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 
 export interface WalletUser {
+  id?: string;
   public_id: string;
   username: string;
   email: string;
+  image?: string;
   orig_iat: number;
   otp_device_id?: string;
   created_at?: string;
@@ -19,7 +21,7 @@ export interface AuthTokens {
   access_token: string;
   access_token_exp: number;
   refresh_token: string;
-  refresh_token_exp: number;
+  expires_at: number;
 }
 
 declare module "next-auth" {
@@ -33,7 +35,6 @@ declare module "next-auth" {
   }
 
   interface JWT extends AuthTokens {
-    token: { username: string; provider: string | undefined };
     user: WalletUser;
     refresh_token_err?: "RefreshTokenError";
   }

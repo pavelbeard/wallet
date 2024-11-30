@@ -16,6 +16,7 @@ import {
   User,
 } from "next-auth";
 import { AdapterSession, AdapterUser } from "next-auth/adapters";
+import { JWT as NextAuthJWT } from "next-auth/jwt";
 import { CredentialInput } from "next-auth/providers";
 
 type SignInCallback = (params: {
@@ -29,14 +30,14 @@ type SignInCallback = (params: {
 }) => Awaitable<boolean | string>;
 
 type JWTCallback = (params: {
-  token: JWT;
+  token: NextAuthJWT;
   user: User | AdapterUser;
   account: Account | null;
   profile?: Profile;
   trigger?: "signIn" | "signUp" | "update";
   isNewUser?: boolean;
   session?: Session;
-}) => Promise<JWT | null>;
+}) => Promise<JWT | NextAuthJWT | null>;
 
 type SessionCallback = (
   params: ({
@@ -46,7 +47,7 @@ type SessionCallback = (
     user: AdapterUser;
   } & {
     session: Session;
-    token: JWT;
+    token: NextAuthJWT;
   }) & {
     newSession: Session;
     trigger?: "update";
@@ -82,7 +83,10 @@ const jwtCallback: JWTCallback = async ({
 }) => {
   if (user && account?.type !== "credentials") {
     token.user = {
-      ...user,
+      ...user.user,
+      id: user?.id as string,
+      image: user.image as string,
+      email: user.email as string,
       username: user.name as string,
       provider: account?.provider,
     };
@@ -101,7 +105,7 @@ const jwtCallback: JWTCallback = async ({
     token.access_token = validatedData.data.access_token;
     token.access_token_exp = validatedData.data.access_token_exp;
     token.refresh_token = validatedData.data.refresh_token;
-    token.refresh_token_exp = validatedData.data.refresh_token_exp;
+    token.expires_at = validatedData.data.expires_at;
 
     return token;
   }
@@ -115,13 +119,13 @@ const jwtCallback: JWTCallback = async ({
     token.access_token = validatedSession.data.access_token;
     token.access_token_exp = validatedSession.data.access_token_exp;
     token.refresh_token = validatedSession.data.refresh_token;
-    token.refresh_token_exp = validatedSession.data.refresh_token_exp;
+    token.expires_at = validatedSession.data.expires_at;
 
     return token;
   }
 
-  const refreshResult = await refresh(token);
-  return refreshResult ? refreshResult : null;
+  const tokens = await refresh(token);
+  return tokens ? tokens : null;
 };
 
 const sessionCallback: SessionCallback = ({ session, token }) => {
@@ -129,7 +133,7 @@ const sessionCallback: SessionCallback = ({ session, token }) => {
   session.access_token = token?.access_token as string;
   session.access_token_exp = token?.access_token_exp as number;
   session.refresh_token = token?.refresh_token as string;
-  session.refresh_token_exp = token?.refresh_token_exp as number;
+  session.expires_at = token?.expires_at as number;
 
   return session;
 };

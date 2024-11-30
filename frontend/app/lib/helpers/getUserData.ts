@@ -24,7 +24,7 @@ export default async function getUserData(parsedCookies: Cookie[]) {
     is_oauth_user: decodedToken.is_oauth_user,
   } as WalletUser;
 
-  const { access_token_exp, refresh_token_exp } = await setTokensExpirationTime(
+  const { access_token_exp, expires_at } = await setTokensExpirationTime(
     access_token?.maxAge as number,
     refresh_token?.maxAge as number,
   );
@@ -34,6 +34,6 @@ export default async function getUserData(parsedCookies: Cookie[]) {
     access_token: access_token?.value,
     refresh_token: refresh_token?.value,
     access_token_exp,
-    refresh_token_exp,
+    expires_at,
   };
 }

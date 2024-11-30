@@ -61,7 +61,7 @@ export type AuthData = {
   access_token: string | undefined;
   access_token_exp: number | undefined;
   refresh_token: string | undefined;
-  refresh_token_exp: number | undefined;
+  expires_at: number | undefined;
 };
 
 export type RefreshToken = {
