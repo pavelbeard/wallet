@@ -9,7 +9,7 @@ from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff.utils import Action
+from stuff.types import Action
 from stuff import stuff_logic
 
 from .models import WalletUser, WalletUserDevice
@@ -146,7 +146,7 @@ class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
             settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"]
         )
         if attrs["refresh"]:
-            tokens = super().validate(attrs) 
+            tokens = super().validate(attrs)
             return tokens
         else:
             raise InvalidToken("There isn't a refresh token in the cookies.")

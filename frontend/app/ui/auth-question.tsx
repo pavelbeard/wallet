@@ -11,7 +11,7 @@ export default function AuthQuestion({
   const t = useTranslations('auth')
   const locale = useLocale();
   return (
-    <div className="p-2">
+    <div className="p-2 h-10 text-sm">
       <Link href={href} locale={locale}>
         {type === "with-account" && t('form.withAccount')}
         {type === "without-account" && t('form.withoutAccount')}

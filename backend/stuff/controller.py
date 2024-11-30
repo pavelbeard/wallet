@@ -1,3 +1,5 @@
+from hmac import new
+from itertools import count
 import uuid
 
 from django.db.models import QuerySet
@@ -11,13 +13,16 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
+from stuff.utils import suggest_username
+
 from . import exceptions, serializers, stuff_logic
 from .models import WalletUser, WalletUserDevice
-from .utils import LOGIN_TYPE, Action
+from .types import LOGIN_TYPE, Action
 
 
 class Auth:
     @staticmethod
+    # TODO: add email verification, add username creation and first/last names
     def sign_up(request: HttpRequest):
         username = request.data.get("username")
         if username is not None and "@" in username:
@@ -114,10 +119,14 @@ class TOTPDeviceController:
                 device.save()
             tokens = stuff_logic.get_custom_jwt(user, device, action=Action.verify)
             response = Response(status=status.HTTP_200_OK)
-            new_token_response = stuff_logic.set_auth_cookies(
-                response=response,
-                jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
-            )
+            # new_token_response = stuff_logic.set_auth_cookies(
+            #     response=response,
+            #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
+            # )
+            new_token_response = response.data = {
+                "access": tokens["access"],
+                "refresh": tokens["refresh"],
+            }
             return new_token_response
 
         raise exceptions.VerifyTokenError(_("Invalid token"))
@@ -175,10 +184,16 @@ class TOTPDeviceController:
         tokens = stuff_logic.get_custom_jwt(user, None, Action.delete)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
-        new_token_response = stuff_logic.set_auth_cookies(
-            response=response,
-            jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
-        )
+        # new_token_response = stuff_logic.set_auth_cookies(
+        #     response=response,
+        #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
+        # )
+        response.data = {
+            **response.data,
+            "access": tokens["access"],
+            "refresh": tokens["refresh"],
+        }
+        new_token_response = response
         return new_token_response
 
 
@@ -238,12 +253,25 @@ class WalletUserController:
 
         return Response(status=status.HTTP_200_OK)
 
+    @staticmethod
+    def check_username_exist_and_suggest(request: HttpRequest) -> Response:
+        username = request.data.get("username")
+        roll_count = request.data.get("count", 3)
+
+        if not username:
+            raise TypeError(_("Please provide username in query params"))
+
+        user = WalletUser.objects.filter(username=username).first()
+        if user:
+            suggest_usernames = suggest_username(username, roll_count)
+            return Response({"username": suggest_usernames}, status=status.HTTP_200_OK)
+
+        return Response({"username": username}, status=status.HTTP_200_OK)
+
 
 class WalletUserDeviceController:
     @staticmethod
     def create_wallet_user_device(request: HttpRequest):
-        
-        
         device, created = WalletUserDevice.objects.get_or_create(
             user=request.user,
             device=request.data.get("device"),

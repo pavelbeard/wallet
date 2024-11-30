@@ -26,7 +26,9 @@
       "signInWith": "Sign in with",
       "verify2fa": "Verify two factor token",
       "2faInput": "Your 2FA token",
-      "2faSubmit": "Verify"
+      "2faSubmit": "Verify",
+      "usernameInput": "Username",
+      "password2Input": "Confirm password"
     },
     "page": {
       "signOut": "Sign out...",
@@ -158,5 +160,8 @@
     "profile": "Profile",
     "2fa": "Two factor authorization"
   },
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "form": {
+    "usernameInput": "Username"
+  }
 }

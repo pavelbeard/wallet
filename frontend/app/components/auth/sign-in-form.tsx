@@ -12,6 +12,7 @@ import PasswordInput from "@/app/ui/input-password";
 import OauthButtons from "@/app/ui/oauth-buttons";
 import Submit from "@/app/ui/submit";
 import { zodResolver } from "@hookform/resolvers/zod";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
@@ -34,8 +35,11 @@ export default function SignInForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <FormTitle>{t("form.formTitle.signIn")}</FormTitle>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={clsx("flex flex-col gap-4")}
+      >
+        <FormTitle textSize="md">{t("form.formTitle.signIn")}</FormTitle>
         <EmailInput
           labelText={t("form.emailInput")}
           htmlFor="credentials-email"

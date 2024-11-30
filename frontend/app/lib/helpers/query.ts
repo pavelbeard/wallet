@@ -1,28 +1,25 @@
 "use server";
 
 import { API_PATH } from "./constants";
-import getAccessToken from "./getAccessToken";
 
 export default async function query({
   url,
   method = "GET",
+  headers,
   body,
+  credentials = "include",
 }: {
   url: string;
   method?: string;
-  body?: any;
-}): Promise<Error | { json: any; response: Response } | null> {
-  const accessToken = await getAccessToken();
-
+  body?: unknown;
+  headers?: Headers;
+  credentials?: "omit" | "include" | "same-origin";
+}): Promise<Error | { json: unknown; response: Response } | null> {
   return fetch(`${API_PATH}/api${url}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Cookie: `__clientid=${accessToken}`,
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
-    credentials: "include",
+    credentials,
   })
     .then((response) => {
       return {

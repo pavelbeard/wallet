@@ -79,8 +79,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
-    "stuff.middleware.HeaderSubstituteMiddleware",
-    "stuff.middleware.UserInfoMiddleware",
+    # "stuff.middleware.HeaderSubstituteMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -88,6 +87,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django_otp.middleware.OTPMiddleware",
+    "stuff.middleware.UserInfoMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -236,12 +236,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "PAGE_SIZE": 9,
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
 }
 
 # JWT
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(minutes=1)
+    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(seconds=15)
     if DEBUG
     else timezone.timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timezone.timedelta(hours=12),
@@ -255,6 +256,7 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "public_id",
     "AUTH_TOKEN_CLASSES": ["rest_framework_simplejwt.tokens.AccessToken"],
     "TOKEN_TYPE_CLAIM": "token_type",
+    
     "AUTH_ACCESS_COOKIE": "__clientid",
     "AUTH_REFRESH_COOKIE": "__rclientid",
     "AUTH_COOKIE_DOMAIN": None,
@@ -262,6 +264,7 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_PATH": "/",
     "AUTH_COOKIE_SAMESITE": "Lax",
+    
     "TOKEN_OBTAIN_SERIALIZER": "stuff.serializers.TwoFactorJWTSerializer",
 }
 

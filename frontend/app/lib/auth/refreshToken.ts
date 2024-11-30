@@ -1,43 +1,51 @@
 "use server";
 
-import { API_PATH } from "@/app/lib/helpers/constants";
-import parseCookies from "@/app/lib/helpers/parseCookies";
-import { RefreshToken } from "@/app/lib/types";
 import { WalletUser } from "@/auth";
-import { JWT } from "next-auth";
-import getUserData from "../helpers/getUserData";
+import CustomHeaders from "../helpers/getHeaders";
+import getUserDataJson from "../helpers/getUserDataJson";
+import query from "../helpers/query";
+
+type RefreshTokenResult = {
+  user?: WalletUser;
+  access_token?: string;
+  refresh_token?: string;
+  access_token_exp?: number;
+  expires_at?: number;
+  refresh_token_err?: "RefreshTokenError";
+};
 
 export default async function refreshToken(
-  refreshTokenValue: string,
-): Promise<RefreshToken> {
-  try {
-    const response = await fetch(`${API_PATH}/api/refresh/`, {
-      method: "POST",
-      headers: { Cookie: `__rclientid=${refreshTokenValue}` },
-      credentials: "include",
-    });
+  refresh_token: string,
+): Promise<RefreshTokenResult | null> {
+  const result = await query({
+    url: "/refresh/",
+    method: "POST",
+    headers: await CustomHeaders.getHeaders(),
+    body: { refresh: refresh_token },
+    credentials: "include",
+  });
 
-    if (!response.ok) throw new Error();
+  if (result instanceof Error) return null;
+  if (result?.response.status !== 200) throw "RefreshTokenError";
 
-    const responseCookies = await parseCookies(response);
-    const { user, access_token, refresh_token, access_token_exp, expires_at } =
-      await getUserData(responseCookies);
+  // const cookies = await parseCookies(response);
+  const { access, refresh } = (await result.json) as {
+    access: string;
+    refresh: string;
+  };
+  const {
+    user,
+    access_token: res_access_token,
+    refresh_token: res_refresh_token,
+    access_token_exp,
+    expires_at,
+  } = await getUserDataJson(access, refresh);
 
-    const tokens = {
-      user: user as WalletUser,
-      access_token,
-      refresh_token,
-      access_token_exp,
-      expires_at,
-    } as JWT;
-
-    return {
-      success: true,
-      tokens,
-      error: undefined,
-    };
-  } catch (error) {
-    console.error(error);
-    return { success: false, tokens: null, error: "RefreshTokenError" };
-  }
+  return {
+    user: user as WalletUser,
+    access_token: res_access_token,
+    refresh_token: res_refresh_token,
+    access_token_exp,
+    expires_at,
+  };
 }

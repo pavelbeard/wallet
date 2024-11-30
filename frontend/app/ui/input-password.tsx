@@ -20,7 +20,7 @@ export default function PasswordInput({
       htmlFor={htmlFor}
       role="password"
     >
-      <span className="pb-1">{labelText}</span>
+      <span className="pb-1 text-sm">{labelText}</span>
       <div
         className={clsx(
           "flex rounded-xl",
@@ -31,14 +31,14 @@ export default function PasswordInput({
       >
         <input
           className={clsx(
-            "flex flex-grow basis-0 p-4 outline-none bg-transparent",
+            "flex flex-grow basis-0 p-2 h-10 outline-none bg-transparent",
           )}
           type={revealed ? "text" : "password"}
           id={id}
           {...register(name)}
           {...rest}
         />
-        <div className="flex flex-col justify-center pr-4 bg-transparent">
+        <div className="flex flex-col justify-center pr-2 bg-transparent">
           {revealed ? (
             <EyeSlashIcon
               aria-expanded={revealed}

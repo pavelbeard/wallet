@@ -28,7 +28,7 @@ export default function OauthButtons() {
               "flex items-center justify-center",
               "bg-slate-800 text-white hover:bg-slate-300 hover:text-black",
               "dark:bg-gray-100 dark:text-slate-800",
-              "p-4 rounded-xl font-bold",
+              "p-2 h-10 text-sm rounded-xl font-bold",
             )}
           >
             {t("form.signInWith")} {provider.name}{" "}

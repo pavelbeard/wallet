@@ -1,4 +1,3 @@
-import { JWT } from "next-auth";
 import React, { ReactNode } from "react";
 import { UseFormRegister } from "react-hook-form";
 
@@ -62,12 +61,6 @@ export type AuthData = {
   access_token_exp: number | undefined;
   refresh_token: string | undefined;
   expires_at: number | undefined;
-};
-
-export type RefreshToken = {
-  success: boolean;
-  tokens: JWT | null;
-  error?: string;
 };
 
 export type Awaitable<T> = T | PromiseLike<T>;

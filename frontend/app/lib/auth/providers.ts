@@ -1,13 +1,13 @@
 import {
-  API_PATH,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } from "@/app/lib/helpers/constants";
-import getUserData from "@/app/lib/helpers/getUserData";
-import parseCookies from "@/app/lib/helpers/parseCookies";
 import Credentials from "@auth/core/providers/credentials";
 import Google from "@auth/core/providers/google";
 import { User } from "next-auth";
+import CustomHeaders from "../helpers/getHeaders";
+import getUserDataJson from "../helpers/getUserDataJson";
+import query from "../helpers/query";
 
 const providers = [
   Credentials({
@@ -16,23 +16,29 @@ const providers = [
       password: {},
     },
     async authorize(credentials): Promise<User | null> {
-      const response = await fetch(`${API_PATH}/api/auth/signin/`, {
+      const result = await query({
+        url: "/auth/signin/",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-        credentials: "include",
+        headers: await CustomHeaders.getHeaders(),
+        body: credentials,
       });
 
-      if (!response.ok) return null;
+      if (result instanceof Error) return null;
 
-      const cookies = await parseCookies(response);
+      if (!result?.response.ok) return null;
+
+      // const cookies = await parseCookies(result.response);
+      const { access, refresh } = (await result.json) as {
+        access: string;
+        refresh: string;
+      };
       const {
         user: walletUser,
         access_token,
         refresh_token,
         access_token_exp,
         expires_at,
-      } = await getUserData(cookies);
+      } = await getUserDataJson(access, refresh);
 
       return {
         access_token,

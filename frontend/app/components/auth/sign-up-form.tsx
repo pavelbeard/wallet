@@ -7,6 +7,7 @@ import { SignUpSchema, SignUpValidator } from "@/app/lib/schemas.z";
 import AuthQuestion from "@/app/ui/auth-question";
 import FormDivider from "@/app/ui/form-divider";
 import FormTitle from "@/app/ui/form-title";
+import CustomInput from "@/app/ui/input-custom";
 import EmailInput from "@/app/ui/input-email";
 import PasswordInput from "@/app/ui/input-password";
 import Messages from "@/app/ui/messages";
@@ -38,7 +39,15 @@ export default function SignUpForm() {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <FormTitle>{t("auth.form.formTitle.signUp")}</FormTitle>
+        <FormTitle textSize="md">{t("auth.form.formTitle.signUp")}</FormTitle>
+        <CustomInput
+          labelText={`${t("form.usernameInput")}:`}
+          htmlFor="credentials-username"
+          name="username"
+          id="credentials-username"
+          register={register}
+          autoComplete="username"
+        />
         <EmailInput
           labelText={t("auth.form.emailInput")}
           htmlFor="credentials-email"
@@ -58,7 +67,7 @@ export default function SignUpForm() {
         />
         <FormError message={errors.password?.message as string} />
         <PasswordInput
-          labelText={t("auth.form.passwordInput")}
+          labelText={`${t("auth.form.password2Input")}:`}
           htmlFor="credentials-password2"
           name="password2"
           id="credentials-password2"

@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { Cookie } from "set-cookie-parser";
 import setTokensExpirationTime from "./setTokensExpirationTime";
 
-export default async function getUserData(parsedCookies: Cookie[]) {
+export default async function getUserDataCookies(parsedCookies: Cookie[]) {
   const [access_token, refresh_token] = parsedCookies.map((cookie) => {
     if (cookie.name === "__clientid" || cookie.name === "__rclientid") {
       return cookie;

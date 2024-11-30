@@ -22,7 +22,6 @@ from .controller import (
     Oauth2Auth,
     TOTPDeviceController,
     WalletUserController,
-    WalletUserDeviceController,
 )
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -244,6 +243,20 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         except TypeError as e:
             return Response(
                 data={"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            logger.error(_("Something went wrong..."), exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    def check_username_exist_and_suggest(self, request):
+        try:
+            result = WalletUserController.check_username_exist_and_suggest(request=request)
+            return result
+        except TypeError:
+            return Response(
+                data={"error": _("Please provide username in query params")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception:

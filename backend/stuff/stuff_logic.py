@@ -25,7 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from stuff import qr_generator
 from stuff.models import WalletUser
-from stuff.utils import LOGIN_TYPE, Action
+from stuff.types import LOGIN_TYPE, Action
 
 
 @contextlib.contextmanager
@@ -247,10 +247,12 @@ def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS
         )
 
     if user.is_active:
-        auth_response = set_auth_cookies(
-            response=response,
-            jwt_tokens={"access": access_token, "refresh": refresh_token},
-        )
+        # auth_response = set_auth_cookies(
+        #     response=response,
+        #     jwt_tokens={"access": access_token, "refresh": refresh_token},
+        # )
+        response.data = {"access": access_token, "refresh": refresh_token}
+        auth_response = response
         csrf_response = set_csrf_cookie(request=request, response=auth_response)
         
         # device section
@@ -262,12 +264,15 @@ def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS
 
 
 def signout_logic(request):
-    refresh_token = request.COOKIES.get("__rclientid")
+    # refresh_token = request.COOKIES.get("__rclientid")
+    refresh_token = request.COOKIES.get("refresh")
+    if not refresh_token:
+        raise TypeError(_("Refresh token is missing"))
     token = tokens.RefreshToken(refresh_token)
     token.blacklist()
     response = Response()
-    response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"])
-    response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"])
+    # response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"])
+    # response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"])
     response.delete_cookie(key="csrfmiddlewaretoken")
     response.data = {"detail": _("You're logged out!")}
     response.status = status.HTTP_200_OK

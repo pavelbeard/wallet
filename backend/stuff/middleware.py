@@ -1,10 +1,12 @@
+import re
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
 from user_agents import parse
 
-from stuff.stuff_logic import jwt_decode_handler
 from stuff.models import DDevice, WalletUser, WalletUserDevice
+from stuff.stuff_logic import jwt_decode_handler
+from stuff.utils import regex_get
 
 
 class HeaderSubstituteMiddleware:
@@ -37,18 +39,37 @@ class UserInfoMiddleware:
 
             try:
                 ua = parse(request.META.get("HTTP_USER_AGENT"))
-                device = DDevice.objects.filter(
-                    d_name__contains=ua.device.model
-                ).first()
-                WalletUserDevice.objects.create(
-                    wallet_user=user,
-                    d_device=device,
-                    operational_system=f"{ua.os.family} {ua.os.version}",
-                    d_ip_address=request.META.get("REMOTE_ADDR"),
-                    location="",
-                    created_at=timezone.now(),
-                    last_access=timezone.now(),
+                browser = regex_get(
+                    dict=request.META,
+                    key="HTTP_SEC_CH_UA",
+                    default=ua.browser.family,
+                    pattern=r'([^"]+)',
                 )
+                platform = regex_get(
+                    dict=request.META,
+                    key="HTTP_SEC_CH_UA_PLATFORM",
+                    default=ua.os.family,
+                    pattern=r'([^"]+)',
+                )
+                version = regex_get(
+                    dict=request.META,
+                    key="HTTP_SEC_CH_UA_VERSION",
+                    default=ua.os.version_string,
+                    pattern=r"^(.*?)(\s.*)?$",
+                )
+                device = DDevice.objects.filter(d_name__contains=browser).first()
+
+                wallet_user_device = {
+                    "wallet_user": user,
+                    "d_device": device,
+                    "operational_system": f"{platform} {version}",
+                    "d_ip_address": request.META.get("REMOTE_ADDR"),
+                    "location": "",
+                    "created_at": timezone.now(),
+                    "last_access": timezone.now(),
+                }
+
+                WalletUserDevice.objects.create(**wallet_user_device)
             except Exception:
                 pass
 

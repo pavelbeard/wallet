@@ -26,7 +26,9 @@
       "or": "o",
       "verify2fa": "Verificar token de dos factores",
       "2faInput": "Tu token 2FA",
-      "2faSubmit": "Verificar"
+      "2faSubmit": "Verificar",
+      "usernameInput": "Nombre de usuario",
+      "password2Input": "Confirmar contraseña"
     },
     "page": {
       "signOut": "Cerrando sesión...",
@@ -159,5 +161,8 @@
     "profile": "Perfil",
     "2fa": "Autorización de dos factores"
   },
-  "loading": "Cargando..."
+  "loading": "Cargando...",
+  "form": {
+    "usernameInput": "Nombre de usuario"
+  }
 }

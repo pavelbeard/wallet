@@ -11,7 +11,8 @@ router.register(r"oauth2", views.OAuth2ViewSet, basename="stuff-oauth")
 router.register(r"2fa", views.TwoFactorAuthViewSet, basename="stuff-two-factor")
 
 urlpatterns = [
-    path("refresh/", views.CookieTokenRefreshView.as_view(), name="refresh-cookie"),
+    # path("refresh/", views.CookieTokenRefreshView.as_view(), name="refresh-cookie"),
+    path("refresh/", jwt_views.TokenRefreshView.as_view(), name="refresh-cookie"),
     path("verify/", jwt_views.TokenVerifyView.as_view(), name="verify"),
 ]
 

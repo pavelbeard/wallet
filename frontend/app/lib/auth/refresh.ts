@@ -16,18 +16,21 @@ const refresh = async (
   if (!refresh_token || now > expires_at) return null;
 
   // it necessary to have access token exp and refresh token value
-  if (now > access_token_exp) {
-    const refreshResult = await refreshToken(refresh_token);
-    if (refreshResult.success && refreshResult.tokens) {
-      const { tokens } = refreshResult;
+  if (now > access_token_exp && refresh_token) {
+    try {
+      const refreshResult = await refreshToken(refresh_token);
 
-      // @ts-ignore
-      if (token?.user.provider == "credentials") {
-        tokens.user.provider = "credentials";
+      if (!refreshResult) {
+        throw new Error("RefreshTokenError");
       }
 
-      return tokens as JWT;
-    } else {
+      token.user = refreshResult.user;
+      token.access_token = refreshResult.access_token;
+      token.refresh_token = refreshResult.refresh_token;
+      token.expires_at = refreshResult.expires_at;
+      token.access_token_exp = refreshResult.access_token_exp;
+    } catch (error) {
+      console.error(error);
       return null;
     }
   }

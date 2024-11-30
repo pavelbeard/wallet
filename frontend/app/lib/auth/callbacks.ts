@@ -18,6 +18,7 @@ import {
 import { AdapterSession, AdapterUser } from "next-auth/adapters";
 import { JWT as NextAuthJWT } from "next-auth/jwt";
 import { CredentialInput } from "next-auth/providers";
+import logger from "../helpers/logger";
 
 type SignInCallback = (params: {
   user: User | AdapterUser;
@@ -124,7 +125,15 @@ const jwtCallback: JWTCallback = async ({
     return token;
   }
 
+  /** One trouble is that refresh token is not working
+   * After refresh the page is redirected to the login page
+   * and backend is showing that, e.g:
+   * Unauthorized: /api/refresh/
+   * WARNING:django.request:Unauthorized: /api/refresh/
+   * [30/Nov/2024 03:21:36] "POST /api/refresh/ HTTP/1.1" 401 90
+   */
   const tokens = await refresh(token);
+  logger("tokens", tokens);
   return tokens ? tokens : null;
 };
 
