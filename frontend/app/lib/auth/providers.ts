@@ -32,6 +32,7 @@ const providers = [
         access: string;
         refresh: string;
       };
+
       const {
         user: walletUser,
         access_token,

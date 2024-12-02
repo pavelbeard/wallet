@@ -11,6 +11,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from stuff import stuff_logic
+from stuff.models import WalletUser
 from stuff.stuff_logic import override_api_settings
 
 User = get_user_model()
@@ -76,6 +77,9 @@ class StuffTests(APITestCase):
     def test_signup_with_username(self):
         data = {
             "username": "testuser_new1",
+            "email": "testuser_new1@example.com",
+            "first_name": "test",
+            "last_name": "test",
             "password": self.password,
             "password2": self.password,
         }
@@ -83,6 +87,27 @@ class StuffTests(APITestCase):
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("detail", response.json())
+
+        obj = WalletUser.objects.first()
+        for field in obj._meta.fields:
+            print(field.name, ": ", getattr(obj, field.name))
+            
+    def test_signup_without_username(self):
+        data = {
+            "email": "testuser_new1@example.com",
+            "first_name": "test",
+            "last_name": "test",
+            "password": self.password,
+            "password2": self.password,
+        }
+
+        response = self.client.post(self.signup_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("detail", response.json())
+
+        obj = WalletUser.objects.last()
+        for field in obj._meta.fields:
+            print(field.name, ": ", getattr(obj, field.name))
 
     def test_signup_only_with_email(self):
         data = {
@@ -232,7 +257,7 @@ class TokensVerificationTestCase(APITestCase):
         response = self.client.get(totp_device_creation_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(isinstance(response.data, str), True)
-        
+
         print(response.data)
         print(response.content)
 

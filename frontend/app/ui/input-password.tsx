@@ -31,7 +31,7 @@ export default function PasswordInput({
       >
         <input
           className={clsx(
-            "flex flex-grow basis-0 p-2 h-10 outline-none bg-transparent",
+            "flex flex-grow basis-0 p-2 text-sm h-10 outline-none bg-transparent",
           )}
           type={revealed ? "text" : "password"}
           id={id}

@@ -1,15 +1,20 @@
 "use server";
 
-import query from "@/app/lib/helpers/query";
-import updateUserData from "@/app/lib/helpers/updateSession";
 import { PasswordValidator } from "@/app/lib/schemas.z";
+import getUserDataJson from "../helpers/getUserDataJson";
+import protectedQuery from "../helpers/protectedQuery";
 
 export default async function delete2fa(data: PasswordValidator) {
   // TODO: Something is wrong with the session access_token in server side
-  const result = await query({
+  const result = await protectedQuery({
     url: `/2fa/delete_totp_device/`,
     method: "DELETE",
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    }),
     body: data,
+    credentials: "include",
   });
 
   if (result instanceof Error) {
@@ -22,7 +27,11 @@ export default async function delete2fa(data: PasswordValidator) {
 
   if (result?.response.ok) {
     // TODO: apply new access token without TOTP device to session
-    const updatedUserData = await updateUserData(result.response);
+    const { access, refresh } = (await result.json) as {
+      access: string;
+      refresh: string;
+    };
+    const updatedUserData = await getUserDataJson(access, refresh);
     return {
       success: "profile.twofactor.deleted",
       error: null,

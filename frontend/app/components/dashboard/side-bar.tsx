@@ -25,22 +25,19 @@ export default function SideBar() {
       <nav className="grid grid-rows-[1fr_50px] h-full">
         <ul className="flex flex-col gap-2">
           {sideMenu.map(({ url, title, icon }: SideBarItem) => (
-            <li
+            <Link
+              locale={locale}
+              href={url}
               key={title}
               className={clsx(
-                "group p-2 text-sm",
+                "flex items-center gap-x-2",
+                "box-border group p-2 text-sm",
                 "hover:bg-white dark:hover:bg-slate-600",
-                "hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
+                "hover:rounded-xl hover:drop-shadow-xl hover:shadow-black hover:text-black cursor-pointer",
               )}
             >
-              <Link
-                className="flex items-center gap-x-2"
-                locale={locale}
-                href={url}
-              >
-                {icon} {t(title)}
-              </Link>
-            </li>
+              {icon} {t(title)}
+            </Link>
           ))}
         </ul>
         <ul>

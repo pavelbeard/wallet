@@ -1,5 +1,4 @@
-from hmac import new
-from itertools import count
+from typing import Dict
 import uuid
 
 from django.db.models import QuerySet
@@ -24,10 +23,6 @@ class Auth:
     @staticmethod
     # TODO: add email verification, add username creation and first/last names
     def sign_up(request: HttpRequest):
-        username = request.data.get("username")
-        if username is not None and "@" in username:
-            request.data["email"] = request.data["username"]
-            del request.data["username"]
         serializer = serializers.SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -103,15 +98,14 @@ class TOTPDeviceController:
         return response
 
     @staticmethod
-    def verify_totp_device(request: HttpRequest):
-        otp_token = request.data.get("token")
+    def verify_totp_device(data: Dict[str, str], user: WalletUser):
+        otp_token = data.get("token")
         if not otp_token:
             return Response(
                 {"error": _("Token is missing.")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = request.user
         device = stuff_logic.get_user_totp_device(user)
         if device is not None and device.verify_token(token=otp_token):
             if not device.confirmed:
@@ -123,10 +117,11 @@ class TOTPDeviceController:
             #     response=response,
             #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
             # )
-            new_token_response = response.data = {
+            response.data = {
                 "access": tokens["access"],
                 "refresh": tokens["refresh"],
             }
+            new_token_response = response
             return new_token_response
 
         raise exceptions.VerifyTokenError(_("Invalid token"))
@@ -238,25 +233,21 @@ class WalletUserController:
         return Response({"new_email": email}, status=status.HTTP_200_OK)
 
     @staticmethod
-    def change_password(request: HttpRequest, pk=None):
+    def change_password(data: Dict[str, str]):
         """Change user password."""
-        data = request.data
-        user = WalletUser.objects.filter(public_id=pk).first()
+        user = WalletUser.objects.filter(public_id=data.get("public_id")).first()
         if not user:
             raise TypeError(_("User not found"))
-
-        if not user.check_password(data.get("actualPassword")):
-            raise TypeError(_("Wrong password"))
-
+        
         user.set_password(data.get("password"))
         user.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({"detail": _("Password changed!")}, status=status.HTTP_200_OK)
 
     @staticmethod
-    def check_username_exist_and_suggest(request: HttpRequest) -> Response:
-        username = request.data.get("username")
-        roll_count = request.data.get("count", 3)
+    def username_suggestions(data: Dict[str, str | int]) -> Response:
+        username = data.get("username")
+        roll_count = data.get("count")
 
         if not username:
             raise TypeError(_("Please provide username in query params"))
@@ -267,20 +258,3 @@ class WalletUserController:
             return Response({"username": suggest_usernames}, status=status.HTTP_200_OK)
 
         return Response({"username": username}, status=status.HTTP_200_OK)
-
-
-class WalletUserDeviceController:
-    @staticmethod
-    def create_wallet_user_device(request: HttpRequest):
-        device, created = WalletUserDevice.objects.get_or_create(
-            user=request.user,
-            device=request.data.get("device"),
-            name=request.data.get("name"),
-            type=request.data.get("type"),
-            created_at=timezone.now(),
-            last_access=timezone.now(),
-        )
-
-    @staticmethod
-    def delete_wallet_user_device(request: HttpRequest):
-        pass

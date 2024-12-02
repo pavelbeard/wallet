@@ -1,6 +1,7 @@
 "use server";
 
 import { API_PATH } from "./constants";
+import logger from "./logger";
 
 export default async function query({
   url,
@@ -21,13 +22,16 @@ export default async function query({
     body: body ? JSON.stringify(body) : undefined,
     credentials,
   })
-    .then((response) => {
+    .then(async (response) => {
       return {
-        json: response.json(),
+        json: JSON.parse(JSON.stringify(await response.json())),
         response,
       };
     })
-    .then((data) => data)
+    .then((data) => {
+      logger("data", data);
+      return data;
+    })
     .catch((error) => {
       console.error(error);
       return error;

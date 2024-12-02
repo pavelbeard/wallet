@@ -47,6 +47,16 @@ const SignInSchema = z.object({
 });
 const SignUpSchema = z
   .object({
+    username: z
+      .string()
+      .min(4, { message: "Provide your username" })
+      .regex(new RegExp("^[a-zA-Z0-9_]+$"), {
+        message:
+          "Your username should contain only letters, numbers and underscores",
+      })
+      .max(20, { message: "Your username is too long" }),
+    first_name: z.string().min(1, { message: "Provide your first name" }),
+    last_name: z.string().min(1, { message: "Provide your last name" }),
     email: z
       .string()
       .email({ message: "Provide your email!" })

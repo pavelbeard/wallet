@@ -6,10 +6,10 @@ export default function Messages({
   successMessage?: string | null;
 }) {
   if (errorMessage) {
-    return <p className="text-red-500">{errorMessage}</p>;
+    return <p className="text-sm text-red-500">{errorMessage}</p>;
   }
 
   if (successMessage) {
-    return <p className="text-green-500">{successMessage}</p>;
+    return <p className="text-sm text-green-500">{successMessage}</p>;
   }
 }

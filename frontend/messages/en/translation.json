@@ -127,7 +127,12 @@
       "title": "Settings"
     },
     "devices": {
-      "title": "Linked devices with your account"
+      "title": "Linked devices with your account",
+      "device": "Device",
+      "operationalSystem": "OS",
+      "ipAddress": "IP Address",
+      "location": "Location",
+      "lastAccess": "Last sign in"
     }
   },
   "header": {
@@ -162,6 +167,9 @@
   },
   "loading": "Loading...",
   "form": {
-    "usernameInput": "Username"
+    "usernameInput": "Username",
+    "firstNameInput": "First name",
+    "lastNameInput": "Last name",
+    "usernameSuggestions": "Username is already taken"
   }
 }

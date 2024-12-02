@@ -113,6 +113,7 @@ class DDevice(models.Model):
 
 
 class WalletUserDevice(models.Model):
+    # TODO: add is actual device field
     wallet_user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
     d_device = models.ForeignKey(DDevice, on_delete=models.CASCADE)
     operational_system = models.CharField(max_length=250, blank=True, null=True)

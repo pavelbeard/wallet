@@ -1,5 +1,3 @@
-import Client from "@/app/components/dashboard/client";
-import { auth } from "@/auth";
 import { LocaleProps } from "@/i18n/types";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -18,14 +16,20 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params: { locale } }: LocaleProps) {
-  const session = await auth();
   return (
-    <div>
-      <div className="p-4">Dashboard</div>
-      <div className="p-4">Server:</div>
-      <div className="break-all max-w-64">{JSON.stringify(session)}</div>
-      <div className="p-4">Client:</div>
-      <Client />
+    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:grid-rows-[300px_300px] lg:gap-6">
+      <div className="col-start-1 w-full h-full bg-slate-400">
+        Cards
+      </div>
+      <div className="col-start-2 w-full h-full bg-slate-400">
+        Passwords
+      </div>
+      <div className="row-start-2 col-start-1 w-full h-full bg-slate-400">
+        Notes
+      </div>
+      <div className="row-start-2 col-start-2 w-full h-full bg-slate-400">
+        Others
+      </div>
     </div>
   );
 }

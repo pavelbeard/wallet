@@ -50,16 +50,16 @@ function FormComponent({
 
   const [next, setNext] = useState(false);
 
-  useDebounce(
-    () => {
+  useDebounce({
+    callback: () => {
       const token = watch("token");
       if (token?.length == 6) {
         handleSubmit(onSubmit)();
       }
     },
-    300,
-    [watch("token")],
-  );
+    delay: 300,
+    dependencies: [watch("token")],
+  });
 
   useEffect(() => resetCopied, []);
 

@@ -128,7 +128,12 @@
       "title": "Ajustes"
     },
     "devices": {
-      "title": "Dispositivos vinculados con tu cuenta"
+      "title": "Dispositivos vinculados con tu cuenta",
+      "device": "Dispositivo",
+      "operationalSystem": "SO",
+      "ipAddress": "Dirección IP",
+      "location": "Ubicación",
+      "lastAccess": "Ultimo inicio"
     }
   },
   "header": {
@@ -163,6 +168,9 @@
   },
   "loading": "Cargando...",
   "form": {
-    "usernameInput": "Nombre de usuario"
+    "usernameInput": "Nombre de usuario",
+    "firstNameInput": "Nombre",
+    "lastNameInput": "Apellido",
+    "usernameSuggestions": "El nombre de usuario ya está en uso"
   }
 }

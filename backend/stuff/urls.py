@@ -9,6 +9,7 @@ router.register(r"users", views.WalletUserViewSet)
 router.register(r"auth", views.AuthViewSet, basename="stuff-auth")
 router.register(r"oauth2", views.OAuth2ViewSet, basename="stuff-oauth")
 router.register(r"2fa", views.TwoFactorAuthViewSet, basename="stuff-two-factor")
+router.register(r"devices", views.WalletUserDeviceViewSet, basename="stuff-devices")
 
 urlpatterns = [
     # path("refresh/", views.CookieTokenRefreshView.as_view(), name="refresh-cookie"),

@@ -37,6 +37,11 @@ class AuthViewSet(viewsets.ViewSet):
         except TypeError as e:
             logger.error(msg=e.args[0], exc_info=True)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                data={"error": e.detail}, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception:
             logger.error(msg=_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -51,9 +56,11 @@ class AuthViewSet(viewsets.ViewSet):
             return Response(
                 {"error": _("Bad credentials.")}, status=status.HTTP_400_BAD_REQUEST
             )
-        except ValidationError:
+        except ValidationError as e:
             logger.error(_("Failed to sign in user"), exc_info=True)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"error": e.detail}, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception:
             logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -126,7 +133,12 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     def verify_totp_device(self, request):
         """Verify/enable a TOTP device."""
         try:
-            result = TOTPDeviceController.verify_totp_device(request=request)
+            serializer = serializers.VerifyTOTPDeviceSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = request.user
+            result = TOTPDeviceController.verify_totp_device(
+                serializer.validated_data, user
+            )
             return result
         except TypeError:
             return Response(
@@ -238,21 +250,34 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         """Change user password."""
         try:
             pk = kwargs.get("public_id")
-            result = WalletUserController.change_password(request=request, pk=pk)
+            serializer = serializers.ChangePasswordSerializer(
+                data=request.data, context={"public_id": pk}
+            )
+            serializer.is_valid(raise_exception=True)
+            result = WalletUserController.change_password(serializer.validated_data)
             return result
         except TypeError as e:
+            logger.error(msg=e.args[0], exc_info=True)
             return Response(
-                data={"error": e.args[0]},
+                data={"error": {"detail": e.args}}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except ValidationError as e:
+            return Response(
+                data={"error": e.detail},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception:
             logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-    @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
-    def check_username_exist_and_suggest(self, request):
+
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    def username_suggestions(self, request):
         try:
-            result = WalletUserController.check_username_exist_and_suggest(request=request)
+            serializer = serializers.UsernameSuggestionsSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            result = WalletUserController.username_suggestions(
+                serializer.validated_data
+            )
             return result
         except TypeError:
             return Response(
@@ -262,3 +287,14 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         except Exception:
             logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class WalletUserDeviceViewSet(viewsets.ModelViewSet):
+    queryset = models.WalletUserDevice.objects.all()
+    serializer_class = serializers.WalletUserDeviceSerializer
+    allowed_methods = ("GET",)
+
+    def list(self, request):
+        qs = self.queryset.filter(wallet_user=request.user).order_by("-last_access")[:5]
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)

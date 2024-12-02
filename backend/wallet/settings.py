@@ -182,6 +182,7 @@ if DEBUG:
     MEDIA_URL = "/media/"
 else:
     MEDIA_URL = "/backend/media/"
+    
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -242,7 +243,7 @@ REST_FRAMEWORK = {
 # JWT
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(seconds=15)
+    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(minutes=10)
     if DEBUG
     else timezone.timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timezone.timedelta(hours=12),

@@ -59,7 +59,7 @@ export default function VerifyTwoFactorForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <FormTitle>{t("auth.form.verify2fa")}</FormTitle>
+      <FormTitle textSize="md">{t("auth.form.verify2fa")}</FormTitle>
       <CustomInput
         labelText={`${t("auth.form.2faInput")}:`}
         htmlFor="token"

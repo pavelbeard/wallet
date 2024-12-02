@@ -5,6 +5,7 @@ import LayoutPublicContainer from "@/app/ui/layout-public-container";
 import { Link } from "@/i18n/routing";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
+import { Metadata } from "next";
 import { useLocale, useTranslations } from "next-intl";
 
 export const metadata: Metadata = {
@@ -14,14 +15,14 @@ export const metadata: Metadata = {
 
 export default function Error() {
   const locale = useLocale();
-  const t = useTranslations("error");
+  const t = useTranslations();
   return (
     <LayoutPublicContainer color="error-bg">
       <Card className="p-6 my-12 w-3/4 lg:w-1/3">
         <div className="flex justify-center flex-col items-center p-4 font-bold text-red-500">
           <section className="p-4 flex items-center">
             <XCircleIcon className="size-8" />
-            <span className="ml-1">{t("error500")}</span>
+            <span className="ml-1">{t("error.error500")}</span>
           </section>
           <section className="p-4">
             <Link
@@ -31,9 +32,9 @@ export default function Error() {
                 "hover:bg-slate-300 hover:text-black",
               )}
               locale={locale}
-              href={"/"}
+              href="/"
             >
-              {t("toMainPage")}
+              {t("error.toMainPage")}
             </Link>
           </section>
         </div>

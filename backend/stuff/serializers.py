@@ -9,10 +9,20 @@ from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff.types import Action
 from stuff import stuff_logic
+from stuff.controller import WalletUserController
+from stuff.types import Action
 
 from .models import WalletUser, WalletUserDevice
+
+
+class WalletUserSerializerStrict(serializers.ModelSerializer):
+    class Meta:
+        model = WalletUser
+        fields = (
+            "public_id",
+            "username",
+        )
 
 
 class WalletUserSerializer(AbstractSerializer):
@@ -21,6 +31,8 @@ class WalletUserSerializer(AbstractSerializer):
         fields = (
             "public_id",
             "username",
+            "first_name",
+            "last_name",
             "email",
             "email_verified",
             "is_two_factor_enabled",
@@ -32,6 +44,8 @@ class WalletUserSerializer(AbstractSerializer):
 
 
 class WalletUserDeviceSerializer(serializers.ModelSerializer):
+    wallet_user = WalletUserSerializerStrict()
+
     class Meta:
         model = WalletUserDevice
         fields = (
@@ -67,9 +81,30 @@ class SignupSerializer(WalletUserSerializer):
 
     class Meta:
         model = WalletUser
-        fields = ("public_id", "username", "email", "password", "password2")
+        fields = (
+            "public_id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+            "password2",
+        )
 
     def validate(self, data):
+        if not data.get("first_name") and not data.get("last_name"):
+            raise serializers.ValidationError(_("Please provide first and last name"))
+        if not data.get("username"):
+            username_suggested = WalletUserController.username_suggestions(
+                {
+                    "username": f"{data.get('first_name')}_{data.get('last_name')}",
+                    "count": 1,
+                }
+            )
+            if isinstance(username_suggested, list):
+                data["username"] = username_suggested[0]
+            else:
+                data["username"] = username_suggested
         if data["password"] != data["password2"]:
             raise serializers.ValidationError(_("Passwords do not match!"))
 
@@ -123,7 +158,7 @@ class TwoFactorJWTSerializer(
     jwt_serializers.TokenObtainPairSerializer, CustomTokenObtainSerializer
 ):
     @classmethod
-    def get_token(cls, user):
+    def get_token(cls, user: WalletUser):
         device = user.totpdevice_set.first()
         payload = stuff_logic.jwt_custom_payload(
             user=user, device=device, Action=Action.sign_in
@@ -167,3 +202,51 @@ class PasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid password.")
 
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    actualPassword = serializers.CharField(min_length=8, max_length=20)
+    password = serializers.CharField(min_length=8, max_length=20)
+    password2 = serializers.CharField(min_length=8, max_length=20)
+
+    def validate(self, attrs):
+        actual_password = attrs.get("actualPassword")
+        password = attrs.get("password")
+        password2 = attrs.get("password2")
+
+        public_id = self.context.get("public_id")
+        user = WalletUser.objects.filter(public_id=public_id).first()
+
+        if not user:
+            raise serializers.ValidationError("User not found.")
+
+        if not user.check_password(actual_password):
+            raise serializers.ValidationError("Wrong password.")
+
+        if not password:
+            raise serializers.ValidationError("Password is required.")
+
+        if password != password2:
+            raise serializers.ValidationError("Passwords do not match.")
+
+        del attrs["password2"]
+        attrs["public_id"] = public_id
+
+        return attrs
+
+
+class UsernameSuggestionsSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    count = serializers.IntegerField(default=3, required=False)
+
+    def validate(self, attrs):
+        username = attrs.get("username")
+
+        if not username:
+            raise serializers.ValidationError("Please provide username")
+
+        return attrs
+
+
+class VerifyTOTPDeviceSerializer(serializers.Serializer):
+    token = serializers.CharField()

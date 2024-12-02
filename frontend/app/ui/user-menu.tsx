@@ -11,32 +11,27 @@ function UserMenuItem({ item }: { item: UserMenuItem }) {
   const locale = useLocale();
   const t = useTranslations();
   return (
-    <li
+    <Link
+      href={item.url}
+      locale={locale}
       className={clsx(
         "p-2",
         "hover:bg-white hover:text-black hover:rounded-md",
         "dark:hover:bg-slate-600 dark:hover:text-gray-100",
+        "w-full flex items-center justify-between",
+        item.fontBold && "font-bold",
       )}
     >
-      <Link
-        href={item.url}
-        locale={locale}
-        className={clsx(
-          "w-full flex items-center justify-between",
-          item.fontBold && "font-bold",
-        )}
-      >
-        <div className="flex w-full text-sm items-center gap-x-2">
-          {item.icon}
+      <div className="flex w-full text-sm items-center gap-x-2">
+        {item.icon}
+        {t(item.title)}
+      </div>
+      {isDesktop && (
+        <p className={clsx("text-sm", item.fontBold && "font-bold")}>
           {t(item.title)}
-        </div>
-        {isDesktop && (
-          <p className={clsx("text-sm", item.fontBold && "font-bold")}>
-            {t(item.title)}
-          </p>
-        )}
-      </Link>
-    </li>
+        </p>
+      )}
+    </Link>
   );
 }
 

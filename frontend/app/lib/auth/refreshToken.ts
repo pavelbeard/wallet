@@ -25,7 +25,7 @@ export default async function refreshToken(
     credentials: "include",
   });
 
-  if (result instanceof Error) return null;
+  if (result instanceof Error) throw "RefreshTokenError";
   if (result?.response.status !== 200) throw "RefreshTokenError";
 
   // const cookies = await parseCookies(response);
@@ -33,6 +33,7 @@ export default async function refreshToken(
     access: string;
     refresh: string;
   };
+
   const {
     user,
     access_token: res_access_token,

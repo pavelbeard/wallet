@@ -86,6 +86,10 @@ def jwt_custom_payload(
 
     if getattr(user, "username") is not None:
         payload["username"] = user.username
+    if getattr(user, "first_name") is not None:
+        payload["first_name"] = user.first_name
+    if getattr(user, "last_name") is not None:
+        payload["last_name"] = user.last_name
     if getattr(user, "email") is not None:
         payload["email"] = user.email
     if getattr(user, "public_id") is not None:

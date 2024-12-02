@@ -18,7 +18,6 @@ import {
 import { AdapterSession, AdapterUser } from "next-auth/adapters";
 import { JWT as NextAuthJWT } from "next-auth/jwt";
 import { CredentialInput } from "next-auth/providers";
-import logger from "../helpers/logger";
 
 type SignInCallback = (params: {
   user: User | AdapterUser;
@@ -133,7 +132,6 @@ const jwtCallback: JWTCallback = async ({
    * [30/Nov/2024 03:21:36] "POST /api/refresh/ HTTP/1.1" 401 90
    */
   const tokens = await refresh(token);
-  logger("tokens", tokens);
   return tokens ? tokens : null;
 };
 

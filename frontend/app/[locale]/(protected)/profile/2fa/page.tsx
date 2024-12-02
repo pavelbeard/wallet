@@ -1,5 +1,6 @@
 import TwoFactorSkeleton from "@/app/components/profile/two-factor-skeleton";
-import { routing } from "@/i18n/routing";
+import getUser from "@/app/lib/getUser";
+import { redirect, routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -35,6 +36,11 @@ export default async function Page({ params: { locale } }: PageProps) {
   const t = await getTranslations({
     locale,
   });
+  const user = await getUser();
+
+  if (user?.is_oauth_user) {
+    redirect({ href: "/profile", locale });
+  }
 
   return (
     <section className="flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">

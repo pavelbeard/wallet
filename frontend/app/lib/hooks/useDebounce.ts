@@ -1,17 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function useDebounce(
-  callback: () => void,
-  delay: number,
-  dependencies: any[],
-) {
+export default function useDebounce({
+  callback,
+  value,
+  delay,
+  dependencies,
+}: {
+  callback?: () => void;
+  value?: unknown;
+  delay: number;
+  dependencies: any[];
+}) {
+  const [debouncedValue, setDebouncedValue] = useState(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    if (callback) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(callback, delay);
     }
-    timerRef.current = setTimeout(callback, delay);
+
+    if (value) {
+      timerRef.current = setTimeout(() => {
+        setDebouncedValue(value as any);
+      }, delay);
+    }
 
     return () => {
       if (timerRef.current) {
@@ -19,4 +34,6 @@ export default function useDebounce(
       }
     };
   }, dependencies);
+
+  return debouncedValue;
 }
