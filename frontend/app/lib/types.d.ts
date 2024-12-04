@@ -46,7 +46,7 @@ export type SideBarItem = {
 export type UserMenuItem = {
   icon: ReactNode;
   title: string;
-  url: string;
+  url?: string;
   fontBold?: boolean;
 };
 

@@ -28,7 +28,6 @@ export default async function RootPublicLayout({
   params: { locale },
 }: RootPublicLayoutProps) {
   const messages = await getMessages();
-
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LayoutPublicContainer color="container-bg">

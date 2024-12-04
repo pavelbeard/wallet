@@ -1,4 +1,4 @@
-import { User } from "next-auth";
+import { WalletUser } from "@/auth";
 import BurgerMenu from "./burger-menu";
 import BurgerButtonMenu from "./burger-menu-btn";
 import LogoHeader from "./logo-header";
@@ -16,12 +16,12 @@ export default function HeaderMobile({
   toggleSidebarSection: (section: string) => void;
   isBurgerOpen: boolean;
   toggleBurgerMenu: () => void;
-  user: User | undefined;
+  user: WalletUser | undefined;
 }) {
   return (
     <>
       <LogoHeader className="flex flex-grow basis-0 items-center" />
-      
+
       <BurgerButtonMenu
         isBurgerOpen={isBurgerOpen}
         toggleBurgerMenu={toggleBurgerMenu}

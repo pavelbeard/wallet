@@ -1,5 +1,5 @@
 import TwoFactorSkeleton from "@/app/components/profile/two-factor-skeleton";
-import getUser from "@/app/lib/getUser";
+import getUser from "@/app/lib/helpers/getUser";
 import { redirect, routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { Metadata } from "next";

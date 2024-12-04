@@ -3,37 +3,37 @@
 import { sideMenu } from "@/app/lib/sidebar";
 import { SideBarItem } from "@/app/lib/types";
 import { Link } from "@/i18n/routing";
-import { DEFAULT_SIGNED_OUT_PATH } from "@/routes";
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 export default function SideBar() {
   const t = useTranslations();
   const locale = useLocale();
+  const sideBar = useMemo(() => sideMenu, []);
 
   return (
     <aside
       className={clsx(
-        "p-4 border-gray-300 bg-slate-100 drop-shadow-md shadow-black",
+        "border-gray-300 bg-slate-100 p-4 shadow-black drop-shadow-md",
         "dark:bg-slate-800 dark:text-gray-100",
         "lg:border-r-[1px] dark:border-slate-600",
         "max-lg:flex-1",
       )}
     >
-      <nav className="grid grid-rows-[1fr_50px] h-full">
+      <nav className="grid h-full grid-rows-[1fr_50px]">
         <ul className="flex flex-col gap-2">
-          {sideMenu.map(({ url, title, icon }: SideBarItem) => (
+          {sideBar.map(({ url, title, icon }: SideBarItem) => (
             <Link
               locale={locale}
               href={url}
               key={title}
               className={clsx(
                 "flex items-center gap-x-2",
-                "box-border group p-2 text-sm",
+                "group box-border p-2 text-sm",
                 "hover:bg-white dark:hover:bg-slate-600",
-                "hover:rounded-xl hover:drop-shadow-xl hover:shadow-black hover:text-black cursor-pointer",
+                "cursor-pointer hover:rounded-xl hover:text-black hover:shadow-black hover:drop-shadow-xl",
               )}
             >
               {icon} {t(title)}
@@ -44,21 +44,17 @@ export default function SideBar() {
           <li
             className={clsx(
               "group p-2",
-              "hover:bg-white dark:hover:bg-slate-600 hover:rounded-xl hover:drop-shadow-xl hover:shadow-black cursor-pointer",
+              "cursor-pointer hover:rounded-xl hover:bg-white hover:shadow-black hover:drop-shadow-xl dark:hover:bg-slate-600",
             )}
           >
-            <button
-              className="flex items-center gap-x-2 font-bold text-sm"
-              onClick={() =>
-                signOut({
-                  callbackUrl: `/${locale}${DEFAULT_SIGNED_OUT_PATH}`,
-                })
-              }
-              type="button"
+            <Link
+              locale={locale}
+              href="/auth/sign-out"
+              className="flex items-center gap-x-2 text-sm font-bold"
             >
               <ArrowLeftStartOnRectangleIcon className="size-6" />
               {t("sidebar.signOut")}
-            </button>
+            </Link>
           </li>
         </ul>
       </nav>

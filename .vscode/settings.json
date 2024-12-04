@@ -15,5 +15,18 @@
   "i18n-ally.keystyle": "nested",
   "i18n-ally.enabledParsers": ["js", "json", "ts"],
   "i18n-ally.enabledFrameworks": ["next-intl"],
-  "css.styleSheets": ["frontend/app/**/*.css"]
+  "css.styleSheets": ["frontend/app/**/*.css"],
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  "python.testing.unittestArgs": [
+    "--ds=wallet.settings",
+    "-v",
+    "-s",
+    "./backend",
+    "-p",
+    "test*.py"
+  ],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["backend"],
+  "python.envFile": "${workspaceFolder}/backend/.venv/bin/python3.12",
 }

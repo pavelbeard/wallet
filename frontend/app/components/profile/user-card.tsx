@@ -1,5 +1,5 @@
 import Email from "@/app/components/profile/user-card-email";
-import getUser from "@/app/lib/getUser";
+import getUser from "@/app/lib/helpers/getUser";
 import Card from "@/app/ui/card";
 import { WalletUser } from "@/auth";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";

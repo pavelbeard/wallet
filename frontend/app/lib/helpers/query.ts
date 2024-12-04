@@ -1,12 +1,11 @@
 "use server";
 
 import { API_PATH } from "./constants";
-import logger from "./logger";
 
 export default async function query({
   url,
   method = "GET",
-  headers,
+  headers = new Headers(),
   body,
   credentials = "include",
 }: {
@@ -15,22 +14,18 @@ export default async function query({
   body?: unknown;
   headers?: Headers;
   credentials?: "omit" | "include" | "same-origin";
-}): Promise<Error | { json: unknown; response: Response } | null> {
+}): Promise<Error | Response | null> {
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+
   return fetch(`${API_PATH}/api${url}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
     credentials,
   })
-    .then(async (response) => {
-      return {
-        json: JSON.parse(JSON.stringify(await response.json())),
-        response,
-      };
-    })
-    .then((data) => {
-      logger("data", data);
-      return data;
+    .then((response) => {
+      return response;
     })
     .catch((error) => {
       console.error(error);

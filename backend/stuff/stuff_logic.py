@@ -5,27 +5,22 @@ from typing import Any, Dict, List
 
 import jwt
 from django.conf import settings
-from django.core.mail import EmailMessage
 from django.http import HttpRequest
 from django.middleware import csrf
-from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django_otp import devices_for_user
 from django_otp.models import Device
 from django_otp.plugins.otp_static.models import StaticDevice
 from django_otp.plugins.otp_totp.models import TOTPDevice
-from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt import authentication as jwt_authentication
-from rest_framework_simplejwt import tokens
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from stuff import qr_generator
 from stuff.models import WalletUser
-from stuff.types import LOGIN_TYPE, Action
+from stuff.types import Action
 
 
 @contextlib.contextmanager
@@ -231,64 +226,6 @@ def set_csrf_cookie(response: Response, request: HttpRequest):
         samesite=settings.CSRF_COOKIE_SAMESITE,
     )
     return response
-
-
-def signin_logic(request, validated_data=None, login_type=LOGIN_TYPE.CREDENTIALS):
-    response = Response()
-    
-    if login_type == LOGIN_TYPE.OAUTH2:
-        user = request.user
-        jwt_tokens = RefreshToken.for_user(user)
-        access_token = str(jwt_tokens.access_token)
-        refresh_token = str(jwt_tokens)
-    else:
-        access_token = validated_data["access"]
-        refresh_token = validated_data["refresh"]
-
-        access_token_obj = tokens.AccessToken(validated_data["access"])
-        user = WalletUser.objects.get_object_by_public_id(
-            public_id=access_token_obj.payload["public_id"]
-        )
-
-    if user.is_active:
-        # auth_response = set_auth_cookies(
-        #     response=response,
-        #     jwt_tokens={"access": access_token, "refresh": refresh_token},
-        # )
-        response.data = {"access": access_token, "refresh": refresh_token}
-        auth_response = response
-        csrf_response = set_csrf_cookie(request=request, response=auth_response)
-        
-        # device section
-        
-        
-        return csrf_response, None
-    else:
-        return None, {"error": _("Inactive user")}
-
-
-def signout_logic(request):
-    # refresh_token = request.COOKIES.get("__rclientid")
-    refresh_token = request.COOKIES.get("refresh")
-    if not refresh_token:
-        raise TypeError(_("Refresh token is missing"))
-    token = tokens.RefreshToken(refresh_token)
-    token.blacklist()
-    response = Response()
-    # response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"])
-    # response.delete_cookie(key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"])
-    response.delete_cookie(key="csrfmiddlewaretoken")
-    response.data = {"detail": _("You're logged out!")}
-    response.status = status.HTTP_200_OK
-    return response
-
-
-def verify_email_logic(request, user):
-    html_string = render_to_string("")
-
-    email = EmailMessage(subject=_("Welcome"), body=html_string)
-    email.from_email = settings.EMAIL_HOST_USER
-    email.to = [user.email]
 
 
 def generate_2fa_key_in_qr_code(data):

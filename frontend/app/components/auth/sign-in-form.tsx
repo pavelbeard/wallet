@@ -12,14 +12,14 @@ import PasswordInput from "@/app/ui/input-password";
 import OauthButtons from "@/app/ui/oauth-buttons";
 import Submit from "@/app/ui/submit";
 import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import ResetPasswordRequestBtn from "../change/reset-password-request-btn";
 
 const signInResolver = zodResolver(SignInSchema);
 
 export default function SignInForm() {
-  const t = useTranslations("auth");
+  const t = useTranslations();
   const {
     register,
     handleSubmit,
@@ -35,36 +35,54 @@ export default function SignInForm() {
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className={clsx("flex flex-col gap-4")}
-      >
-        <FormTitle textSize="md">{t("form.formTitle.signIn")}</FormTitle>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <FormTitle textSize="md">{t("auth.form.formTitle.signIn")}</FormTitle>
         <EmailInput
-          labelText={t("form.emailInput")}
+          ariaLabel="Email input"
+          labelText={t("auth.form.emailInput")}
           htmlFor="credentials-email"
           name="email"
           id="credentials-email"
           register={register}
           autoComplete="email"
+          testId="sign-in-email-input"
         />
-        <FormError message={errors.email?.message as string} />
+        <FormError
+          ariaLabel="Form error (email)"
+          message={errors.email?.message as string}
+        />
         <PasswordInput
-          labelText={t("form.passwordInput")}
+          ariaLabel="Password input"
+          labelText={t("auth.form.passwordInput")}
           htmlFor="credentials-password"
           name="password"
           id="credentials-password"
           register={register}
           autoComplete="password"
+          testId="sign-in-password-input"
         />
-        <FormError message={errors.password?.message as string} />
-        <FormError message={formMessages.error} />
-        <FormSuccess message={formMessages.success} />
+        <ResetPasswordRequestBtn />
+        <FormError
+          ariaLabel="Form error (password)"
+          message={errors.password?.message as string}
+        />
+        <FormError
+          ariaLabel="Form error"
+          message={formMessages.error}
+          testId="sign-in-error"
+        />
+        <FormSuccess
+          ariaLabel="Form success"
+          message={formMessages.success}
+          testId="sign-in-success"
+        />
         <Submit
+          ariaLabel="Sign in button"
           disabled={isPending}
           color="bg-slate-800 hover:bg-slate-300 hover:text-black"
+          testId="sign-in-btn"
         >
-          {t("form.signIn")}
+          {t("auth.form.signIn")}
         </Submit>
       </form>
       <FormDivider />

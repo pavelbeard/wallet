@@ -25,10 +25,9 @@ const providers = [
 
       if (result instanceof Error) return null;
 
-      if (!result?.response.ok) return null;
+      if (!result?.ok) return null;
 
-      // const cookies = await parseCookies(result.response);
-      const { access, refresh } = (await result.json) as {
+      const { access, refresh } = (await result.json()) as {
         access: string;
         refresh: string;
       };

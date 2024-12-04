@@ -13,7 +13,12 @@ from stuff import stuff_logic
 from stuff.controller import WalletUserController
 from stuff.types import Action
 
-from .models import WalletUser, WalletUserDevice
+from .models import (
+    EmailVerificationToken,
+    PasswordResetToken,
+    WalletUser,
+    WalletUserDevice,
+)
 
 
 class WalletUserSerializerStrict(serializers.ModelSerializer):
@@ -56,6 +61,7 @@ class WalletUserDeviceSerializer(serializers.ModelSerializer):
             "location",
             "created_at",
             "last_access",
+            "is_actual_device",
         )
         depth = 2
 
@@ -151,7 +157,9 @@ class CustomTokenObtainSerializer(jwt_serializers.TokenObtainSerializer):
                 "no_active_account",
             )
 
-        return {}
+        return {
+            "user_is_active": self.user.is_active,
+        }
 
 
 class TwoFactorJWTSerializer(
@@ -169,8 +177,10 @@ class TwoFactorJWTSerializer(
             if k == "exp" and tokens.token_type == "refresh":
                 continue
             tokens[k] = v
-
+        
         return tokens
+    
+    
 
 
 class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
@@ -250,3 +260,121 @@ class UsernameSuggestionsSerializer(serializers.Serializer):
 
 class VerifyTOTPDeviceSerializer(serializers.Serializer):
     token = serializers.CharField()
+
+
+class ChangeEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+
+        if not email:
+            raise serializers.ValidationError(_("Please provide email"))
+
+        user = WalletUser.objects.filter(email=email).first()
+        if user:
+            raise serializers.ValidationError(_("Email is already in use"))
+
+        return attrs
+
+
+class VerifyEmailChangeSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, attrs):
+        token = attrs.get("token")
+
+        if not token:
+            raise serializers.ValidationError(_("Please provide token"))
+
+        record = EmailVerificationToken.objects.filter(token=token).first()
+        if not record or not record.is_valid() or not record.is_active:
+            raise serializers.ValidationError(_("Token is not valid"))
+
+        del attrs["token"]
+
+        attrs["email"] = record.email
+        attrs["user_pk"] = record.user.pk
+
+        record.is_active = False
+        record.save()
+
+        return attrs
+
+
+class DeleteAccountSerializer(serializers.Serializer):
+    token = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        public_id = self.context["public_id"]
+        user: WalletUser = WalletUser.objects.filter(public_id=public_id).first()
+
+        if not user:
+            raise TypeError(_("User not found"))
+
+        if user.is_two_factor_enabled:
+            token = attrs.get("token")
+
+            if not token:
+                raise serializers.ValidationError(_("Please provide token"))
+
+            return attrs
+
+        return {}
+
+
+class SignOutSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        refresh_token = attrs.get("refresh_token")
+        if not refresh_token:
+            raise serializers.ValidationError(_("Please provide refresh token"))
+        return attrs
+
+
+class CreateResetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    username = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        username = attrs.get("username")
+        if not email and not username:
+            raise serializers.ValidationError(_("Please provide email or username"))
+        return attrs
+
+
+class CreateNewPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField()
+    password2 = serializers.CharField()
+
+    def validate(self, attrs):
+        token = attrs.get("token")
+        password = attrs.get("password")
+        password2 = attrs.get("password2")
+
+        if not token:
+            raise serializers.ValidationError(_("Please provide token"))
+        if not password:
+            raise serializers.ValidationError(_("Please provide password"))
+        if not password2:
+            raise serializers.ValidationError(_("Please provide password2"))
+        if password != password2:
+            raise serializers.ValidationError(_("Passwords do not match"))
+
+        record: PasswordResetToken = PasswordResetToken.objects.filter(
+            token=token
+        ).first()
+
+        if not record or not record.is_valid() or not record.is_active:
+            raise serializers.ValidationError(_("Token is not valid"))
+        
+        record.is_active = False
+        record.save()
+
+        return {
+            "public_id": record.user.public_id,
+            "password": password,
+        }

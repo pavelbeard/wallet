@@ -1,8 +1,16 @@
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
 
-from .forms import WalletUserCreationForm, WalletUserUpdateForm
-from .models import DDevice, WalletUser, WalletUserDevice
+from .forms import DDeviceCreationForm, WalletUserCreationForm, WalletUserUpdateForm
+from .models import (
+    DDevice,
+    EmailVerificationToken,
+    PasswordResetToken,
+    WalletUser,
+    WalletUserDevice,
+)
 
 # Register your models here.
 
@@ -33,6 +41,8 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(DDevice)
 class DDeviceAdmin(admin.ModelAdmin):
     list_display = ("d_name", "icon")
+    search_fields = ("d_name",)
+    form = DDeviceCreationForm
 
 
 @admin.register(WalletUserDevice)
@@ -45,4 +55,24 @@ class WalletUserDeviceAdmin(admin.ModelAdmin):
         "location",
         "created_at",
         "last_access",
+        "is_actual_device",
     )
+
+
+@admin.register(EmailVerificationToken)
+class EmailVerificationTokenAdmin(admin.ModelAdmin):
+    list_display = ("email", "token", "created_at", "until", "is_valid", "is_active")
+    search_fields = ("email", "token", "created_at", "until")
+
+    @admin.display(boolean=True, description=_("Is token valid"))
+    def is_valid(self, obj: EmailVerificationToken):
+        return obj.is_valid()
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    list_display = ("user", "token", "created_at", "until", "is_valid", "is_active")
+    search_fields = ("user", "token", "created_at", "until")
+    
+    @admin.display(boolean=True, description=_("Is token valid"))
+    def is_valid(self, obj: PasswordResetToken):
+        return obj.is_valid()

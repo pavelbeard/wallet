@@ -26,10 +26,9 @@ export default async function refreshToken(
   });
 
   if (result instanceof Error) throw "RefreshTokenError";
-  if (result?.response.status !== 200) throw "RefreshTokenError";
+  if (result?.status !== 200) throw "RefreshTokenError";
 
-  // const cookies = await parseCookies(response);
-  const { access, refresh } = (await result.json) as {
+  const { access, refresh } = (await result.json()) as {
     access: string;
     refresh: string;
   };

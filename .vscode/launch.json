@@ -2,6 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python Debugger: Django",
+      "type": "debugpy",
+      "request": "launch",
+      "args": ["runserver"],
+      "django": true,
+      "autoStartBrowser": false,
+      "program": "${workspaceFolder}/backend/manage.py"
+    },
+    {
       "name": "Next.js: debug server-side",
       "type": "node-terminal",
       "request": "launch",
@@ -27,8 +36,7 @@
         "pattern": "- Local:.+(https?://.+)",
         "uriFormat": "%s",
         "webRoot": "${workspaceFolder}"
-      },
+      }
     }
-    
   ]
 }

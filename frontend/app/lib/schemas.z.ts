@@ -45,6 +45,7 @@ const SignInSchema = z.object({
   email: z.string().email({ message: "Provide your email!" }),
   password: z.string().min(1, { message: "Provide your password" }),
 });
+
 const SignUpSchema = z
   .object({
     username: z
@@ -70,7 +71,7 @@ const SignUpSchema = z
   })
   .superRefine(passwordComplexityChecker);
 
-const ChangeEmailSchema = z.object({
+const RequestEmailSchema = z.object({
   email: z.string().email({ message: "Provide your email!" }),
 });
 
@@ -120,23 +121,48 @@ const ChangePasswordSchema = z
   .superRefine(passwordComplexityChecker);
 
 const NextAuthUserSchema = AuthDataSchema;
+
 const SessionSchema = AuthDataSchema;
+
+const NewPasswordSchema = z
+  .object({
+    password: z.string().min(8, { message: "Min 8 chars!" }),
+    password2: z.string().min(8, { message: "Min 8 chars!" }),
+  })
+  .refine(
+    ({ password, password2 }) => {
+      return password == password2;
+    },
+    {
+      message: "Passwords aren't match.",
+      path: ["password2"],
+    },
+  )
+  .superRefine(passwordComplexityChecker);
+
+const ResetPasswordRequestSchema = RequestEmailSchema;
 
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
-export type ChangeEmailValidator = z.infer<typeof ChangeEmailSchema>;
+export type RequestEmailValidator = z.infer<typeof RequestEmailSchema>;
 export type TwoFactorValidator = z.infer<typeof TwoFactorSchema>;
 export type UpdateSessionValidator = z.infer<typeof AuthDataSchema>;
 export type PasswordValidator = z.infer<typeof PasswordSchema>;
 export type ChangePasswordValidator = z.infer<typeof ChangePasswordSchema>;
 export type NextAuthUserValidator = z.infer<typeof NextAuthUserSchema>;
 export type SessionValidator = z.infer<typeof SessionSchema>;
+export type NewPasswordValidator = z.infer<typeof NewPasswordSchema>;
+export type ResetPasswordRequestValidator = z.infer<
+  typeof ResetPasswordRequestSchema
+>;
 
 export {
-  ChangeEmailSchema,
   ChangePasswordSchema,
+  NewPasswordSchema,
   NextAuthUserSchema,
   PasswordSchema,
+  RequestEmailSchema,
+  ResetPasswordRequestSchema,
   SessionSchema,
   SignInSchema,
   SignUpSchema,

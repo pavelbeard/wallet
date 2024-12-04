@@ -3,7 +3,6 @@ import {
   SIGN_IN_HANDLERS,
   SIGN_IN_PROVIDERS,
 } from "@/app/lib/auth/signInProviders";
-import getCurrentEpochTime from "@/app/lib/helpers/getCurrentEpochTime";
 import { NextAuthUserSchema, UpdateSessionSchema } from "@/app/lib/schemas.z";
 import { Awaitable } from "@/app/lib/types";
 import { WalletUser } from "@/auth";
@@ -82,8 +81,17 @@ const jwtCallback: JWTCallback = async ({
   session,
 }) => {
   if (user && account?.type !== "credentials") {
-    token.user = {
+    // HERE IS THE PROBLEM
+    // TOKEN IS TAKING FROM THE GOOGLE DIRECTLY
+    // need to request a new token from backend
+    const newUser = {
       ...user.user,
+      // @ts-expect-error user is necessary
+      ...account?.user,
+    };
+
+    token.user = {
+      ...newUser,
       id: user?.id as string,
       image: user.image as string,
       email: user.email as string,
@@ -91,8 +99,9 @@ const jwtCallback: JWTCallback = async ({
       provider: account?.provider,
     };
     token.access_token = account?.access_token as string;
-    token.access_token_exp = getCurrentEpochTime() + (account?.expires_in || 0);
+    token.access_token_exp = account?.access_token_exp as number;
     token.refresh_token = account?.refresh_token as string;
+    token.expires_in = account?.expires_in as number;
 
     return token;
   }
@@ -124,13 +133,6 @@ const jwtCallback: JWTCallback = async ({
     return token;
   }
 
-  /** One trouble is that refresh token is not working
-   * After refresh the page is redirected to the login page
-   * and backend is showing that, e.g:
-   * Unauthorized: /api/refresh/
-   * WARNING:django.request:Unauthorized: /api/refresh/
-   * [30/Nov/2024 03:21:36] "POST /api/refresh/ HTTP/1.1" 401 90
-   */
   const tokens = await refresh(token);
   return tokens ? tokens : null;
 };

@@ -3,7 +3,11 @@ import Card from "@/app/ui/card";
 import { routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export const generateStaticParams = async () => {
+  return routing.locales.map((locale) => ({ locale }));
+};
 
 export async function generateMetadata({
   params: { locale },
@@ -17,17 +21,15 @@ export async function generateMetadata({
   };
 }
 
-export const generateStaticParams = async () => {
-  return routing.locales.map((locale) => ({ locale }));
-};
-
 export default async function Page({ params: { locale } }: LocaleProps) {
+  setRequestLocale(locale);
+
   return (
     <>
-      <Card className="hidden md:block p-6 my-12 w-3/4 lg:w-1/3">
+      <Card className="my-12 hidden w-3/4 p-6 md:block lg:w-1/3">
         <VerifyTwoFactorForm params={{ locale }} />
       </Card>
-      <div className="md:hidden max-sm:px-4 my-12">
+      <div className="my-12 max-sm:px-4 md:hidden">
         <VerifyTwoFactorForm params={{ locale }} />
       </div>
     </>

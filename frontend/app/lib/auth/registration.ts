@@ -2,7 +2,6 @@
 
 import { API_PATH } from "@/app/lib/helpers/constants";
 import { SignUpSchema, SignUpValidator } from "@/app/lib/schemas.z";
-import logger from "../helpers/logger";
 
 export default async function registration(values: SignUpValidator) {
   const validatedData = SignUpSchema.safeParse(values);
@@ -22,7 +21,7 @@ export default async function registration(values: SignUpValidator) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    logger("error", "");
+
     return {
       success: null,
       // @ts-expect-error itemType as {error: {<field>: [ '<message>' ]}}

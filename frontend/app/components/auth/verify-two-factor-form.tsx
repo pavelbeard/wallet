@@ -1,27 +1,22 @@
 "use client";
 
-import verify2fa from "@/app/lib/queries/verify2fa";
+import useVerify from "@/app/lib/hooks/auth/useVerify";
+import useUser from "@/app/lib/hooks/useUser";
 import { TwoFactorSchema, TwoFactorValidator } from "@/app/lib/schemas.z";
 import FormTitle from "@/app/ui/form-title";
 import CustomInput from "@/app/ui/input-custom";
 import Submit from "@/app/ui/submit";
-import { useRouter } from "@/i18n/routing";
-import { LocaleProps } from "@/i18n/types";
-import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import Messages from "../../ui/messages";
 import FormError from "../form/form-error";
 
 const twoFactorResolver = zodResolver(TwoFactorSchema);
 
-export default function VerifyTwoFactorForm({
-  params: { locale },
-}: LocaleProps) {
+export default function VerifyTwoFactorForm() {
   const t = useTranslations();
+  const user = useUser();
   const {
     register,
     handleSubmit,
@@ -32,35 +27,16 @@ export default function VerifyTwoFactorForm({
       token: "",
     },
   });
-  const { update } = useSession();
-  const router = useRouter();
-  const [formMessages, setFormMessages] = useState({
-    success: null as string | null,
-    error: null as string | null,
-  });
-  const [isPending, startTransition] = useTransition();
-  const onSubmit: SubmitHandler<TwoFactorValidator> = (data) => {
-    startTransition(async () => {
-      const { error, success, userData } = await verify2fa(data);
-
-      if (success) {
-        update({ ...userData }).then(
-          () => router.push(DEFAULT_SIGNED_IN_PATH),
-        );
-      }
-
-      setFormMessages({
-        ...formMessages,
-        success: success || null,
-        error: error || null,
-      });
-    });
-  };
+  const { onSubmit, isPending, formMessages } = useVerify();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <FormTitle textSize="md">{t("auth.form.verify2fa")}</FormTitle>
+      <p className="text-sm">
+        {t("auth.form.2faForUser")}: {user?.username}
+      </p>
       <CustomInput
+        ariaLabel="2FA token"
         labelText={`${t("auth.form.2faInput")}:`}
         htmlFor="token"
         name="token"
@@ -69,8 +45,14 @@ export default function VerifyTwoFactorForm({
         disabled={isPending}
       />
       <Messages errorMessage={errors?.token?.message} />
-      <FormError message={formMessages.error} />
-      <Submit color="bg-slate-800 hover:bg-slate-300 hover:text-black">
+      <FormError
+        ariaLabel="Form error (2FA token)"
+        message={formMessages.error}
+      />
+      <Submit
+        ariaLabel="2FA submit"
+        color="bg-slate-800 hover:bg-slate-300 hover:text-black"
+      >
         {t("auth.form.2faSubmit")}
       </Submit>
     </form>

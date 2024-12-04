@@ -1,4 +1,4 @@
-import { User } from "next-auth";
+import { WalletUser } from "@/auth";
 import { MENU } from "./constants";
 import LogoHeader from "./logo-header";
 import NavBar from "./nav-bar";
@@ -8,8 +8,16 @@ import DropdownMenu from "./nav-item-dropdown";
 export default function HeaderDesktop({
   user,
 }: {
-  user: User | undefined;
+  user: WalletUser | undefined;
 }) {
+  const isOauthUser = user?.is_oauth_user;
+  const isTwoFactorEnabled = user?.is_two_factor_enabled;
+  const isVerified = user?.verified;
+  const canAccessDashboard =
+    user?.email &&
+    (!isTwoFactorEnabled || isOauthUser || (isTwoFactorEnabled && isVerified));
+  const signInNeeded = !user || (isTwoFactorEnabled && !isVerified);
+
   return (
     <>
       <LogoHeader className="flex flex-grow basis-0 items-center" />
@@ -50,8 +58,11 @@ export default function HeaderDesktop({
         ))}
       </NavBar>
 
-      <NavBar className="flex flex-grow justify-end basis-0" data-testid="desktop-right-nav">
-        {user ? (
+      <NavBar
+        className="flex flex-grow basis-0 justify-end"
+        data-testid="desktop-right-nav"
+      >
+        {canAccessDashboard ? (
           <NavItem isOnHeader title="Dashboard" href="/dashboard" />
         ) : (
           <NavItem isOnHeader title="Sign in" href="/auth/sign-in" />

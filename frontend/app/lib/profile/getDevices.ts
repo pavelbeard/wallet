@@ -1,4 +1,5 @@
 import { WalletUser } from "@/auth";
+import CustomHeaders from "../helpers/getHeaders";
 import protectedQuery from "../helpers/protectedQuery";
 
 type WalletUserPartial = Partial<WalletUser>;
@@ -11,6 +12,7 @@ export interface UserDevice {
   location: string;
   created_at: Date;
   last_access: Date;
+  is_actual_device: boolean;
 }
 
 export interface DDevice {
@@ -23,6 +25,7 @@ export default async function getDevices() {
   const response = await protectedQuery({
     url: "/devices/",
     method: "GET",
+    headers: await CustomHeaders.getHeaders(),
     credentials: "include",
   });
 
@@ -33,16 +36,18 @@ export default async function getDevices() {
     };
   }
 
-  if (!response?.response.ok) {
+  if (!response?.ok) {
     return {
       success: null,
       error: "Unauthorized",
     };
   }
 
+  const devices = (await response.json()) as UserDevice[];
+
   return {
     success: true,
-    data: response.json as UserDevice[],
+    data: devices,
     error: null,
   };
 }

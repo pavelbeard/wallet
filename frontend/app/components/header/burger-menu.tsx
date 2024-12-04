@@ -1,4 +1,4 @@
-import { User } from "next-auth";
+import { WalletUser } from "@/auth";
 import { Fragment } from "react";
 import { MENU } from "./constants";
 import NavBar from "./nav-bar";
@@ -13,14 +13,11 @@ export default function BurgerMenu({
   sidebarMenuRef: React.RefObject<HTMLDivElement>;
   sidebarSection: string | null;
   toggleSidebarSection: (section: string) => void;
-  user: User | undefined;
+  user: WalletUser | undefined;
 }) {
   return (
-    <div
-      ref={sidebarMenuRef}
-      className="header-mobile-accordion-sidebar"
-    >
-      <NavBar className="flex px-6 pt-6 h-4/5 overflow-y-auto border-t border-slate-800 dark:border-slate-300">
+    <div ref={sidebarMenuRef} className="header-mobile-accordion-sidebar">
+      <NavBar className="flex h-4/5 overflow-y-auto border-t border-slate-800 px-6 pt-6 dark:border-slate-300">
         {MENU.map(
           (item) =>
             item.children && (
@@ -32,7 +29,7 @@ export default function BurgerMenu({
                       title={item.title}
                       onClick={() => toggleSidebarSection(item.title)}
                     />
-                    <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-col gap-4 md:flex-row">
                       {item.children.map((accordionItem) => (
                         <NavItem
                           key={accordionItem.title}
@@ -66,7 +63,7 @@ export default function BurgerMenu({
       </NavBar>
 
       <NavBar
-        className="flex flex-grow basis-0 p-6 border-t border-slate-800 dark:border-slate-300"
+        className="flex flex-grow basis-0 border-t border-slate-800 p-6 dark:border-slate-300"
         data-testid="mobile-bottom-nav"
       >
         {user ? (

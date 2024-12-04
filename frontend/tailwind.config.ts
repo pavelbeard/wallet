@@ -77,7 +77,7 @@ const config: Config = {
         },
       },
       animation: {
-        appear: "appear 1s ease-in-out",
+        appear: "appear 0.5s ease-in-out",
         slide: "slide 0.5s ease-in-out",
         "slide-reverse": "slide-reverse 750ms ease-in-out",
         "short-slide-in-right": "short-slide-in-right 100ms ease-in-out",

@@ -20,15 +20,13 @@ export default function useChangePassword(
       logger(data);
       const { success, error } = await changePassword(data);
 
-      if (success) {
-        setFormMessages({ ...formMessages, success });
-        reset();
-        return;
-      }
+      setFormMessages({
+        success: success ?? null,
+        error: error ?? null,
+      });
 
-      if (error) {
-        setFormMessages({ ...formMessages, error });
-        return;
+      if (success) {
+        reset();
       }
     });
   };

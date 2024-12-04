@@ -1,22 +1,22 @@
-from typing import Dict
 import uuid
+from typing import Any, Dict
 
+from django.conf import settings
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_otp import devices_for_user
 from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
+from rest_framework_simplejwt import tokens
 
-from stuff.utils import suggest_username
+from stuff.utils import send_email, suggest_username
 
 from . import exceptions, serializers, stuff_logic
-from .models import WalletUser, WalletUserDevice
-from .types import LOGIN_TYPE, Action
+from .models import EmailVerificationToken, PasswordResetToken, WalletUser
+from .types import Action
 
 
 class Auth:
@@ -30,8 +30,13 @@ class Auth:
         if not instance:
             raise TypeError(_("Failed to create user!"))
 
-        # user = WalletUser.objects.filter(email=instance.email).first()
-        # stuff_logic.verify_email_logic(request, user)
+        user = WalletUser.objects.filter(email=instance.email).first()
+
+        send_email(
+            email=user.email,
+            subject=_("Welcome!"),
+            body=_("Thanks for registration in a super vault of your secrets!"),
+        )
 
         return Response(
             {"detail": _("You have been registered successfully!")},
@@ -39,35 +44,55 @@ class Auth:
         )
 
     @staticmethod
-    def sign_in(request: HttpRequest):
-        serializer = serializers.TwoFactorJWTSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # The result is None and with an error data or Response 200 with a success message
-        result, data = stuff_logic.signin_logic(request, serializer.validated_data)
+    def sign_in(data: Dict[str, str | bool], request: HttpRequest) -> Response:
+        response = Response()
+        access_token = data["access"]
+        refresh_token = data["refresh"]
+        user_is_active = data["user_is_active"]
 
-        if result is None:
-            return AuthenticationFailed(data)
+        if user_is_active:
+            response.data = {
+                "access": access_token,
+                "refresh": refresh_token,
+            }
+            auth_response = response
+            csrf_response = stuff_logic.set_csrf_cookie(
+                request=request, response=auth_response
+            )
+            return csrf_response
 
-        return result
+        raise exceptions.AuthenticationFailed(_("User is not active"))
+
+    @staticmethod
+    def sign_out(data: Dict[str, str]):
+        refresh_token = data.get("refresh_token")
+
+        token = tokens.RefreshToken(refresh_token)
+        token.blacklist()
+
+        return Response({"detail": _("You're logged out!")}, status=status.HTTP_200_OK)
 
 
 class Oauth2Auth:
     @staticmethod
-    def signin_with_google(request: HttpRequest, response: HttpResponse):
+    def signin_with_google(request: HttpRequest, response: HttpResponse) -> Response:
+        # TOKEN Doesn't work in frontend
         response_user_data = response.data.get("user")
         user = WalletUser.objects.get(pk=response_user_data.get("pk"))
-        if user.is_oauth_user is not True:
-            user.is_oauth_user = True
-            user.is_email_verified = True
-            user.save()
 
-        result, data = stuff_logic.signin_logic(
-            request=request, login_type=LOGIN_TYPE.OAUTH2
+        user.email = response_user_data.get("email")
+        user.first_name = response_user_data.get("first_name")
+        user.last_name = response_user_data.get("last_name")
+        user.is_oauth_user = True
+        user.email_verified = True
+        user.save()
+
+        jwt_tokens = stuff_logic.get_custom_jwt(user=user, action=Action.oauth2)
+
+        return Response(
+            data={"access": jwt_tokens["access"], "refresh": jwt_tokens["refresh"]},
+            status=status.HTTP_200_OK
         )
-        if result is None:
-            raise TypeError(data)
-
-        return result
 
 
 class TOTPDeviceController:
@@ -87,9 +112,6 @@ class TOTPDeviceController:
         # use it in response
         # response.headers["Content-Type"] = "multipart/mixed; boundary=boundary"
         # two_fa_img.save(response, "PNG")
-        # user has enable 2fa
-        user.is_two_factor_enabled = True
-        user.save()
         # last preparations for the response
         response.status_code = status.HTTP_200_OK
         # 2fa configuration key is necessary too
@@ -111,6 +133,9 @@ class TOTPDeviceController:
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
+
+                user.is_two_factor_enabled = True
+                user.save()
             tokens = stuff_logic.get_custom_jwt(user, device, action=Action.verify)
             response = Response(status=status.HTTP_200_OK)
             # new_token_response = stuff_logic.set_auth_cookies(
@@ -179,10 +204,12 @@ class TOTPDeviceController:
         tokens = stuff_logic.get_custom_jwt(user, None, Action.delete)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
+
         # new_token_response = stuff_logic.set_auth_cookies(
         #     response=response,
         #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
         # )
+
         response.data = {
             **response.data,
             "access": tokens["access"],
@@ -214,35 +241,96 @@ class WalletUserController:
         return Response(data, status=status.HTTP_200_OK)
 
     @staticmethod
-    def change_email(request: HttpRequest):
-        email = request.data.get("email")
-        if not email:
-            raise TypeError(_("Please provide email in query params"))
+    def change_email_request(validated_data: Dict[str, str], user: WalletUser):
+        email = validated_data.get("email")
 
-        check_email = WalletUser.objects.filter(email=email).first()
-        if check_email:
-            raise TypeError(_("Email is already in use"))
+        old_records = EmailVerificationToken.objects.filter(user=user)
+        if old_records.exists():
+            old_records.update(is_active=False)
 
-        user = WalletUser.objects.filter(public_id=request.user.public_id).first()
-        if not user:
-            raise TypeError(_("User not found"))
+        record = EmailVerificationToken.objects.create(user=user, email=email)
+
+        send_email(
+            email=email,
+            subject=_("Change email verification"),
+            body=f"Please verify your email by this link: {settings.FRONTEND_URL}/verify-email?token={record.token}",
+        )
+
+        return Response(
+            {"detail": _("A token has been sent to your new email")},
+            status=status.HTTP_200_OK,
+        )
+
+    @staticmethod
+    def verify_email_change(validated_data: Dict[str, str]):
+        email = validated_data.get("email")
+        user = WalletUser.objects.filter(pk=validated_data.get("user_pk")).first()
 
         user.email = email
         user.save()
 
-        return Response({"new_email": email}, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "new_email": email,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @staticmethod
-    def change_password(data: Dict[str, str]):
+    def change_password(data: Dict[str, str]) -> Response:
         """Change user password."""
         user = WalletUser.objects.filter(public_id=data.get("public_id")).first()
         if not user:
             raise TypeError(_("User not found"))
-        
+
         user.set_password(data.get("password"))
         user.save()
 
         return Response({"detail": _("Password changed!")}, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def create_reset_password_request(data: Dict[str, str]) -> Response:
+        """Forgot password."""
+        email = data.get("email")
+        username = data.get("username")
+
+        user = WalletUser.objects.filter(email=email).first()
+
+        if not user:
+            raise TypeError(_("User not found"))
+
+        old_records = PasswordResetToken.objects.filter(user=user)
+        if old_records.exists():
+            old_records.update(is_active=False)
+
+        record = PasswordResetToken.objects.create(user=user)
+
+        send_email(
+            email=user.email,
+            subject=_("Reset your password"),
+            body=f"Please reset your password by this link: {settings.FRONTEND_URL}/reset-password?token={record.token}",
+        )
+
+        return Response(
+            {"detail": _("Password reset link sent to your email!")},
+            status=status.HTTP_200_OK,
+        )
+
+    @staticmethod
+    def create_new_password(data: Dict[str, str | int]) -> Response:
+        user = WalletUser.objects.filter(public_id=data.get("public_id")).first()
+        password = data.get("password")
+
+        if not user:
+            raise TypeError(_("User not found"))
+
+        user.set_password(password)
+        user.save()
+
+        return Response(
+            {"detail": _("Password changed!")},
+            status=status.HTTP_200_OK,
+        )
 
     @staticmethod
     def username_suggestions(data: Dict[str, str | int]) -> Response:
@@ -258,3 +346,20 @@ class WalletUserController:
             return Response({"username": suggest_usernames}, status=status.HTTP_200_OK)
 
         return Response({"username": username}, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def destroy(validated_data: Dict[str, str] | None, public_id: Any) -> None:
+        user: WalletUser = WalletUser.objects.filter(public_id=public_id).first()
+
+        if user.is_two_factor_enabled:
+            token = validated_data.get("token")
+            device = stuff_logic.get_user_totp_device(user)
+            if device is not None and device.verify_token(token):
+                device.delete()
+                user.delete()
+                return
+
+            raise TypeError(_("Invalid token"))
+
+        user.delete()
+        return

@@ -1,4 +1,5 @@
 from datetime import timedelta
+import uuid
 
 from abstract.models import AbstractModel
 from django.contrib.auth.models import AbstractUser
@@ -6,6 +7,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
 
 from . import managers
 
@@ -59,19 +61,25 @@ class WalletUser(AbstractModel, AbstractUser):
 
 
 class EmailVerificationToken(AbstractModel, models.Model):
-    token = models.UUIDField(max_length=32, editable=False, serialize=False)
+    token = models.UUIDField(
+        max_length=32, editable=False, serialize=False, default=uuid.uuid4
+    )
     user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now=True)
     until = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.until = self.created_at + timedelta(hours=1)
+            self.until = timezone.now() + timedelta(hours=1)
 
         super(EmailVerificationToken, self).save(*args, **kwargs)
 
     def is_valid(self):
-        return timezone.now() > self.until
+        if self.is_active:
+            return timezone.now() < self.until
+        return False
 
     class Meta:
         verbose_name = _("Email Verification Token")
@@ -80,19 +88,24 @@ class EmailVerificationToken(AbstractModel, models.Model):
 
 
 class PasswordResetToken(AbstractModel, models.Model):
-    token = models.UUIDField(max_length=32, editable=False, serialize=False)
+    token = models.UUIDField(
+        max_length=32, editable=False, serialize=False, default=uuid.uuid4
+    )
     user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=True)
     until = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.until = self.created_at + timedelta(hours=1)
+            self.until = timezone.now() + timedelta(hours=1)
 
         super(PasswordResetToken, self).save(*args, **kwargs)
 
     def is_valid(self):
-        return timezone.now() > self.until
+        if self.is_active:
+            return timezone.now() < self.until
+        return False
 
     class Meta:
         verbose_name = _("Password Reset Token")
@@ -102,7 +115,12 @@ class PasswordResetToken(AbstractModel, models.Model):
 
 class DDevice(models.Model):
     d_name = models.CharField(max_length=250, blank=True, null=True)
-    icon = models.ImageField(upload_to="device_icons", blank=True, null=True)
+    icon = models.ImageField(
+        upload_to="device_icons",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=["svg", "webp", "png"])],
+    )
 
     def __str__(self):
         return self.d_name
@@ -121,6 +139,7 @@ class WalletUserDevice(models.Model):
     location = models.CharField(max_length=250, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_access = models.DateTimeField(auto_now_add=True)
+    is_actual_device = models.BooleanField(default=True)
 
     def __str__(self):
         return self.d_device.d_name

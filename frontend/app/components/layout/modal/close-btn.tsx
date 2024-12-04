@@ -2,9 +2,9 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
-type Props = { toggleForm: () => void };
+type Props = { onClose: () => void };
 
-export default function CloseModalButton({ toggleForm }: Props) {
+export default function CloseModalButton({ onClose: toggleForm }: Props) {
   const t = useTranslations();
   
   return (

@@ -1,5 +1,4 @@
 
-from typing import Dict
 
 from abstract.managers import AbstractManager
 from django.apps import apps
@@ -37,6 +36,9 @@ class WalletUserManager(BaseUserManager, AbstractManager):
 
         if not password and not extra_fields.get("is_oauth_user"):
             raise TypeError(_("Password or oauth creation method are required."))
+        
+        if extra_fields.get("is_oauth_user"):
+            user.is_oauth_user = True
 
         user.save(using=self._db)
         return user

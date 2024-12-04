@@ -63,3 +63,8 @@ backend/singleton
 backend/access_timer_middleware
 backend/check_db
 backend/singleton
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

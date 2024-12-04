@@ -2,12 +2,14 @@
 
 import { ChangePasswordSchema } from "@/app/lib/schemas.z";
 import { z } from "zod";
-import getUser from "../getUser";
+import getTranslations from "../helpers/getTranslations";
+import getUser from "../helpers/getUser";
 import protectedQuery from "../helpers/protectedQuery";
 
 export default async function changePassword(
   data: z.infer<typeof ChangePasswordSchema>,
 ) {
+  const t = await getTranslations();
   const user = await getUser();
   const result = await protectedQuery({
     url: `/users/${user?.public_id}/change_password/`,
@@ -21,13 +23,13 @@ export default async function changePassword(
 
   if (result instanceof Error) {
     return {
-      error: "Something went wrong...",
+      error: t("error.somethingWentWrong"),
       success: null,
     };
   }
 
-  if (!result?.response.ok) {
-    const errorData = await result.json;
+  if (!result?.ok) {
+    const errorData = await result?.json();
     return {
       // @ts-expect-error itemType as {error: {<field>: [ '<message>' ]}}
       error: Object.values(Object.values(errorData)[0])[0][0],
@@ -35,10 +37,10 @@ export default async function changePassword(
     };
   }
 
-  if (result?.response.ok) {
+  if (result?.ok) {
     return {
       error: null,
-      success: "Password changed!",
+      success: t("changePassword.success"),
     };
   }
 

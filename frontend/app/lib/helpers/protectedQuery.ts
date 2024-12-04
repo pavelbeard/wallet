@@ -13,12 +13,12 @@ export default async function protectedQuery({
   body?: unknown;
   headers?: Headers;
   credentials?: "omit" | "include" | "same-origin";
-}) {
+}): Promise<Error | Response | null> {
   const accessToken = await getAccessToken();
 
-  headers?.append("Content-Type", "application/json");
-  headers?.append("Accept", "application/json");
-  headers?.append("Authorization", `Bearer ${accessToken}`);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  headers.set("Authorization", `Bearer ${accessToken}`);
 
   return fetch(`${API_PATH}/api${url}`, {
     method,
@@ -26,16 +26,8 @@ export default async function protectedQuery({
     body: body ? JSON.stringify(body) : undefined,
     credentials,
   })
-    .then(async (response) => {
-      const json = await response.json();
-
-      return {
-        json: JSON.parse(JSON.stringify(json)),
-        response,
-      };
-    })
-    .then((data) => {
-      return data;
+    .then((response) => {
+      return response;
     })
     .catch((error) => {
       console.error(error);

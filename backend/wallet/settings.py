@@ -22,6 +22,7 @@ from django.utils import timezone
 env = environ.Env(
     DJANGO_SETTINGS_DEBUG_MODE=(bool, False),
     FRONTEND_URL=(str, "http://localhost:3000"),
+    RESEND_API_KEY=(str, os.environ.get("RESEND_TEST_API_KEY")),
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -316,3 +317,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 FRONTEND_URL = env("FRONTEND_URL")
+
+# email
+
+EMAIL_HOST_USER = "onboarding@resend.dev"
+RESEND_API_KEY = env("RESEND_API_KEY")

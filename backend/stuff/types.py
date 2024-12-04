@@ -6,6 +6,7 @@ class Action(enum.Enum):
     sign_in = "sign_in"
     verify = "verify"
     delete = "delete"
+    oauth2 = "oauth2"
 
 class LOGIN_TYPE(Enum):
     CREDENTIALS: str = "credentials"

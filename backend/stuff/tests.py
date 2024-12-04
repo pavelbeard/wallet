@@ -11,7 +11,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from stuff import stuff_logic
-from stuff.models import WalletUser
+from stuff.models import EmailVerificationToken, PasswordResetToken, WalletUser
 from stuff.stuff_logic import override_api_settings
 
 User = get_user_model()
@@ -91,7 +91,7 @@ class StuffTests(APITestCase):
         obj = WalletUser.objects.first()
         for field in obj._meta.fields:
             print(field.name, ": ", getattr(obj, field.name))
-            
+
     def test_signup_without_username(self):
         data = {
             "email": "testuser_new1@example.com",
@@ -208,6 +208,75 @@ class StuffTests(APITestCase):
         # test api accessibility
         response3 = self.client.get(card_url, format="json")
         self.assertEqual(response3.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class DeleteAccountTestCase(APITestCase):
+    def setUp(self):
+        user = WalletUser.objects.create_user(
+            username="testuser",
+            email="test@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )
+
+        self.user = user
+        response = self.client.post(
+            reverse("stuff-auth-signin"),
+            data={"email": user.email, "password": "Rt3$YiOO"},
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Test-Agent": "True",
+            },
+            format="json",
+        )
+
+        print(response)
+        authData = {
+            "refresh": response.data.get("refresh"),
+            "access": response.data.get("access"),
+        }
+
+        self.headers = {
+            "Authorization": f"Bearer {authData['access']}",
+            "Test-Agent": "True",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+
+    def test_delete_account_fail_with_oauth(self):
+        self.user.is_oauth_user = True
+        self.user.save()
+
+        url = reverse(
+            "walletuser-detail",
+            kwargs={"public_id": self.user.public_id},
+        )
+
+        response = self.client.delete(url, headers=self.headers, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_account_fail_with_token(self):
+        self.user.is_two_factor_enabled = True
+        self.user.save()
+
+        url = reverse(
+            "walletuser-detail",
+            kwargs={"public_id": self.user.public_id},
+        )
+
+        response = self.client.delete(
+            url, headers=self.headers, data={"token": "123"}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_account_success(self):
+        url = reverse(
+            "walletuser-detail",
+            kwargs={"public_id": self.user.public_id},
+        )
+        response = self.client.delete(url, headers=self.headers, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class CLIENTID_COOKIE_DoesNotExistsException(BaseException):
@@ -394,3 +463,102 @@ class JWTRefreshTokenTestCase(APITestCase):
             token_backend.decode(refresh_response.cookies["__clientid"].value),
         )
         self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
+
+
+class EmailChangeTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )
+        
+        User.objects.create_user(
+            username="testuser2",
+            email="test2@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )
+        
+        User.objects.create_user(
+            username="testuser3",
+            email="test3@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )   
+        
+        User.objects.create_user(
+            username="testuser4",
+            email="test4@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )
+
+    def test_email_verification(self):
+        signin_url = reverse("stuff-auth-signin")
+        response = self.client.post(
+            path=signin_url,
+            data={"username": self.user.username, "password": "Rt3$YiOO"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        access_token = response.data.get("access")
+
+        url = reverse("walletuser-create-change-email-request")
+        response = self.client.post(
+            path=url,
+            headers={"Authorization": f"Bearer {access_token}"},
+            data={"email": "test10@testdomain.com"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.content)
+
+        token = EmailVerificationToken.objects.get(user=self.user)
+
+        url2 = reverse("walletuser-verify-email-change")
+        response2 = self.client.post(
+            url2,
+            headers={"Authorization": f"Bearer {access_token}"},
+            data={"token": token.token},
+        )
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertEqual(WalletUser.objects.get(email="test10@testdomain.com").email, "test10@testdomain.com")
+
+
+class PasswordResetTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@testdomain.com",
+            password="Rt3$YiOO",
+            is_active=True,
+        )
+
+    def test_password_reset_flow(self):
+        url = reverse("walletuser-create-reset-password-request")
+        url2 = reverse("walletuser-create-new-password")
+
+        response = self.client.post(url, {"email": self.user.email})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        token = PasswordResetToken.objects.get(user=self.user)
+
+        print(response.content)
+        print(token)
+
+        response2 = self.client.post(
+            url2,
+            {
+                "token": token.token,
+                "password": "AbraCadabra@123",
+                "password2": "AbraCadabra@123",
+            },
+        )
+
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertIn("detail", response2.json())
+
+        print(response2.content)

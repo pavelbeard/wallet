@@ -1,0 +1,19 @@
+.change-lang-container {
+  overflow: hidden;
+  width: 0;
+}
+
+.change-lang-container.show {
+  width: fit-content;
+  animation: slideOut 0.5s ease-in-out both;
+  transition: width 0.5s ease;
+}
+
+@keyframes slideOut {
+    0% {
+      width: 0;
+    }
+    100% {
+      width: calc(100%);
+    }
+}

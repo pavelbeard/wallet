@@ -1,13 +1,13 @@
 {
   "auth": {
     "title": {
-      "signIn": "Cartera | Iniciar sesión",
-      "signUp": "Cartera | Crear la cuenta",
+      "signIn": "Cartera | Sign in",
+      "signUp": "Cartera | Create account",
       "verify": "Cartera | Verify 2FA"
     },
     "description": {
-      "signIn": "Iniciar sesión",
-      "signUp": "Crear la cuenta",
+      "signIn": "Sign in",
+      "signUp": "Create account",
       "verify": "If user with 2FA, app catches him"
     },
     "form": {
@@ -16,10 +16,10 @@
         "signUp": "Crear la cuenta"
       },
       "emailInput": "Email:",
-      "passwordInput": "Password:",
+      "passwordInput": "Password",
       "confirmPasswordInput": "Repite contraseña:",
       "signIn": "Sign in",
-      "signUp": "Crearla",
+      "signUp": "Create",
       "withAccount": "If you have an account, sign in.",
       "withoutAccount": "If you don't have an account, create it!",
       "or": "or",
@@ -28,7 +28,11 @@
       "2faInput": "Your 2FA token",
       "2faSubmit": "Verify",
       "usernameInput": "Username",
-      "password2Input": "Confirm password"
+      "password2Input": "Confirm password",
+      "2faForUser": "For user",
+      "resetPassword": "Forgot password?",
+      "sendEmail": "Send request",
+      "email": "Email:"
     },
     "page": {
       "signOut": "Sign out...",
@@ -84,12 +88,25 @@
       },
       "changePassword": "Change password",
       "twoFactor": "Two factor",
-      "title": "User info"
+      "title": "User info",
+      "emailRequest": {
+        "error": "Email is already taken!",
+        "success": "Check your email for a message and spam as well"
+      },
+      "deleteAccount": "Delete account",
+      "deleteAccountTitle": "Zone of risk",
+      "deleteAccountQuestion": "Are you sure?",
+      "deleteAccountNote": "That action will delete all your data!",
+      "deleteRequest": {
+        "error": "An error is happend while deleting account."
+      },
+      "deleteOauth2Account": "Unlink account",
+      "deleteOauth2Note": "That action will delete all your data, but data from account provider will be left."
     },
     "useCard": {
       "modal": {
         "form": {
-          "submit": "Confirm change email"
+          "submit": "Send request"
         }
       }
     },
@@ -118,7 +135,9 @@
       "added": "Added",
       "next": "Next",
       "change2fa": "Change 2FA",
-      "oauth2note": "Ask your account provider"
+      "oauth2note": "Ask your account provider",
+      "deleted": "2FA if turned off",
+      "notDeleted": "Wrong password"
     },
     "main": {
       "twoFactorBtn": "2FA management"
@@ -132,7 +151,8 @@
       "operationalSystem": "OS",
       "ipAddress": "IP Address",
       "location": "Location",
-      "lastAccess": "Last sign in"
+      "lastAccess": "Last sign in",
+      "active": "Is actual device"
     }
   },
   "header": {
@@ -149,21 +169,30 @@
   },
   "userMenu": {
     "profile": "Profile",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "language": "Change language",
+    "changeLanguage": "Change language:"
   },
   "error": {
     "error500": "Error 500",
-    "toMainPage": "To main page..."
+    "toMainPage": "To main page...",
+    "somethingWentWrong": "Something went wrong...",
+    "requestFailed": "Email not found"
   },
   "footer": {
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "currentLang": "Current language"
   },
   "pageName": {
     "dashboard": "Dashboard",
     "passwords": "Passwords",
     "cards": "Payment cards",
     "profile": "Profile",
-    "2fa": "Two factor authorization"
+    "2fa": "Two factor authorization",
+    "verify": {
+      "email": "Verify new email",
+      "password": "Verify new password"
+    }
   },
   "loading": "Loading...",
   "form": {
@@ -171,5 +200,36 @@
     "firstNameInput": "First name",
     "lastNameInput": "Last name",
     "usernameSuggestions": "Username is already taken"
+  },
+  "verify": {
+    "email": {
+      "email": "Email verification",
+      "submit": "Submit",
+      "title": "Cartera | Email verification",
+      "description": "Cartera | Email verification",
+      "tokenError": "Couldn't update your email",
+      "emailError": "Couldn't update your email",
+      "verifySuccess": "Email is updated!",
+      "formTitle": "Verify your new email"
+    },
+    "tokenIsMissing": "Token is missing",
+    "password": {
+      "title": "Cartera | Password reset",
+      "description": "Cartera | Password reset",
+      "form": {
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "title": "Set new password",
+        "signIn": "Go to sign in"
+      },
+      "passwordError": "Couldn't create your new password",
+      "creationSuccess": "Password has been updated",
+      "error": "Couldn't set new password"
+    },
+    "emailError": "Couldn't update your email.",
+    "verifySuccess": "Email is changed!"
+  },
+  "resetPassword": {
+    "success": "Request for reset password is sent. Check your email."
   }
 }

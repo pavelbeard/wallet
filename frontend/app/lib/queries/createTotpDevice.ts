@@ -1,6 +1,6 @@
 "use server";
 
-import getUser from "@/app/lib/getUser";
+import getUser from "@/app/lib/helpers/getUser";
 import { TOTPData } from "@/app/lib/types";
 import protectedQuery from "../helpers/protectedQuery";
 
@@ -18,11 +18,12 @@ export default async function createTotpDevice(): Promise<TOTPData | null> {
       return null;
     }
 
-    if (result?.response.ok) {
-      return result.json;
+    if (result?.ok) {
+      const json = await result.json();
+      return json;
     }
 
-    if (result?.response.status === 400) {
+    if (result?.status === 400) {
       return null;
     }
   }

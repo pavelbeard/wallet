@@ -41,10 +41,10 @@ function FormComponent() {
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={clsx(
-        "p-8 flex flex-col gap-y-4",
+        "flex flex-col gap-y-4 p-8",
         "border-t border-slate-800 dark:border-slate-600",
         "[&>label>span]:text-sm",
-        "[&>label>div>input]:p-2 [&>label>div>div]:pr-2",
+        "[&>label>div>div]:pr-2 [&>label>div>input]:p-2",
         "[&>label>div>input]:text-sm",
         "[&>button]:p-2 [&>button]:text-sm",
       )}
@@ -53,14 +53,17 @@ function FormComponent() {
         {t("profile.userCard.modal.changePassword.title")}
       </FormTitle>
       <PasswordInput
+        ariaLabel="Actual password"
         labelText={`${t("profile.userCard.modal.changePassword.form.actualPassword")}:`}
         htmlFor="actualPassword"
         name="actualPassword"
         register={register}
         id="actualPassword"
         disabled={isPending}
+        testId="password-change-actual-password"
       />
       <PasswordInput
+        ariaLabel="New password"
         labelText={`${t("profile.userCard.modal.changePassword.form.newPassword")}:`}
         htmlFor="password"
         name="password"
@@ -68,10 +71,11 @@ function FormComponent() {
         id="password"
         disabled={isPending}
       />
-      <p className="p-2 rounded-xl border border-yellow-500 bg-yellow-200 text-sm dark:text-slate-800">
+      <p className="rounded-xl border border-yellow-500 bg-yellow-200 p-2 text-sm dark:text-slate-800">
         {t("profile.userCard.modal.changePassword.form.passwordNote")}
       </p>
       <PasswordInput
+        ariaLabel="New password confirmation"
         labelText={`${t("profile.userCard.modal.changePassword.form.confirmPassword")}:`}
         htmlFor="password2"
         name="password2"
@@ -84,13 +88,19 @@ function FormComponent() {
       {issues && (
         <div className="flex flex-col gap-y-2">
           {issues.map((issue) => (
-            <FormError key={issue.message} message={issue.message as string} />
+            <FormError
+              ariaLabel={`password-change-error-${issue.type}`}
+              key={issue.message}
+              message={issue.message as string}
+            />
           ))}
         </div>
       )}
       <Submit
+        ariaLabel="Password change submit"
         disabled={isPending}
         color="bg-slate-800 hover:bg-slate-300 hover:text-black dark:text-slate-800 dark:bg-gray-100"
+        testId="password-change-submit"
       >
         {t("profile.userCard.modal.changePassword.form.submit")}
       </Submit>

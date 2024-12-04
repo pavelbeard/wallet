@@ -1,7 +1,7 @@
 /**
  * Routes, which middleware should ignore by default
  */
-export const publicRoutes: string[] = ["/"];
+export const publicRoutes: string[] = ["/", "/verify/password"];
 
 /**
  * Routes, which middleware should protect by default
@@ -10,6 +10,7 @@ export const protectedRoutes: string[] = [
   "/dashboard",
   "/profile",
   "/profile/2fa",
+  "/verify/email",
 ];
 
 /**

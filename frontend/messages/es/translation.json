@@ -16,7 +16,7 @@
         "signUp": "Crear la cuenta"
       },
       "emailInput": "Correo electrónico:",
-      "passwordInput": "Contraseña:",
+      "passwordInput": "Contraseña",
       "confirmPasswordInput": "Repite contraseña:",
       "signIn": "Entrar",
       "signUp": "Crearla",
@@ -28,7 +28,11 @@
       "2faInput": "Tu token 2FA",
       "2faSubmit": "Verificar",
       "usernameInput": "Nombre de usuario",
-      "password2Input": "Confirmar contraseña"
+      "password2Input": "Confirmar contraseña",
+      "2faForUser": "Para usuario",
+      "resetPassword": "¿Has olvidado tu contraseña?",
+      "email": "Correo electrónico:",
+      "sendEmail": "Enviar solicitud"
     },
     "page": {
       "signOut": "Cerrando sesión...",
@@ -85,12 +89,25 @@
       },
       "changePassword": "Cambiar la contraseña",
       "twoFactor": "Dos factores",
-      "title": "Información de usuario"
+      "title": "Información de usuario",
+      "emailRequest": {
+        "error": "El correo electrónico ya está tomado!",
+        "success": "Revise su correo electrónico para ver si hay algún mensaje y también spam."
+      },
+      "deleteAccount": "Eliminar cuenta",
+      "deleteAccountTitle": "Zona de riesgo",
+      "deleteAccountQuestion": "¿Está seguro?",
+      "deleteAccountNote": "¡Esa acción eliminará todos tus datos!",
+      "deleteRequest": {
+        "error": "Se produjo un error al eliminar la cuenta."
+      },
+      "deleteOauth2Account": "Desvincular cuenta",
+      "deleteOauth2Note": "Esa acción eliminará todos sus datos, pero los datos del proveedor de la cuenta estarán seguros."
     },
     "useCard": {
       "modal": {
         "form": {
-          "submit": "Confirmar cambio de correo electrónico"
+          "submit": "Enviar petición"
         }
       }
     },
@@ -119,7 +136,9 @@
       "added": "Añadido",
       "next": "Siguente",
       "change2fa": "Cambiar 2FA",
-      "oauth2note": "Pregúntele a su proveedor de cuenta"
+      "oauth2note": "Pregúntele a su proveedor de cuenta",
+      "deleted": "2FA si está apagado",
+      "notDeleted": "Contraseña incorrecta"
     },
     "main": {
       "twoFactorBtn": "Gestión 2FA"
@@ -133,7 +152,8 @@
       "operationalSystem": "SO",
       "ipAddress": "Dirección IP",
       "location": "Ubicación",
-      "lastAccess": "Ultimo inicio"
+      "lastAccess": "Ultimo inicio",
+      "active": "Es un dispositivo real"
     }
   },
   "header": {
@@ -150,21 +170,30 @@
   },
   "userMenu": {
     "profile": "Perfil",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "language": "Cambiar idioma",
+    "changeLanguage": "Cambiar idioma:"
   },
   "error": {
     "error500": "Falla 500",
-    "toMainPage": "Al inicio..."
+    "toMainPage": "Al inicio...",
+    "somethingWentWrong": "Algo salió mal...",
+    "requestFailed": "Correo electrónico no encontrado"
   },
   "footer": {
-    "rights": "Reservados todos los derechos"
+    "rights": "Reservados todos los derechos",
+    "currentLang": "Idioma actual"
   },
   "pageName": {
     "dashboard": "Panel de Control",
     "passwords": "Contraseñas",
     "cards": "Tarjetas de pago",
     "profile": "Perfil",
-    "2fa": "Autorización de dos factores"
+    "2fa": "Autorización de dos factores",
+    "verify": {
+      "password": "Verificar nueva contraseña",
+      "email": "Verificar nuevo correo electrónico"
+    }
   },
   "loading": "Cargando...",
   "form": {
@@ -172,5 +201,36 @@
     "firstNameInput": "Nombre",
     "lastNameInput": "Apellido",
     "usernameSuggestions": "El nombre de usuario ya está en uso"
+  },
+  "verify": {
+    "email": {
+      "email": "Verificación de correo electrónico",
+      "title": "Cartera | Verificación de correo electrónico",
+      "description": "Cartera | Verificación de correo electrónico",
+      "submit": "Entregar",
+      "tokenError": "No se pudo actualizar tu correo electrónico",
+      "emailError": "No se pudo actualizar tu correo electrónico",
+      "verifySuccess": "¡El correo electrónico está actualizado!",
+      "formTitle": "Verifica tu nuevo correo electrónico"
+    },
+    "tokenIsMissing": "Falta el token",
+    "password": {
+      "title": "Cartera | \nRestablecer contraseña",
+      "description": "Cartera | \nRestablecer contraseña",
+      "passwordError": "No se pudo crear tu nueva contraseña",
+      "form": {
+        "title": "Establecer nueva contraseña",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar nueva contraseña",
+        "signIn": "Ir a iniciar sesión"
+      },
+      "creationSuccess": "La contraseña ha sido actualizada",
+      "error": "No se pudo establecer una nueva contraseña"
+    },
+    "emailError": "No se pudo actualizar su correo electrónico.",
+    "verifySuccess": "¡El correo electrónico ha cambiado!"
+  },
+  "resetPassword": {
+    "success": "Se envía la solicitud para restablecer la contraseña. \nRevisa tu correo electrónico."
   }
 }

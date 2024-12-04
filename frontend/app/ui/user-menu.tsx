@@ -1,38 +1,82 @@
-import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
+"use client";
+
 import useUserMenu from "@/app/lib/hooks/useUserMenu";
 import { type UserMenuItem } from "@/app/lib/types";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useLocale, useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+
+const ChangeLanguage = dynamic(
+  () => import("@/app/components/utils/change-language"),
+  {
+    ssr: false,
+  },
+);
+
+type LinkProps = {
+  href: string;
+  locale: string;
+  className: string;
+  children: React.ReactNode;
+};
+
+type ListProps = {
+  className: string;
+  callback?: () => void;
+  children: React.ReactNode;
+};
+
+function LinkItem({ href, locale, className, children }: LinkProps) {
+  return (
+    <Link href={href} locale={locale} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+function ListItem({ className, children }: ListProps) {
+  return <li className={className}>{children}</li>;
+}
 
 function UserMenuItem({ item }: { item: UserMenuItem }) {
-  const isDesktop = useDesktopBreakpoint();
+  const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations();
-  return (
-    <Link
-      href={item.url}
-      locale={locale}
-      className={clsx(
-        "p-2",
-        "hover:bg-white hover:text-black hover:rounded-md",
-        "dark:hover:bg-slate-600 dark:hover:text-gray-100",
-        "w-full flex items-center justify-between",
-        item.fontBold && "font-bold",
-      )}
-    >
-      <div className="flex w-full text-sm items-center gap-x-2">
+  const isChangeLanguage = item.title === "userMenu.language";
+
+  const className = clsx(
+    "p-2",
+    "hover:bg-white hover:text-black hover:rounded-md",
+    "dark:hover:bg-slate-600 dark:hover:text-gray-100",
+    "w-full flex items-center justify-between",
+    item.fontBold && "font-bold",
+  );
+
+  const children = (
+    <>
+      <div className="flex w-full items-center gap-x-2 text-xs">
         {item.icon}
         {t(item.title)}
       </div>
-      {isDesktop && (
-        <p className={clsx("text-sm", item.fontBold && "font-bold")}>
-          {t(item.title)}
-        </p>
+      {isChangeLanguage && (
+        <div className={clsx("text-xs", item.fontBold && "font-bold")}>
+          <ChangeLanguage href={pathname} params={{ locale }} />
+        </div>
       )}
-    </Link>
+    </>
   );
+
+  if (item.url) {
+    return (
+      <LinkItem href={item.url} locale={locale} className={className}>
+        {children}
+      </LinkItem>
+    );
+  } else {
+    return <ListItem className={className}>{children}</ListItem>;
+  }
 }
 
 export function UserMenuMobile() {
@@ -41,13 +85,13 @@ export function UserMenuMobile() {
   return (
     <nav
       className={clsx(
-        "w-full p-2 flex-1 text-slate-800 bg-slate-100",
+        "w-full flex-1 bg-slate-100 p-2 text-slate-800",
         "dark:bg-slate-800 dark:text-slate-100",
       )}
     >
       <div ref={mobileRef}>
         <button
-          className="p-2 flex items-center gap-x-2"
+          className="flex items-center gap-x-2 p-2"
           onClick={toggleOpenMobile}
         >
           <ArrowLeftIcon className="size-6" />
@@ -64,15 +108,16 @@ export function UserMenuMobile() {
 }
 
 export default function UserMenuDesktop() {
-  const { userMenu } = useUserMenu();
+  const { ref, userMenu } = useUserMenu();
 
   return (
     <nav
+      ref={ref}
       className={clsx(
-        "block absolute right-4 top-28 z-50",
-        "py-4 p-4 w-64 max-w-96",
-        "bg-slate-100 shadow-black drop-shadow-md border-[1px] border-slate-300 rounded-md",
-        "dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-slate-100",
+        "absolute right-4 top-28 z-50 block",
+        "w-64 max-w-96 p-4 py-4",
+        "rounded-md border-[1px] border-slate-300 bg-slate-100 shadow-black drop-shadow-md",
+        "text-slate-800 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100",
       )}
     >
       <ul>

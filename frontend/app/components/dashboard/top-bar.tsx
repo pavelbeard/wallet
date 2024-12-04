@@ -27,7 +27,7 @@ export default function TopBar() {
     >
       <div className="max-md:hidden flex flex-grow basis-0" aria-label="for flex box"></div>
       <PageName className="flex justify-center items-center font-bold max-lg:hidden" />
-      <div className="flex flex-grow basis-0 justify-start items-center lg:justify-end gap-2">
+      <div className="flex flex-grow basis-0 justify-start items-center lg:justify-end gap-4">
         <span className="hidden lg:block text-lg font-bold">
           {user?.username}
         </span>

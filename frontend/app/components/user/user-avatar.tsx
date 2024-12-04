@@ -24,7 +24,6 @@ export default function UserAvatar({ src, provider }: Props) {
     if (isDesktop) {
       return (
         <div
-          ref={ref}
           data-type="desktop-oauth-avatar"
           className="hidden lg:block relative"
         >
@@ -61,7 +60,6 @@ export default function UserAvatar({ src, provider }: Props) {
     if (isDesktop) {
       return (
         <div
-          ref={ref}
           data-type="desktop-avatar"
           className={clsx(
             "hidden relative lg:flex justify-center items-center",

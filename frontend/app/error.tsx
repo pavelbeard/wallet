@@ -24,9 +24,10 @@ export default function Error() {
             <XCircleIcon className="size-8" />
             <span className="ml-1">{t("error.error500")}</span>
           </section>
-          <section className="p-4">
+          <section className="p-1 lg:p-4">
             <Link
               className={clsx(
+                "text-sm w-full",
                 "p-4 bg-slate-300 dark:bg-slate-800 dark:border-[0.5px] dark:border-slate-600 text-white",
                 "rounded-full mt-4 shadow-slate-800 drop-shadow-lg",
                 "hover:bg-slate-300 hover:text-black",
