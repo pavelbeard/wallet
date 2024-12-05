@@ -23,7 +23,7 @@ const CustomInput = ({
       <span className="pb-1 text-sm">{labelText}</span>
       <input
         className={clsx(
-          "h-10 border-[1px] border-slate-700 p-2 text-sm outline-2 outline-gray-500",
+          "h-10 border-[1px] border-slate-700 bg-white p-2 text-sm outline-2 outline-gray-500",
           "dark:border-gray-300 dark:text-slate-800 dark:outline-gray-100",
           "rounded-xl",
         )}

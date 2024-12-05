@@ -18,6 +18,7 @@ django-allauth==65.0.1
 django-checkdb==1.2
 django-cors-headers==4.4.0
 django-environ==0.11.2
+django-extensions==3.2.3
 django-filter==24.2
 django-nanoid-field==0.1.4
 django-newsingleton==1.1

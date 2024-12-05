@@ -3,14 +3,14 @@ FROM node:lts-alpine3.20 AS base
 # downloading deps
 FROM base AS deps
 
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache curl libc6-compat
 WORKDIR /app
 
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 
 RUN \
    if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-   elif [ -f package-lock.json ]; then npm ci; \
+   elif [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i; \
    else echo "Lockfile not found." && exit 1; \
    fi
@@ -39,10 +39,9 @@ RUN \
    addgroup --system --gid 1001 nextjs; \
    adduser --system --uid 1001 cartera;
 
-COPY --from=builder /app/public ./public
+COPY --from=builder /app ./public
 
-RUN mkdir .next; chown cartera:nextjs .nextjs
-
+RUN mkdir .next; chown cartera:nextjs .next
 
 COPY --from=builder --chown=cartera:nextjs /app/.next/standalone ./
 COPY --from=builder --chown=cartera:nextjs /app/.next/static ./.next/static

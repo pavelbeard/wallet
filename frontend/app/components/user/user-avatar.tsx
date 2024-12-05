@@ -1,8 +1,8 @@
 "use client";
 
-import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
-import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
 import AuthMethodLogo from "@/app/components/user/auth-method-logo";
+import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
+import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
 import UserMenuDesktop from "@/app/ui/user-menu";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -17,7 +17,7 @@ type Props = { src?: string | null; provider: string | "Credentials" };
  * @provider Needs for auth method icon
  */
 export default function UserAvatar({ src, provider }: Props) {
-  const { ref, isOpen, toggleOpen, toggleOpenMobile } = useUserMenu();
+  const { isOpen, toggleOpen, toggleOpenMobile } = useUserMenu();
   const isDesktop = useDesktopBreakpoint();
 
   if (src) {
@@ -25,7 +25,7 @@ export default function UserAvatar({ src, provider }: Props) {
       return (
         <div
           data-type="desktop-oauth-avatar"
-          className="hidden lg:block relative"
+          className="relative hidden lg:block"
         >
           <div className="hover-avatar">
             <Image
@@ -42,7 +42,7 @@ export default function UserAvatar({ src, provider }: Props) {
         </div>
       );
     } else {
-      <div data-type="mobile-oauth-avatar" className="block lg:hidden relative">
+      <div data-type="mobile-oauth-avatar" className="relative block lg:hidden">
         <div className="hover-avatar">
           <Image
             onClick={toggleOpenMobile}
@@ -62,16 +62,13 @@ export default function UserAvatar({ src, provider }: Props) {
         <div
           data-type="desktop-avatar"
           className={clsx(
-            "hidden relative lg:flex justify-center items-center",
-            "bg-gray-100 size-16 border-[1px] border-gray-300 rounded-full",
-            "dark:bg-slate-800 dark:border-slate-600",
+            "relative hidden items-center justify-center lg:flex",
+            "size-16 rounded-full border-[1px] border-gray-300 bg-gray-100",
+            "dark:border-slate-600 dark:bg-slate-800",
           )}
         >
           <div className="hover-avatar">
-            <UserCircleIcon
-              onClick={toggleOpen}
-              className="size-[64px]"
-            />
+            <UserCircleIcon onClick={toggleOpen} className="size-[64px]" />
             <AuthMethodLogo provider={provider} />
           </div>
           {isOpen && createPortal(<UserMenuDesktop />, document.body)}
@@ -79,19 +76,16 @@ export default function UserAvatar({ src, provider }: Props) {
       );
     } else {
       return (
-        <div className="lg:hidden flex flex-col">
+        <div className="flex flex-col lg:hidden">
           <div
             data-type="mobile-avatar"
             className={clsx(
-              "relative flex justify-center items-center",
-              "bg-gray-100 size-16 border-[1px] border-gray-300 rounded-full",
-              "dark:bg-slate-800 dark:border-slate-600",
+              "relative flex items-center justify-center",
+              "size-16 rounded-full border-[1px] border-gray-300 bg-gray-100",
+              "dark:border-slate-600 dark:bg-slate-800",
             )}
           >
-            <UserCircleIcon
-              onClick={toggleOpenMobile}
-              className="size-12"
-            />
+            <UserCircleIcon onClick={toggleOpenMobile} className="size-12" />
             <AuthMethodLogo provider={provider} />
           </div>
         </div>

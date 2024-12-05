@@ -1,6 +1,6 @@
 import { WalletUser } from "@/auth";
 import { routing } from "@/i18n/routing";
-import { Locales } from "@/i18n/types";
+import { LocalesList } from "@/i18n/types";
 import {
   authRoutes,
   DEFAULT_SIGNED_IN_PATH,
@@ -15,7 +15,7 @@ import {
 } from "next/server";
 import { CustomMiddleware } from "./types";
 
-function rewriteRoutes(protectedPaths: string[], locales: Locales) {
+function rewriteRoutes(protectedPaths: string[], locales: LocalesList) {
   let protectedIntlRoutes = [...protectedPaths];
 
   protectedPaths.forEach((route) => {

@@ -20,7 +20,7 @@ export default function useTotpData() {
       setState({ ...state, loading: false, success: true });
       setTotpData(data);
     });
-  }, []);
+  }, [state]);
 
   return {
     loading: state.loading,

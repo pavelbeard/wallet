@@ -25,7 +25,7 @@ const refresh = async (
       }
 
       token.user = refreshResult.user;
-      //@ts-ignore
+      //@ts-expect-error access_token_exp is not in NextAuthJWT
       token.user.provider = "credentials";
       token.access_token = refreshResult.access_token;
       token.refresh_token = refreshResult.refresh_token;

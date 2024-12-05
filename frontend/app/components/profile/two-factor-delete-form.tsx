@@ -57,6 +57,7 @@ function FormComponent() {
       </p>
 
       <PasswordInput
+        ariaLabel="2FA delete password"
         placeholder={t("profile.twofactor.inputPlaceholder")}
         htmlFor="password"
         name="password"
@@ -66,6 +67,7 @@ function FormComponent() {
       />
 
       <Submit
+        ariaLabel="Submit 2FA delete"
         disabled={isPending}
         color="bg-red-500 dark:bg-red-500 hover:bg-red-400 dark:hover:bg-red-700"
       >

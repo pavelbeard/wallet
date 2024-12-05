@@ -9,9 +9,9 @@ export default function useDebounce({
   callback?: () => void;
   value?: unknown;
   delay: number;
-  dependencies: any[];
+  dependencies: unknown[];
 }) {
-  const [debouncedValue, setDebouncedValue] = useState(null);
+  const [debouncedValue, setDebouncedValue] = useState<unknown | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function useDebounce({
 
     if (value) {
       timerRef.current = setTimeout(() => {
-        setDebouncedValue(value as any);
+        setDebouncedValue(value);
       }, delay);
     }
 
@@ -33,7 +33,8 @@ export default function useDebounce({
         clearTimeout(timerRef.current);
       }
     };
-  }, dependencies);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dependencies]);
 
   return debouncedValue;
 }

@@ -19,7 +19,7 @@ export default function useResetPassword(
     if (watch("password")) {
       clearErrors("password");
     }
-  }, [watch]);
+  }, [watch, clearErrors]);
 
   const onSubmit = (data: z.infer<typeof NewPasswordSchema>) => {
     startTransition(async () => {

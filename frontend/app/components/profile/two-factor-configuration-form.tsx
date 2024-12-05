@@ -61,12 +61,12 @@ function FormComponent({
     dependencies: [watch("token")],
   });
 
-  useEffect(() => resetCopied, []);
+  useEffect(() => resetCopied, [resetCopied]);
 
   return (
     <form
       className={clsx(
-        "p-8 flex flex-col items-center gap-y-4",
+        "flex flex-col items-center gap-y-4 p-8",
         "border-t dark:border-slate-600 dark:text-slate-300",
         "[&>label>span]:text-sm",
         "[&>label>input]:p-2",
@@ -86,6 +86,7 @@ function FormComponent({
             {next ? (
               <>
                 <CustomInput
+                  ariaLabel="2FA token"
                   labelText={`${t("profile.twofactor.input")}:`}
                   htmlFor="token"
                   name="token"

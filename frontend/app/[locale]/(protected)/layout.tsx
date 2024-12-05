@@ -1,7 +1,6 @@
 import LayoutSideElementsDesktop from "@/app/components/dashboard/layout-side-elements-desktop";
 import LayoutSideElementsMobile from "@/app/components/dashboard/layout-side-elements-mobile";
 import "@/app/globals.css";
-import { Props } from "@/app/lib/types";
 import { routing } from "@/i18n/routing";
 import clsx from "clsx";
 import { NextIntlClientProvider } from "next-intl";
@@ -16,7 +15,10 @@ export const generateStaticParams = async () => {
   return routing.locales.map((locale) => ({ locale }));
 };
 
-export default async function RootProtectedLayout({ children, params: { locale } }: RootProtectedLayoutProps) {
+export default async function RootProtectedLayout({
+  children,
+  params: { locale },
+}: RootProtectedLayoutProps) {
   const messages = await getMessages();
 
   return (
@@ -31,7 +33,7 @@ export default async function RootProtectedLayout({ children, params: { locale }
         )}
       >
         <LayoutSideElementsDesktop />
-        <div className="p-4 h-full lg:mx-32">{children}</div>
+        <div className="h-full p-4 lg:mx-32">{children}</div>
       </main>
 
       {/* mobile layout */}
@@ -44,7 +46,7 @@ export default async function RootProtectedLayout({ children, params: { locale }
         )}
       >
         <LayoutSideElementsMobile />
-        <div className="p-4 h-full">{children}</div>
+        <div className="h-full p-4">{children}</div>
       </main>
     </NextIntlClientProvider>
   );

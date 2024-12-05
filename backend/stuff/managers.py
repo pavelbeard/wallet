@@ -1,5 +1,3 @@
-
-
 from abstract.managers import AbstractManager
 from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
@@ -34,9 +32,11 @@ class WalletUserManager(BaseUserManager, AbstractManager):
         if password and not extra_fields.get("is_oauth_user"):
             user.password = make_password(password)
 
-        if not password and not extra_fields.get("is_oauth_user"):
+        if not extra_fields.get("is_superuser") or (
+            not password and not extra_fields.get("is_oauth_user")
+        ):
             raise TypeError(_("Password or oauth creation method are required."))
-        
+
         if extra_fields.get("is_oauth_user"):
             user.is_oauth_user = True
 
@@ -47,7 +47,7 @@ class WalletUserManager(BaseUserManager, AbstractManager):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault("is_oauth_user", False)
-        
+
         return self._create_user(username, email, password, **extra_fields)
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):

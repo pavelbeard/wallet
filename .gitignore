@@ -68,3 +68,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+frontend/.env.development.local
+test-frontend/

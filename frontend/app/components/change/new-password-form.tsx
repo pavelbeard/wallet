@@ -5,22 +5,19 @@ import { NewPasswordSchema, NewPasswordValidator } from "@/app/lib/schemas.z";
 import FormTitle from "@/app/ui/form-title";
 import PasswordInput from "@/app/ui/input-password";
 import Submit from "@/app/ui/submit";
+import { Link } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import FormError from "../form/form-error";
 import FormSuccess from "../form/form-success";
-import { Link } from "@/i18n/routing";
 
 type NewPasswordForm = { token: string } & LocaleProps;
 
 const newPasswordResolver = zodResolver(NewPasswordSchema);
 
-export default function NewPasswordForm({
-  params: { locale },
-  token,
-}: NewPasswordForm) {
+export default function NewPasswordForm({ token }: NewPasswordForm) {
   const t = useTranslations();
   const {
     register,
@@ -101,7 +98,10 @@ export default function NewPasswordForm({
         testId="new-password-success"
       />
       {Boolean(formMessages.success) && (
-        <Link className="text-xs text-green-500 hover:text-green-300" href="/auth/sign-in">
+        <Link
+          className="text-xs text-green-500 hover:text-green-300"
+          href="/auth/sign-in"
+        >
           {t("verify.password.form.signIn")}
         </Link>
       )}

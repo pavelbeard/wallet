@@ -19,7 +19,7 @@ services:
       - POSTGRES_USER=main
       - POSTGRES_DB=wallet
       # secrets
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
     volumes:
       - postgresdata:/var/lib/postgresql/data
 
@@ -42,10 +42,10 @@ services:
       dockerfile: dev.Dockerfile
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`) || PathPrefix(`/admin`) || PathPrefix(`/static`)"
+      - "traefik.http.routers.backend.rule=(Host(`localhost`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`) || PathPrefix(`/static`)))"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
     environment:
-#      - ALLOWED_ORIGINS=http://77.238.243.142:8001
+      - ALLOWED_ORIGINS=http://backend:8000
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
       - DJANGO_SETTINGS_DEBUG_MODE=False
@@ -55,7 +55,10 @@ services:
       - POSTGRES_DB_NAME=wallet
       - POSTGRES_DB_USER=main
       - POSTGRES_DB_PORT=5432
+      - FRONTEND_URL=http://localhost:3010
       # secrets
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
       - SECRET_KEY=${SECRET_KEY}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
@@ -72,9 +75,16 @@ services:
       dockerfile: dev.Dockerfile
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    environment:
+      - NEXTAUTH_URL=http://backend:8000
+      # secrets
+      - AUTH_TRUST_HOST=false
+      - AUTH_SECRET=${SECRET_KEY}
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
     restart: on-failure
     depends_on:
       - backend

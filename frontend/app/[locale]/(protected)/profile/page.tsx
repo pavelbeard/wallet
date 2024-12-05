@@ -2,7 +2,6 @@ import AccountSettings from "@/app/components/profile/account-settings";
 import DeleteAccountBtn from "@/app/components/profile/delete-account-btn";
 import Devices from "@/app/components/profile/devices";
 import UserCard from "@/app/components/profile/user-card";
-import CustomButton from "@/app/ui/button-custom";
 import { routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { getTranslations, setRequestLocale } from "next-intl/server";

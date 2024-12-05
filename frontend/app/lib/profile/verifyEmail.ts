@@ -14,14 +14,14 @@ export default async function verifyEmail(token: string) {
     };
   }
 
-  if (!response?.response.ok) {
+  if (!response?.ok) {
     return {
       success: null,
       error: "profile.userCard.changeEmail.error",
     };
   }
 
-  if (response?.response.ok) {
+  if (response?.ok) {
     return {
       success: "profile.userCard.changeEmail",
       error: null,

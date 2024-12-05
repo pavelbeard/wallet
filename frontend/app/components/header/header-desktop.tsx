@@ -16,7 +16,6 @@ export default function HeaderDesktop({
   const canAccessDashboard =
     user?.email &&
     (!isTwoFactorEnabled || isOauthUser || (isTwoFactorEnabled && isVerified));
-  const signInNeeded = !user || (isTwoFactorEnabled && !isVerified);
 
   return (
     <>

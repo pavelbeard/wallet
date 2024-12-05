@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "singleton",
     "rest_framework",
     "nanoid_field",
+    "django_extensions",
     # auth
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
@@ -212,8 +213,10 @@ else:
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = [
         "http://localhost:3000",
+        "http://localhost:3010",
         "https://localhost",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:3010",
         "https://127.0.0.1",
     ]
 else:

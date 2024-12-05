@@ -14,7 +14,6 @@ import FormSuccess from "../form/form-success";
 type EmailVerificationFormProps = { token: string } & LocaleProps;
 
 export default function EmailVerificationForm({
-  params: { locale },
   token,
 }: EmailVerificationFormProps) {
   const t = useTranslations();

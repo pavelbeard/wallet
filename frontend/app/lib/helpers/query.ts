@@ -18,7 +18,7 @@ export default async function query({
   headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json");
 
-  return fetch(`${API_PATH}/api${url}`, {
+  return fetch(`${API_PATH}/api-v1${url}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,

@@ -233,5 +233,8 @@
   },
   "resetPassword": {
     "success": "Se envía la solicitud para restablecer la contraseña. \nRevisa tu correo electrónico."
+  },
+  "usernameSuggestions": {
+    "error": "Se toma el nombre de usuario"
   }
 }

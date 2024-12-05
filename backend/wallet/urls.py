@@ -22,11 +22,11 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("stuff.urls")),
-    path("api/cards/", include("cards.urls")),
-    path("api/passwords/", include("passwords.urls")),
-    path("api/oauth2/accounts/", include("allauth.urls")),
-    path("api/rest-auth", include("dj_rest_auth.urls")),
+    path("api-v1/", include("stuff.urls")),
+    path("api-v1/cards/", include("cards.urls")),
+    path("api-v1/passwords/", include("passwords.urls")),
+    path("api-v1/oauth2/accounts/", include("allauth.urls")),
+    path("api-v1/rest-auth", include("dj_rest_auth.urls")),
     # settings.DEBUG and path("api/admin/", include("rest_framework.urls")),
 ]
 

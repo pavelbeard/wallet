@@ -1,0 +1,30 @@
+[
+  {
+    "model": "stuff.ddevice",
+    "pk": 1,
+    "fields": { "d_name": "Brave", "icon": "device_icons/icons8-brave.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 2,
+    "fields": { "d_name": "Safari", "icon": "device_icons/safari.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 3,
+    "fields": { "d_name": "Chrome", "icon": "device_icons/chrome.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 4,
+    "fields": { "d_name": "iPhone", "icon": "device_icons/Apple_light.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 5,
+    "fields": {
+      "d_name": "iPad",
+      "icon": "device_icons/Apple_light_TYCNA2O.svg"
+    }
+  }
+]

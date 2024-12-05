@@ -1,0 +1,528 @@
+[
+  {
+    "model": "stuff.walletuser",
+    "pk": 1,
+    "fields": {
+      "last_login": "2024-12-05T09:18:03.657Z",
+      "is_superuser": true,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-10-09T21:05:38.748Z",
+      "username": "admin",
+      "password": "pbkdf2_sha256$870000$BqCd7FtNIshfi1B2LA80dN$tyPxxGUtA5+2L57Fc2sVkQTIKwdccoOt3ZmV5lFQGOI=",
+      "email": "heavycream9090@icloud.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": true,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 2,
+    "fields": {
+      "last_login": "2024-12-04T19:40:28.695Z",
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-10T15:29:56.498Z",
+      "username": "cuckoo_dragon",
+      "password": "pbkdf2_sha256$870000$A4XnEWFsEqS7B9rDLJOhf5$1i10YwqcmoSjKLbeDeMNsMTtiEeNqamOmzb1wfBUERs=",
+      "email": "cuckoo_0_dragon@icloud.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 8,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-31T12:05:24.392Z",
+      "username": null,
+      "password": "pbkdf2_sha256$870000$6MethLkGzW8XReQljUu888$icatiqlsGoFrZqfR8gdYF2h8L2d4K2sbzBXkrdTG9Hc=",
+      "email": "borodinpa@icloud.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 9,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-31T12:24:11.842Z",
+      "username": null,
+      "password": "pbkdf2_sha256$870000$Smqcpm9ekMCmTGKrgBgtxM$65XWt9rH+UwFBVIEF9elBMen5vnn7S8MlTk1G9Mrkqw=",
+      "email": "heavycream9090@icloud.es",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 10,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-31T12:38:28.240Z",
+      "username": null,
+      "password": "pbkdf2_sha256$870000$uwtdrFjtJFiA0zjBs0POaC$tXjIOb0OpbHnyWslJVnewvU3aFhCxQQrCvyHH/N3Cb0=",
+      "email": "cuckoo_0_dragon@gmail.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 11,
+    "fields": {
+      "last_login": "2024-12-04T20:42:42.500Z",
+      "is_superuser": false,
+      "first_name": "Pavel",
+      "last_name": "Borodin",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-01T21:06:47.038Z",
+      "username": "test_user_new",
+      "password": "pbkdf2_sha256$870000$IJQyv1tMhaD239fGL1a17L$Os+wJBeDZUBwYEh/jXOsOIYNyz1ruUv7kLJlauElMpk=",
+      "email": "heavycream9080@icloud.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 12,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "Heavy",
+      "last_name": "Cream",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-01T21:41:28.598Z",
+      "username": "cuckoo_fragon",
+      "password": "pbkdf2_sha256$870000$F5T7rd5O2xtdJowjxvuhWL$nQ9XjILvl5Mb2lCBPQbvT7AYv7JhrJdNQrizZMOCox0=",
+      "email": "cuckoo_0_dragon@cloud.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 13,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "test",
+      "last_name": "test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-03T21:00:24.309Z",
+      "username": "testuser",
+      "password": "pbkdf2_sha256$870000$0rcksQlfGfm3LfFrY2BV7T$jBMMrcwhhkawn+XCY922TY+jjJGhgbrWl4lnyerlkEY=",
+      "email": "test@testdomain.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 17,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "John",
+      "last_name": "Doe",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-03T21:12:14.126Z",
+      "username": "john_doe",
+      "password": "pbkdf2_sha256$870000$XkbPkwa4FvdedAPVwqQTHs$e5CoQ033rPCUGdN/RvyuQweWC9cYavHaOq5DhcifEes=",
+      "email": "johndoe@cartera.es",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 18,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "John",
+      "last_name": "Doe",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-03T21:15:58.909Z",
+      "username": "john_doe2489",
+      "password": "pbkdf2_sha256$870000$UmQw2nMrTfFNSkEgptRuPm$+FS8MF1+759UJMt6LKfZ7kPMsZCVDoDiAyGdcOeWQFM=",
+      "email": "johndoe2489@cartera.es",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 20,
+    "fields": {
+      "last_login": "2024-12-04T20:07:04.931Z",
+      "is_superuser": false,
+      "first_name": "Pavel",
+      "last_name": "Borodin",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-04T19:22:33.487Z",
+      "username": "pavel",
+      "password": "!9RxIqC8e4UvqNzAjfpTcYnetyhKdSSojn1YXF30c",
+      "email": "pavelborodin0095@gmail.com",
+      "email_verified": true,
+      "is_oauth_user": true,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 21,
+    "fields": {
+      "last_login": "2024-12-04T20:57:31.385Z",
+      "is_superuser": false,
+      "first_name": "tim",
+      "last_name": "shee",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-04T19:58:59.156Z",
+      "username": "tim",
+      "password": "!o8fWSDEf32wKpKcOJcxss2NTjX1P4mgfABFJxUrq",
+      "email": "timsheestore@gmail.com",
+      "email_verified": true,
+      "is_oauth_user": true,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 22,
+    "fields": {
+      "last_login": "2024-12-05T09:09:18.788Z",
+      "is_superuser": false,
+      "first_name": "heavy",
+      "last_name": "cream",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-12-04T20:59:59.927Z",
+      "username": "heavy",
+      "password": "!V93Ioae5jG1rNNHU5G87KegnM0TIiujfitZEe7U6",
+      "email": "heavycream9090@gmail.com",
+      "email_verified": true,
+      "is_oauth_user": true,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.walletuser",
+    "pk": 23,
+    "fields": {
+      "last_login": null,
+      "is_superuser": true,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-12-05T09:54:05.439Z",
+      "username": "admin_new",
+      "password": "pbkdf2_sha256$870000$Zigbb51rwrEeNC59bNHQsE$zHOkiaXmxGJCisYhZ5CzK7sGAHyKbEXXn4kzw+TbxCE=",
+      "email": "adminnew@example.com",
+      "email_verified": false,
+      "is_oauth_user": false,
+      "provider": null,
+      "is_two_factor_enabled": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "stuff.emailverificationtoken",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "email": "cuckoo_dragon@new.cloud.com",
+      "created_at": "2024-12-04T16:37:07.977Z",
+      "until": "2024-12-04T17:30:56Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.emailverificationtoken",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "email": "cuckoo_0_dragon@icloud.com",
+      "created_at": "2024-12-04T18:39:14.914Z",
+      "until": "2024-12-04T19:38:38.295Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "created_at": "2024-12-04T16:27:08.625Z",
+      "until": "2024-12-04T17:00:00Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 2,
+    "fields": {
+      "user": 8,
+      "created_at": "2024-12-04T16:42:42.879Z",
+      "until": "2024-12-04T17:42:42.879Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 3,
+    "fields": {
+      "user": 8,
+      "created_at": "2024-12-04T16:49:42.465Z",
+      "until": "2024-12-04T17:49:42.464Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 4,
+    "fields": {
+      "user": 8,
+      "created_at": "2024-12-04T16:51:37.120Z",
+      "until": "2024-12-04T17:51:37.119Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 5,
+    "fields": {
+      "user": 8,
+      "created_at": "2024-12-04T16:58:54.839Z",
+      "until": "2024-12-04T17:58:54.838Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 7,
+    "fields": {
+      "user": 2,
+      "created_at": "2024-12-04T18:42:25.912Z",
+      "until": "2024-12-04T19:42:25.912Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.passwordresettoken",
+    "pk": 8,
+    "fields": {
+      "user": 2,
+      "created_at": "2024-12-04T18:44:41.258Z",
+      "until": "2024-12-04T19:42:30.443Z",
+      "is_active": false
+    }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 1,
+    "fields": { "d_name": "Brave", "icon": "device_icons/icons8-brave.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 2,
+    "fields": { "d_name": "Safari", "icon": "device_icons/safari.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 3,
+    "fields": { "d_name": "Chrome", "icon": "device_icons/chrome.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 4,
+    "fields": { "d_name": "iPhone", "icon": "device_icons/Apple_light.svg" }
+  },
+  {
+    "model": "stuff.ddevice",
+    "pk": 5,
+    "fields": {
+      "d_name": "iPad",
+      "icon": "device_icons/Apple_light_TYCNA2O.svg"
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 1,
+    "fields": {
+      "wallet_user": 2,
+      "d_device": 1,
+      "operational_system": "macOS 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-02T13:32:01.369Z",
+      "last_access": "2024-12-04T19:25:01.082Z",
+      "is_actual_device": false
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 2,
+    "fields": {
+      "wallet_user": 2,
+      "d_device": 2,
+      "operational_system": "Mac OS X 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-02T13:39:30.828Z",
+      "last_access": "2024-12-04T19:40:28.893Z",
+      "is_actual_device": true
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 5,
+    "fields": {
+      "wallet_user": 20,
+      "d_device": 3,
+      "operational_system": "Mac OS X 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-04T19:38:35.879Z",
+      "last_access": "2024-12-04T19:38:35.879Z",
+      "is_actual_device": true
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 6,
+    "fields": {
+      "wallet_user": 1,
+      "d_device": 2,
+      "operational_system": "Mac OS X 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-04T19:50:26.322Z",
+      "last_access": "2024-12-05T09:07:45.118Z",
+      "is_actual_device": false
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 8,
+    "fields": {
+      "wallet_user": 1,
+      "d_device": 1,
+      "operational_system": "macOS 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-04T20:46:11.251Z",
+      "last_access": "2024-12-05T09:57:55.627Z",
+      "is_actual_device": true
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 9,
+    "fields": {
+      "wallet_user": 21,
+      "d_device": 2,
+      "operational_system": "Mac OS X 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-04T20:58:36.210Z",
+      "last_access": "2024-12-04T20:58:36.210Z",
+      "is_actual_device": true
+    }
+  },
+  {
+    "model": "stuff.walletuserdevice",
+    "pk": 11,
+    "fields": {
+      "wallet_user": 22,
+      "d_device": 2,
+      "operational_system": "Mac OS X 10.15.7",
+      "d_ip_address": "127.0.0.1",
+      "location": "Alicante, Spain",
+      "created_at": "2024-12-04T21:00:11.428Z",
+      "last_access": "2024-12-04T21:25:17.810Z",
+      "is_actual_device": true
+    }
+  }
+]

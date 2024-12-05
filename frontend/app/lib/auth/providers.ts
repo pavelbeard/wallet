@@ -7,6 +7,7 @@ import Google from "@auth/core/providers/google";
 import { User } from "next-auth";
 import CustomHeaders from "../helpers/getHeaders";
 import getUserDataJson from "../helpers/getUserDataJson";
+import logger from "../helpers/logger";
 import query from "../helpers/query";
 
 const providers = [
@@ -22,6 +23,8 @@ const providers = [
         headers: await CustomHeaders.getHeaders(),
         body: credentials,
       });
+
+      logger("Credentials signin result", result);
 
       if (result instanceof Error) return null;
 

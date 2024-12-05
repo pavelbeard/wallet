@@ -211,6 +211,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         "create_reset_password_request",
         "create_new_password",
         "partial_update",
+        "username_suggestions",
         "destroy",
     )
 

@@ -1,3 +1,5 @@
+"use server";
+
 import { API_PATH } from "./constants";
 import getAccessToken from "./getAccessToken";
 
@@ -20,7 +22,7 @@ export default async function protectedQuery({
   headers.set("Accept", "application/json");
   headers.set("Authorization", `Bearer ${accessToken}`);
 
-  return fetch(`${API_PATH}/api${url}`, {
+  return fetch(`${API_PATH}/api-v1${url}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,

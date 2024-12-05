@@ -1,9 +1,3 @@
-import React from 'react'
-
-type Props = {}
-
-export default function Page({}: Props) {
-  return (
-    <div>Passwords</div>
-  )
+export default function Page() {
+  return <div>Passwords</div>;
 }

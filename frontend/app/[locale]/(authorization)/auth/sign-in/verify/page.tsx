@@ -27,10 +27,10 @@ export default async function Page({ params: { locale } }: LocaleProps) {
   return (
     <>
       <Card className="my-12 hidden w-3/4 p-6 md:block lg:w-1/3">
-        <VerifyTwoFactorForm params={{ locale }} />
+        <VerifyTwoFactorForm />
       </Card>
       <div className="my-12 max-sm:px-4 md:hidden">
-        <VerifyTwoFactorForm params={{ locale }} />
+        <VerifyTwoFactorForm />
       </div>
     </>
   );

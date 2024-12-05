@@ -2,6 +2,7 @@ import { API_PATH } from "@/app/lib/helpers/constants";
 import { CredentialInput } from "@auth/core/providers";
 import { Account, Profile, User } from "next-auth";
 import getUserDataJson from "../helpers/getUserDataJson";
+import logger from "../helpers/logger";
 
 type Provider = {
   user: User;
@@ -20,23 +21,22 @@ type Handler = ({
 }: Provider) => Promise<boolean | string>;
 
 export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
-  credentials: async ({
-    user,
-    account,
-    profile,
-    email,
-    credentials,
-  }): Promise<boolean | string> => {
+  credentials: async (): Promise<boolean | string> => {
     return true;
   },
   google: async ({ account }: Provider): Promise<boolean | string> => {
     try {
-      const result = await fetch(`${API_PATH}/api/oauth2/signin_with_google/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: account?.access_token }),
-        credentials: "include",
-      });
+      const result = await fetch(
+        `${API_PATH}/api-v1/oauth2/signin_with_google/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: account?.access_token }),
+          credentials: "include",
+        },
+      );
+
+      logger("Google signin result", result);
 
       const { access, refresh } = (await result.json()) as {
         access: string;

@@ -1,4 +1,5 @@
 .venv
+.qrVenv
 access_timer_middleware
 check_db
 singleton

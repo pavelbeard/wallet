@@ -12,12 +12,13 @@ import { FormEvent, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import Modal from "../layout/modal";
 
-export default function DeleteAccountBtn({ params: { locale } }: LocaleProps) {
+export default function DeleteAccountBtn({}: LocaleProps) {
   const [isOpen, setForm] = useState(false);
   const t = useTranslations();
   const user = useUser();
   const public_id = user?.public_id;
-  const [formMessages, setFormMessages] = useState({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setFormMessages] = useState({
     success: null as string | null,
     error: null as string | null,
   });
@@ -78,7 +79,7 @@ export default function DeleteAccountBtn({ params: { locale } }: LocaleProps) {
               <FormTitle textSize="md">
                 {t("profile.userCard.deleteAccountQuestion")}
               </FormTitle>
-              <p className="text-sm max-w-48">
+              <p className="max-w-48 text-sm">
                 {user?.is_oauth_user
                   ? t("profile.userCard.deleteOauth2Note")
                   : t("profile.userCard.deleteAccountNote")}

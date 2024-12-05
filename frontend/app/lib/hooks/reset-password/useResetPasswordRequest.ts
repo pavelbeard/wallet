@@ -21,7 +21,7 @@ export default function useResetPasswordRequest(
     if (watch("email")) {
       clearErrors("email");
     }
-  }, [watch("email")]);
+  }, [clearErrors, watch]);
 
   const onSubmit = (data: z.infer<typeof ResetPasswordRequestSchema>) => {
     startTransition(async () => {

@@ -10,7 +10,8 @@ const nextConfig = {
   },
   experimental: {
     swcTraceProfiling: true,
-  }
+  },
+  output: "standalone",
 };
 
 export default i18wrapper(nextConfig);

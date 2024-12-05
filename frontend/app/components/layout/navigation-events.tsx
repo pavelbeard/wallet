@@ -1,5 +1,6 @@
 "use client";
 
+import logger from "@/app/lib/helpers/logger";
 import useBurgerMenuStore from "@/app/lib/hooks/ui/useBurgerMenuStore";
 import { useOverflowControlStore } from "@/app/lib/store/useOverflowControlStore";
 import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
@@ -35,7 +36,9 @@ export default function NavigationEvents() {
 
   useEffect(() => {
     // those things are for close any modal/burger/sidebar while navigation
-    process.env.NODE_ENV === "development" && console.log("pathname", pathname);
+    if (process.env.NODE_ENV === "development") {
+      logger("pathname: ", pathname);
+    }
 
     if (isOverflowHidden) setOverflowAuto();
     if (isBurgerOpen) setIsBurgerOpen(false);

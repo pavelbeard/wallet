@@ -7,7 +7,6 @@ import protectedQuery from "../helpers/protectedQuery";
 export default async function createTotpDevice(): Promise<TOTPData | null> {
   const user = await getUser();
   if (user?.provider == "credentials") {
-    // TODO: Something is wrong with the session access_token in server side
     const result = await protectedQuery({
       url: "/2fa/create_totp_device/",
       method: "POST",
