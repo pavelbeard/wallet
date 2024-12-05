@@ -1,7 +1,7 @@
 "use client";
 
 import protectedQuery from "@/app/lib/helpers/protectedQuery";
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import CustomButton from "@/app/ui/button-custom";
 import FormTitle from "@/app/ui/form-title";
 import Submit from "@/app/ui/submit";

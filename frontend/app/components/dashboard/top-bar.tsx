@@ -1,6 +1,6 @@
 "use client";
 
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
 import UserAvatarSkeleton from "../user/user-avatar-skeleton";

@@ -4,6 +4,7 @@ import { pick } from "lodash";
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { ThemeProvider } from "next-themes";
 import { Roboto_Mono } from "next/font/google";
 import { Suspense } from "react";
 import NavigationEvents from "./components/layout/navigation-events";
@@ -75,12 +76,14 @@ export default async function ErrorLayout({
           locale={locale}
           messages={pick(messages, "error")}
         >
-          <SessionProvider>
-            {children}
-            <Suspense fallback={null}>
-              <NavigationEvents />
-            </Suspense>
-          </SessionProvider>
+          <ThemeProvider themes={["dark", "light", "system"]} attribute="class">
+            <SessionProvider>
+              {children}
+              <Suspense fallback={null}>
+                <NavigationEvents />
+              </Suspense>
+            </SessionProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

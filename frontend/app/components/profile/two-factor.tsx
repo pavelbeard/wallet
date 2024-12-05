@@ -1,6 +1,6 @@
 "use client";
 
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import TwoFactorConfiguration from "./two-factor-configuration";

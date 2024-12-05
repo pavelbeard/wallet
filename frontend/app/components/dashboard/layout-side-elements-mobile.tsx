@@ -2,8 +2,8 @@
 
 import SideBar from "@/app/components/dashboard/side-bar";
 import TopBar from "@/app/components/dashboard/top-bar";
-import useDashboard from "@/app/lib/hooks/useDashboard";
-import useUserMenu from "@/app/lib/hooks/useUserMenu";
+import useDashboard from "@/app/lib/hooks/ui/useDashboard";
+import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
 import { LayoutLogo } from "@/app/ui/layout-logo";
 import LogoHeader from "@/app/ui/logo-header";
 import { UserMenuMobile } from "@/app/ui/user-menu";

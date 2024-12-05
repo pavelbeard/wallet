@@ -2,6 +2,7 @@
 
 import { Link, routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
+import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -16,7 +17,12 @@ export default function ChangeLanguage({
   const [isOpen, setOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-center gap-2 rounded-md bg-slate-100 p-2 hover:bg-slate-600 dark:bg-slate-800">
+    <div
+      className={clsx(
+        "h-10 flex items-center justify-center gap-2 rounded-md bg-slate-100 p-2",
+        "hover:bg-slate-600 dark:bg-slate-800 hover:text-slate-100",
+      )}
+    >
       <div className="flex items-center gap-2">
         <button onClick={() => setOpen(true)}>{languages[locale]}</button>
       </div>

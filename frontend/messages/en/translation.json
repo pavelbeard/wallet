@@ -170,8 +170,9 @@
   "userMenu": {
     "profile": "Profile",
     "signOut": "Sign out",
-    "language": "Change language",
-    "changeLanguage": "Change language:"
+    "language": "Language",
+    "changeLanguage": "Change language:",
+    "theme": "Theme"
   },
   "error": {
     "error500": "Error 500",

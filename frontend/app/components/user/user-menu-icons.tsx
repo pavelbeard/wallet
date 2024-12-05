@@ -2,6 +2,7 @@ import { UserMenuItem } from "@/app/lib/types";
 import {
   ArrowLeftStartOnRectangleIcon,
   LanguageIcon,
+  LightBulbIcon,
   UserIcon,
 } from "@heroicons/react/24/solid";
 
@@ -14,6 +15,10 @@ export const USER_MENU: UserMenuItem[] = [
   {
     icon: <LanguageIcon className="size-6" />,
     title: "userMenu.language",
+  },
+  {
+    icon: <LightBulbIcon className="size-6" />,
+    title: "userMenu.theme",
   },
   {
     icon: <ArrowLeftStartOnRectangleIcon className="size-6" />,

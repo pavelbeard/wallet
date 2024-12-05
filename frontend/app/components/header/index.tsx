@@ -1,7 +1,7 @@
 "use client";
 
 import useHeader from "@/app/lib/hooks/header/useHeader";
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import { OuterHeaderContext } from "@/app/lib/providers/header";
 import clsx from "clsx";
 import HeaderDesktop from "./header-desktop";

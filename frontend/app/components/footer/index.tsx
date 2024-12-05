@@ -13,6 +13,13 @@ const ChangeLanguage = dynamic(
   },
 );
 
+const ChangeTheme = dynamic(
+  () => import("@/app/components/utils/change-theme"),
+  {
+    ssr: false,
+  }
+)
+
 type FooterProps = {
   params: { locale: string };
 };
@@ -27,12 +34,12 @@ export default async function Footer({ params: { locale } }: FooterProps) {
         <p className="flex items-center gap-2">
           <CopyrightIcon /> heavycream9090.
         </p>
-        <p className="text-sm">Cartera.</p>
+        <p className="text-sm">Cartera. Version: 0.3.21</p>
         <p className="text-sm">{t("footer.rights")}</p>
       </section>
       <section className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-4">
         <ChangeLanguage href="/" params={{ locale }} />
-        <div>Change theme</div>
+        <ChangeTheme />
       </section>
     </footer>
   );

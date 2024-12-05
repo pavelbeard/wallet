@@ -1,6 +1,6 @@
 "use client";
 
-import useBurgerMenuStore from "@/app/lib/hooks/useBurgerMenuStore";
+import useBurgerMenuStore from "@/app/lib/hooks/ui/useBurgerMenuStore";
 import { useOverflowControlStore } from "@/app/lib/store/useOverflowControlStore";
 import useUserMenuStore from "@/app/lib/store/useUserMenuStore";
 import { usePathname } from "@/i18n/routing";

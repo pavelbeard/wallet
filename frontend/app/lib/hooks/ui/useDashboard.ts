@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import useUserMenuStore from "../store/useUserMenuStore";
+import useUserMenuStore from "../../store/useUserMenuStore";
 import useBurgerMenu from "./useBurgerMenu";
 
 const SLIDE_RIGHT = "animate-medium-slide-to-right";

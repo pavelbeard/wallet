@@ -1,7 +1,7 @@
 "use client";
 
 import UserCardEmailSkeleton from "@/app/components/profile/user-card-email-skeleton";
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 
 type Props = { title: string };
 

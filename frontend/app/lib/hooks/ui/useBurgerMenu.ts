@@ -3,7 +3,7 @@ import { useShallow } from "zustand/react/shallow";
 import {
   useEffectOverflow,
   useOverflow,
-} from "../store/useOverflowControlStore";
+} from "../../store/useOverflowControlStore";
 import useBurgerMenuStore from "./useBurgerMenuStore";
 
 export default function useBurgerMenu() {

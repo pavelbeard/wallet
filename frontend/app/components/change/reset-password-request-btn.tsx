@@ -34,9 +34,9 @@ export default function ResetPasswordRequestBtn() {
   const { isPending, formMessages, onSubmit } = useResetPasswordRequest(watch, clearErrors);
 
   return (
-    <div className="flex items-center justify-end text-xs text-slate-600">
+    <div className="flex items-center justify-end text-xs text-slate-600 dark:text-slate-400">
       <button
-        className="cursor-pointer hover:text-slate-700"
+        className="cursor-pointer hover:text-slate-700 dark:hover:text-slate-500"
         onClick={() => setForm(true)}
       >
         {t("auth.form.resetPassword")}

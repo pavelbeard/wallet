@@ -1,7 +1,7 @@
 "use client";
 
 import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
-import useUserMenu from "@/app/lib/hooks/useUserMenu";
+import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
 import AuthMethodLogo from "@/app/components/user/auth-method-logo";
 import UserMenuDesktop from "@/app/ui/user-menu";
 import { UserCircleIcon } from "@heroicons/react/24/outline";

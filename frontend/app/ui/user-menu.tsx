@@ -1,12 +1,13 @@
 "use client";
 
-import useUserMenu from "@/app/lib/hooks/useUserMenu";
+import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
 import { type UserMenuItem } from "@/app/lib/types";
 import { Link, usePathname } from "@/i18n/routing";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
+import ChangeTheme from "../components/utils/change-theme";
 
 const ChangeLanguage = dynamic(
   () => import("@/app/components/utils/change-language"),
@@ -45,6 +46,7 @@ function UserMenuItem({ item }: { item: UserMenuItem }) {
   const locale = useLocale();
   const t = useTranslations();
   const isChangeLanguage = item.title === "userMenu.language";
+  const isChangeTheme = item.title === "userMenu.theme";
 
   const className = clsx(
     "p-2",
@@ -63,6 +65,11 @@ function UserMenuItem({ item }: { item: UserMenuItem }) {
       {isChangeLanguage && (
         <div className={clsx("text-xs", item.fontBold && "font-bold")}>
           <ChangeLanguage href={pathname} params={{ locale }} />
+        </div>
+      )}
+      {isChangeTheme && (
+        <div className={clsx("text-xs", item.fontBold && "font-bold")}>
+          <ChangeTheme />
         </div>
       )}
     </>

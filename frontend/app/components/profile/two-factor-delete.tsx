@@ -1,6 +1,6 @@
 "use client";
 
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import Button from "@/app/ui/button-custom";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";

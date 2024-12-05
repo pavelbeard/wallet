@@ -171,8 +171,9 @@
   "userMenu": {
     "profile": "Perfil",
     "signOut": "Cerrar sesión",
-    "language": "Cambiar idioma",
-    "changeLanguage": "Cambiar idioma:"
+    "language": "Idioma",
+    "changeLanguage": "Cambiar idioma:",
+    "theme": "Tema"
   },
   "error": {
     "error500": "Falla 500",

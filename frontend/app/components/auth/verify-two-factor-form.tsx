@@ -1,7 +1,7 @@
 "use client";
 
 import useVerify from "@/app/lib/hooks/auth/useVerify";
-import useUser from "@/app/lib/hooks/useUser";
+import useUser from "@/app/lib/hooks/ui/useUser";
 import { TwoFactorSchema, TwoFactorValidator } from "@/app/lib/schemas.z";
 import FormTitle from "@/app/ui/form-title";
 import CustomInput from "@/app/ui/input-custom";
