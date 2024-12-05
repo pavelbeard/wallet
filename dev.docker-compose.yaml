@@ -79,7 +79,8 @@ services:
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     environment:
-      - NEXTAUTH_URL=http://backend:8000
+      - NEXT_API_URL=http://backend:8000
+      - NEXTAUTH_URL=http://localhost:3010
       # secrets
       - AUTH_TRUST_HOST=false
       - AUTH_SECRET=${SECRET_KEY}

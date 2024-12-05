@@ -86,7 +86,7 @@ export default async function Layout({
           locale={locale}
           messages={pick(messages, "error")}
         >
-          <ThemeProvider themes={["dark", "light", "system"]} attribute="class">
+          <ThemeProvider themes={["dark", "light", "system"]} attribute="class" defaultTheme="system">
             <SessionProvider>
               {children}
               <Suspense fallback={null}>
