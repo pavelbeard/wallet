@@ -40,7 +40,7 @@ services:
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - ALLOWED_ORIGINS=https://cartera.heavycream.es,http://backend:8800
+      - ALLOWED_ORIGINS=https://cartera.heavycream.es,http://django:8800
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
       - DJANGO_SETTINGS_DEBUG_MODE=False
@@ -58,7 +58,7 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
     depends_on:
-      - postgres
+      - db
     restart: on-failure
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
@@ -77,7 +77,7 @@ services:
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - NEXT_API_URL=http://backend:8800
+      - NEXT_API_URL=http://django:8800
       - NEXTAUTH_URL=http://cartera.heavycream.es
       - STATIC_PATH=http://cartera.heavycream.es
       # secrets
@@ -86,7 +86,7 @@ services:
       - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
     restart: on-failure
     depends_on:
-      - backend
+      - django
     networks:
       - ext
 
