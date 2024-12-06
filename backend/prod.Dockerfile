@@ -18,9 +18,9 @@ ENV APP_HOME=/home/wallet_app/app
 RUN \
    if [ ! -d $APP_HOME/staticfiles ]; then mkdir -p $APP_HOME/staticfiles; \
    else echo ""; \
-   fi \
-   addgroup --system --gid 1001 django; \
-   adduser --system --uid 1001 wallet_app;
+   fi
+RUN addgroup --system --gid 1001 django; \
+    adduser --system --uid 1001 wallet_app;
 
 WORKDIR $APP_HOME
 

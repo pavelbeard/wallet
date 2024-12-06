@@ -92,6 +92,7 @@ services:
     environment:
       - NEXT_API_URL=http://backend:8800
       - NEXTAUTH_URL=http://cartera.heavycream.es
+      - STATIC_PATH=http://cartera.heavycream.es
       # secrets
       - AUTH_SECRET=${SECRET_KEY}
       - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
