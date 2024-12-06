@@ -12,6 +12,8 @@ services:
       - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
       - "--entryPoints.websecure.address=:443"
     ports:
+      - "80:80"
+      - "8800:8080"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -19,6 +21,6 @@ services:
     networks:
       - ext
 
-  networks:
-    ext:
-      external: true
+networks:
+  ext:
+    external: true
