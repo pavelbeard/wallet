@@ -46,7 +46,7 @@ services:
       - DJANGO_SETTINGS_DEBUG_MODE=False
       - SERVER_ADDRESS=0.0.0.0
       - SERVER_PORT=8000
-      - POSTGRES_DB_HOST=postgres
+      - POSTGRES_DB_HOST=db
       - POSTGRES_DB_NAME=wallet
       - POSTGRES_DB_USER=main
       - POSTGRES_DB_PORT=5432
