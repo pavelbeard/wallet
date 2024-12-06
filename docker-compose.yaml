@@ -9,7 +9,7 @@ services:
       - "30"
       - "--rolling-restart"
     networks:
-      - default
+      - ext
 
   postgres:
     image: postgres:16
@@ -27,7 +27,7 @@ services:
     volumes:
       - postgresdata:/var/lib/postgresql/data
     networks:
-      - default
+      - ext
 
 
   backend:
@@ -64,7 +64,7 @@ services:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
     networks:
-      - default
+      - ext
 
   frontend:
     image: pavelbeard/wallet-frontend.production:latest
@@ -88,7 +88,7 @@ services:
     depends_on:
       - backend
     networks:
-      - default
+      - ext
 
   file_server:
     image: pavelbeard/wallet-file-server.production:latest
@@ -103,7 +103,7 @@ services:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
     networks:
-      - default
+      - ext
 
 volumes:
   letsencrypt:
@@ -112,6 +112,5 @@ volumes:
   file_server_data.images:
 
 networks:
-  default:
-    external:
-      name: heavycream_network
+  ext:
+    external: true

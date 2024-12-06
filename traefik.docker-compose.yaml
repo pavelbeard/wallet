@@ -20,5 +20,4 @@ traefik:
 
 networks:
   default:
-    external:
-      name: heavycream_network
+    external: true
