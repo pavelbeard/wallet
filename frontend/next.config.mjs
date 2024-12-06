@@ -8,9 +8,9 @@ const nextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
-  experimental: {
-    swcTraceProfiling: true,
-  },
+  // experimental: {
+  //   swcTraceProfiling: true,
+  // },
   output: "standalone",
 };
 
