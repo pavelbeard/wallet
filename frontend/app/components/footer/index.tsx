@@ -34,7 +34,7 @@ export default async function Footer({ params: { locale } }: FooterProps) {
         <p className="flex items-center gap-2">
           <CopyrightIcon /> heavycream9090.
         </p>
-        <p className="text-sm">Cartera. Version: 0.3.4</p>
+        <p className="text-sm">Cartera. Version: 0.3.7</p>
         <p className="text-sm">{t("footer.rights")}</p>
       </section>
       <section className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-4">
