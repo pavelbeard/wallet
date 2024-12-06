@@ -1,22 +1,4 @@
 services:
-  traefik:
-    image: traefik:v3.1
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=heavycream9090@icloud.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entryPoints.web.address=:80"
-      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entryPoints.websecure.address=:443"
-    ports:
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
-
   watchtower:
     image: containrrr/watchtower
     volumes:
@@ -26,6 +8,8 @@ services:
       - "--interval"
       - "30"
       - "--rolling-restart"
+    networks:
+      - default
 
   postgres:
     image: postgres:16
@@ -42,6 +26,8 @@ services:
     restart: on-failure
     volumes:
       - postgresdata:/var/lib/postgresql/data
+    networks:
+      - default
 
 
   backend:
@@ -77,6 +63,8 @@ services:
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
+    networks:
+      - default
 
   frontend:
     image: pavelbeard/wallet-frontend.production:latest
@@ -99,6 +87,8 @@ services:
     restart: on-failure
     depends_on:
       - backend
+    networks:
+      - default
 
   file_server:
     image: pavelbeard/wallet-file-server.production:latest
@@ -112,8 +102,16 @@ services:
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
+    networks:
+      - default
 
 volumes:
+  letsencrypt:
   postgresdata:
   file_server_data.staticfiles:
   file_server_data.images:
+
+networks:
+  default:
+    external:
+      name: heavycream_network
