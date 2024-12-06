@@ -1,5 +1,5 @@
 services:
-  watchtower:
+  updater:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -11,7 +11,7 @@ services:
     networks:
       - ext
 
-  postgres:
+  db:
     image: postgres:16
     labels:
       # loadbalancer
@@ -30,7 +30,7 @@ services:
       - ext
 
 
-  backend:
+  django:
     image: pavelbeard/wallet-backend.production:latest
     labels:
       # loadbalancer
@@ -66,7 +66,7 @@ services:
     networks:
       - ext
 
-  frontend:
+  nextjs:
     image: pavelbeard/wallet-frontend.production:latest
     labels:
       # loadbalancer
