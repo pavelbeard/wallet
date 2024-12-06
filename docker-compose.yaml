@@ -35,8 +35,8 @@ services:
     labels:
       # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.routers.django.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
+      - "traefik.http.services.django.loadbalancer.server.port=8000"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
@@ -71,9 +71,9 @@ services:
     labels:
       # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.nextjs.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
+      - "traefik.http.routers.nextjs.entrypoints=web"
+      - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
