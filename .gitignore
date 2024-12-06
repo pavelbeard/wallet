@@ -71,3 +71,4 @@ node_modules/
 
 frontend/.env.development.local
 test-frontend/
+.pytest_cache

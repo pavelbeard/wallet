@@ -11,9 +11,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, TokenError
-from rest_framework_simplejwt.views import TokenRefreshView
 
-from . import models, serializers, stuff_logic
+from . import models, serializers
 from . import permissions as stuff_permissions
 from .controller import (
     Auth,
@@ -103,23 +102,23 @@ class OAuth2ViewSet(viewsets.ViewSet, dj_rest_auth_views.SocialLoginView):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CookieTokenRefreshView(TokenRefreshView):
-    serializer_class = serializers.CookieTokenRefreshSerializer
+# class CookieTokenRefreshView(TokenRefreshView):
+#     serializer_class = serializers.CookieTokenRefreshSerializer
 
-    def finalize_response(self, request, response, *args, **kwargs):
-        if response.data.get("refresh") and response.status_code == status.HTTP_200_OK:
-            stuff_logic.set_auth_cookies(
-                response=response,
-                jwt_tokens={
-                    "access": response.data["access"],
-                    "refresh": response.data["refresh"],
-                },
-            )
+#     def finalize_response(self, request, response, *args, **kwargs):
+#         if response.data.get("refresh") and response.status_code == status.HTTP_200_OK:
+#             stuff_logic.set_auth_cookies(
+#                 response=response,
+#                 jwt_tokens={
+#                     "access": response.data["access"],
+#                     "refresh": response.data["refresh"],
+#                 },
+#             )
 
-        if response.status_code == status.HTTP_401_UNAUTHORIZED:
-            response.data["error"] = _("Token is blacklisted.")
+#         if response.status_code == status.HTTP_401_UNAUTHORIZED:
+#             response.data["error"] = _("Token is blacklisted.")
 
-        return super().finalize_response(request, response, *args, **kwargs)
+#         return super().finalize_response(request, response, *args, **kwargs)
 
 
 class TwoFactorAuthViewSet(viewsets.ViewSet):

@@ -14,7 +14,7 @@ env = environ.Env(
     DJANGO_SUPERUSER_USERNAME=(str, "admin"),
     DJANGO_SUPERUSER_EMAIL=(str, "admin@example.com"),
     SERVER_ADDRESS=(str, "0.0.0.0"),
-    SERVER_PORT=(str, "8000"),
+    SERVER_PORT=(str, 8000),
 )
 
 SERVER_ADDRESS = env("SERVER_ADDRESS")
@@ -93,8 +93,17 @@ def main(app_name):
         createsuperuser()
         collectstatic()
         create_devices()
+        # CORRECT THIS
+        # DOES NOT WORK
         p = subprocess.Popen(
-            ("uvicorn", {app_name}, f"--host {SERVER_ADDRESS}", f"--port {SERVER_PORT}")
+            args=[
+                "uvicorn",
+                f"{app_name}",
+                "--host",
+                f"{SERVER_ADDRESS}",
+                "--port",
+                f"{SERVER_PORT}",
+            ]
         )
         p.communicate()
 

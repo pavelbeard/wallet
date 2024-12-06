@@ -1,6 +1,7 @@
 import { UserDevice } from "@/app/lib/profile/getDevices";
 import { LocaleProps } from "@/i18n/types";
 import { getTranslations } from "next-intl/server";
+import Image from "../image";
 
 type DeviceProps = { device: UserDevice } & LocaleProps;
 
@@ -13,7 +14,7 @@ export default async function Device({
   });
   return (
     <div className="flex flex-col gap-2 p-2 lg:flex-row">
-      <img
+      <Image
         src={device.d_device.icon}
         alt={device.d_device.d_name}
         className="size-8 lg:size-12"

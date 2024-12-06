@@ -8,8 +8,6 @@ import { ThemeProvider } from "next-themes";
 import { Roboto_Mono } from "next/font/google";
 import { Suspense } from "react";
 import NavigationEvents from "./components/layout/navigation-events";
-import logger from "./lib/helpers/logger";
-import query from "./lib/helpers/query";
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
@@ -30,13 +28,6 @@ export default async function Layout({
   params: { locale },
 }: ErrorProps) {
   const messages = await getMessages();
-  const testQuery = query({
-    url: "/users/username_suggestions/",
-    method: "POST",
-    body: { username: "admin", count: 5 },
-  });
-
-  logger(testQuery);
 
   return (
     <html lang={locale} className={robotoMono.className}>
@@ -86,7 +77,11 @@ export default async function Layout({
           locale={locale}
           messages={pick(messages, "error")}
         >
-          <ThemeProvider themes={["dark", "light", "system"]} attribute="class" defaultTheme="system">
+          <ThemeProvider
+            themes={["dark", "light", "system"]}
+            attribute="class"
+            defaultTheme="system"
+          >
             <SessionProvider>
               {children}
               <Suspense fallback={null}>

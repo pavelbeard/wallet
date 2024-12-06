@@ -6,7 +6,6 @@
     "dev": "next dev ",
     "start": "next start",
     "build": "next build",
-    "build:dev": "NODE_ENV=production next build",
     "lint": "next lint",
     "test:vitest": "vitest --watch",
     "test:playwright": "playwright test",

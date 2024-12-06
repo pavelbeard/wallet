@@ -4,35 +4,58 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=heavycream9090@icloud.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entryPoints.web.address=:80"
+      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.websecure.address=:443"
     ports:
-      - "3010:80"
-      - "8800:8080"
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - "--label-enable"
+      - "--interval"
+      - "30"
+      - "--rolling-restart"
 
   postgres:
-    image: postgres
-    restart: on-failure
+    image: postgres:16
+    labels:
+      # loadbalancer
+      - "traefik.enable=true"
+      # watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - POSTGRES_USER=main
       - POSTGRES_DB=wallet
       # secrets
       - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+    restart: on-failure
     volumes:
       - postgresdata:/var/lib/postgresql/data
 
+
   backend:
-    build:
-      context: backend/
-      dockerfile: dev.Dockerfile
+    image: pavelbeard/wallet-backend.production:latest
     labels:
+      # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=(Host(`localhost`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`)))"
+      - "traefik.http.routers.backend.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      # watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - ALLOWED_ORIGINS=http://backend:8000
+      - ALLOWED_ORIGINS=https://cartera.heavycream.es,http://backend:8800
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
       - DJANGO_SETTINGS_DEBUG_MODE=False
@@ -42,14 +65,13 @@ services:
       - POSTGRES_DB_NAME=wallet
       - POSTGRES_DB_USER=main
       - POSTGRES_DB_PORT=5432
-      - FRONTEND_URL=http://localhost:3010
+      - FRONTEND_URL=https://cartera.heavycream.es
       # secrets
       - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
       - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
       - SECRET_KEY=${SECRET_KEY}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
-    command: ["python", "/home/wallet_app/app/entrypoint.py"]
     depends_on:
       - postgres
     restart: on-failure
@@ -58,20 +80,19 @@ services:
       - file_server_data.images:/home/wallet_app/app/media
 
   frontend:
-    build:
-      context: frontend/
-      dockerfile: dev.Dockerfile
+    image: pavelbeard/wallet-frontend.production:latest
     labels:
+      # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
+      - "traefik.http.routers.frontend.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      # watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - NEXT_API_URL=http://backend:8000
-      - NEXTAUTH_URL=http://localhost:3010
-      - NEXT_PUBLIC_URL=http://localhost:3010
+      - NEXT_API_URL=http://backend:8800
+      - NEXTAUTH_URL=http://cartera.heavycream.es
       # secrets
-      - AUTH_TRUST_HOST=false
       - AUTH_SECRET=${SECRET_KEY}
       - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
       - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
@@ -80,12 +101,13 @@ services:
       - backend
 
   file_server:
-    build:
-      context: file-server/
-      dockerfile: dev.Dockerfile
+    image: pavelbeard/wallet-file-server.production:latest
     labels:
+      # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.file_server.rule=Host(`localhost`) && PathPrefix(`/backend/static`) || PathPrefix(`/backend/media`)"
+      - "traefik.http.routers.file_server.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/backend/static`) || PathPrefix(`/backend/media`))"
+      # watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
     restart: on-failure
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
