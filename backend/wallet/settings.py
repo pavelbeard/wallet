@@ -10,36 +10,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import environ
-import os
 import re
-from pathlib import Path
 
 from django.utils import timezone
 
+from env_config import env
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-
-env = environ.Env(
-    DJANGO_SETTINGS_DEBUG_MODE=(bool, False),
-    FRONTEND_URL=(str, "http://localhost:3000"),
-    RESEND_API_KEY=(str, os.environ.get("RESEND_TEST_API_KEY")),
-)
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-environ.Env.read_env(os.path.join(BASE_DIR, ".env.local"), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DJANGO_SETTINGS_DEBUG_MODE")
+DEBUG = env.debug_mode
 
-
-# dotenv
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env.get_env.SECRET_KEY
 
 
 ALLOWED_HOSTS = ["*"]
@@ -99,7 +85,7 @@ ROOT_URLCONF = "wallet.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [env.base_dir / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -121,18 +107,18 @@ if DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": env.base_dir / "db.sqlite3",
         }
     }
 elif not DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": env("POSTGRES_DB_NAME"),
-            "USER": env("POSTGRES_DB_USER"),
-            "PASSWORD": env("POSTGRES_DB_PASSWORD"),
-            "HOST": env("POSTGRES_DB_HOST"),
-            "PORT": env("POSTGRES_DB_PORT"),
+            "NAME": env.get_env.POSTGRES_DB_NAME,
+            "USER": env.get_env.POSTGRES_DB_USER,
+            "PASSWORD": env.get_env.POSTGRES_DB_PASSWORD,
+            "HOST": env.get_env.POSTGRES_DB_HOST,
+            "PORT": env.get_env.POSTGRES_DB_PORT,
         }
     }
 
@@ -168,8 +154,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_ROOT = BASE_DIR / "media"
+STATIC_ROOT = env.base_dir / "staticfiles"
+MEDIA_ROOT = env.base_dir / "media"
 
 # static
 if DEBUG:
@@ -219,14 +205,14 @@ if DEBUG:
         "https://127.0.0.1",
     ]
 else:
-    CSRF_TRUSTED_ORIGINS = re.split(r",|\s", env("ALLOWED_ORIGINS"))
+    CSRF_TRUSTED_ORIGINS = re.split(r",|\s", env.get_env.ALLOWED_ORIGINS)
 
 # CORS
 
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
-    CORS_ALLOWED_ORIGINS = re.split(r",|\s", env("ALLOWED_ORIGINS"))
+    CORS_ALLOWED_ORIGINS = re.split(r",|\s", env.get_env.ALLOWED_ORIGINS)
 
 CORS_ALLOWED_METHODS = ["GET", "POST", "PUT", "OPTIONS", "DELETE"]
 CORS_ALLOW_CREDENTIALS = True
@@ -306,8 +292,8 @@ SOCIALACCOUNT_PROVIDERS = {
             "email",
         ],
         "APP": {
-            "client_id": env("AUTH_GOOGLE_ID"),
-            "secret": env("AUTH_GOOGLE_SECRET"),
+            "client_id": env.get_env.AUTH_GOOGLE_ID,
+            "secret": env.get_env.AUTH_GOOGLE_SECRET,
             "key": "",
         },
         "AUTH_PARAMS": {
@@ -318,9 +304,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-FRONTEND_URL = env("FRONTEND_URL")
+FRONTEND_URL = env.get_env.FRONTEND_URL
 
 # email
 
 EMAIL_HOST_USER = "onboarding@resend.dev"
-RESEND_API_KEY = env("RESEND_API_KEY")
+RESEND_API_KEY = env.get_env.RESEND_API_KEY

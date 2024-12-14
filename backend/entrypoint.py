@@ -1,25 +1,10 @@
 import logging
 import os
-import environ
 import subprocess
 import sys
 
-from pathlib import Path
-from django.core.management import execute_from_command_line, CommandError
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-env = environ.Env(
-    DJANGO_SETTINGS_DEBUG_MODE=(bool, False),
-    DJANGO_SUPERUSER_USERNAME=(str, "admin"),
-    DJANGO_SUPERUSER_EMAIL=(str, "admin@example.com"),
-    SERVER_ADDRESS=(str, "0.0.0.0"),
-    SERVER_PORT=(str, 8000),
-)
-
-SERVER_ADDRESS = env("SERVER_ADDRESS")
-SERVER_PORT = env("SERVER_PORT")
-DJANGO_SETTINGS_DEBUG_MODE = bool(env("DJANGO_SETTINGS_DEBUG_MODE", 0))
+from django.core.management import CommandError, execute_from_command_line
+from env_config import env
 
 
 def check_db(
@@ -34,14 +19,12 @@ def check_db(
     if attempts > 0:
         _args += ["--attempts", f"{attempts}"]
 
-    p = subprocess.Popen(_args)
-    p.communicate()
-
-    exit_code = p.returncode
-
-    logging.info(msg=f"Task has returned exit code: {exit_code}")
-
-    return exit_code == 0
+    try:
+        execute_from_command_line(_args)
+        return True
+    except Exception as e:
+        logging.error("Error: ", e)
+        return False
 
 
 def migrate():
@@ -55,16 +38,18 @@ def createsuperuser():
         from django.contrib.auth import get_user_model
 
         User = get_user_model()
-        if not User.objects.filter(username=env("DJANGO_SUPERUSER_USERNAME")).exists():
+        if not User.objects.filter(
+            username=env.get_env.DJANGO_SUPERUSER_USERNAME
+        ).exists():
             execute_from_command_line(
                 [
                     "manage.py",
                     "createsuperuser",
                     "--username",
-                    env("DJANGO_SUPERUSER_USERNAME"),
+                    env.get_env.DJANGO_SUPERUSER_USERNAME,
                     "--noinput",
                     "--email",
-                    env("DJANGO_SUPERUSER_EMAIL"),
+                    env.get_env.DJANGO_SUPERUSER_EMAIL,
                 ]
             )
     except CommandError as e:
@@ -86,9 +71,7 @@ def main(app_name):
     if not app_name:
         raise ValueError("app_name cannot be empty")
 
-    if check_db(
-        ["python", "manage.py"], post_args=["checkdb", "--database"], db="default"
-    ):
+    if check_db(["manage.py"], post_args=["checkdb", "--database"], db="default"):
         migrate()
         createsuperuser()
         collectstatic()
@@ -100,9 +83,9 @@ def main(app_name):
                 "uvicorn",
                 f"{app_name}",
                 "--host",
-                f"{SERVER_ADDRESS}",
+                f"{env.get_env.SERVER_ADDRESS}",
                 "--port",
-                f"{SERVER_PORT}",
+                f"{env.get_env.SERVER_PORT}",
             ]
         )
         p.communicate()

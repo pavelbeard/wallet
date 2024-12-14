@@ -18,7 +18,7 @@ export const useModalStore = create<State & Action>((set) => ({
     })),
 }));
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
   mountStoreDevtool("useModalStore", useModalStore);
 }
 

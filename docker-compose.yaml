@@ -1,4 +1,24 @@
 services:
+  traefik:
+    image: traefik:v3.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=heavycream9090@icloud.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+
   updater:
     image: containrrr/watchtower
     volumes:
@@ -8,8 +28,6 @@ services:
       - "--interval"
       - "30"
       - "--rolling-restart"
-    networks:
-      - ext
 
   db:
     image: postgres:16
@@ -22,12 +40,10 @@ services:
       - POSTGRES_USER=main
       - POSTGRES_DB=wallet
       # secrets
-      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_DB_PASSWORD_CUSEC
     restart: on-failure
     volumes:
       - postgresdata:/var/lib/postgresql/data
-    networks:
-      - ext
 
 
   django:
@@ -35,13 +51,13 @@ services:
     labels:
       # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
+      - "traefik.http.routers.django.rule=Host(`cusec.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
       - "traefik.http.routers.django.tls.certresolver=myresolver"
       - "traefik.http.services.django.loadbalancer.server.port=8000"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - ALLOWED_ORIGINS=https://cartera.heavycream.es,http://django:8800
+      - ALLOWED_ORIGINS=https://cusec.es,http://django:8800
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
       - DJANGO_SETTINGS_DEBUG_MODE=False
@@ -51,28 +67,27 @@ services:
       - POSTGRES_DB_NAME=wallet
       - POSTGRES_DB_USER=main
       - POSTGRES_DB_PORT=5432
-      - FRONTEND_URL=https://cartera.heavycream.es
+      - FRONTEND_URL=https://cusec.es
       # secrets
-      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
-      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
-      - SECRET_KEY=${SECRET_KEY}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
-      - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - SECRET_KEY=/run/secrets/SECRET_KEY_CUSEC
+      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID_CUSEC
+      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET_CUSEC
+      - DJANGO_SUPERUSER_PASSWORD=/run/secrets/DJANGO_SUPERUSER_PASSWORD_CUSEC
+      - POSTGRES_DB_PASSWORD=/run/secrets/POSTGRES_DB_PASSWORD_CUSEC
+      - RESEND_API_KEY=/run/secrets/RESEND_API_KEY_CUSEC
     depends_on:
       - db
     restart: on-failure
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
-    networks:
-      - ext
 
   nextjs:
     image: pavelbeard/wallet-frontend.production:latest
     labels:
       # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
+      - "traefik.http.routers.nextjs.rule=Host(`cusec.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
       - "traefik.http.routers.nextjs.entrypoints=web"
       - "traefik.http.routers.nextjs.tls.certresolver=myresolver"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
@@ -80,24 +95,22 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - NEXT_API_URL=http://django:8800
-      - NEXTAUTH_URL=http://cartera.heavycream.es
-      - STATIC_PATH=http://cartera.heavycream.es
+      - NEXTAUTH_URL=http://cusec.es
+      - STATIC_PATH=http://cusec.es
       # secrets
-      - AUTH_SECRET=${SECRET_KEY}
-      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
-      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET}
+      - AUTH_SECRET=/run/secrets/SECRET_KEY_CUSEC
+      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID_CUSEC
+      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET_CUSEC
     restart: on-failure
     depends_on:
       - django
-    networks:
-      - ext
 
   file_server:
     image: pavelbeard/wallet-file-server.production:latest
     labels:
       # loadbalancer
       - "traefik.enable=true"
-      - "traefik.http.routers.file_server.rule=Host(`cartera.heavycream.es`) && (PathPrefix(`/backend/static`) || PathPrefix(`/backend/media`))"
+      - "traefik.http.routers.file_server.rule=Host(`cusec.es`) && (PathPrefix(`/backend/static`) || PathPrefix(`/backend/media`))"
       - "traefik.http.routers.file_server.tls.certresolver=myresolver"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
@@ -105,8 +118,6 @@ services:
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
-    networks:
-      - ext
 
 volumes:
   letsencrypt:
@@ -114,6 +125,16 @@ volumes:
   file_server_data.staticfiles:
   file_server_data.images:
 
-networks:
-  ext:
+secrets:
+  AUTH_GOOGLE_ID_CUSEC:
+    external: true
+  AUTH_GOOGLE_SECRET_CUSEC:
+    external: true
+  SECRET_KEY_CUSEC:
+    external: true
+  DJANGO_SUPERUSER_PASSWORD_CUSEC:
+    external: true
+  POSTGRES_DB_PASSWORD_CUSEC:
+    external: true
+  RESEND_API_KEY_CUSEC:
     external: true

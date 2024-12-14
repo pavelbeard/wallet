@@ -14,7 +14,7 @@ const useBurgerMenuStore = create<State & Action>((set) => ({
   setIsBurgerOpen: (payload) => set(() => ({ isBurgerOpen: payload })),
 }));
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
   mountStoreDevtool("useBurgerMenuStore", useBurgerMenuStore);
 }
 

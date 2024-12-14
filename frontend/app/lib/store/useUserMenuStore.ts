@@ -1,3 +1,4 @@
+import { mountStoreDevtool } from "simple-zustand-devtools";
 import { create } from "zustand";
 
 type State = {
@@ -23,8 +24,8 @@ const useUserMenuStore = create<State & Action>((set) => ({
   closeMobile: () => set((state) => ({ ...state, isOpenMobile: false })),
 }));
 
-// if (process.env.NODE_ENV === "development") {
-//   mountStoreDevtool("useUserMenuStore", useUserMenuStore);
-// }
+if (process.env.NODE_ENV !== "production") {
+  mountStoreDevtool("useUserMenuStore", useUserMenuStore);
+}
 
 export default useUserMenuStore;

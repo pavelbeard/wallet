@@ -2,6 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python Debugger: Entrypoint.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/entrypoint.py",
+      "console": "integratedTerminal",
+    },
+    {
       "name": "Python Debugger: Django",
       "type": "debugpy",
       "request": "launch",

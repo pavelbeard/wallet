@@ -23,7 +23,7 @@ export const useOverflowControlStore = create<State & Action>((set) => ({
     set((state) => ({ ...state, isOverflowHidden: false })),
 }));
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "production") {
   mountStoreDevtool("useOverflowControlStore", useOverflowControlStore);
 }
 

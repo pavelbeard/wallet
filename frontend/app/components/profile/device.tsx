@@ -17,6 +17,8 @@ export default async function Device({
       <Image
         src={device.d_device.icon}
         alt={device.d_device.d_name}
+        width={48}
+        height={48}
         className="size-8 lg:size-12"
       />
       <section className="flex flex-col gap-1 [&>p]:text-xs [&>p]:text-slate-500 dark:[&>p]:text-slate-300">
