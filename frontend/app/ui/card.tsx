@@ -12,8 +12,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
       ref={ref}
       className={clsx(
         className,
-        "shadow-black drop-shadow-lg lg:drop-shadow-2xl bg-white rounded-xl",
-        "dark:bg-slate-800 dark:text-gray-100 dark:border-slate-600",
+        "shadow-black drop-shadow-lg lg:drop-shadow-xl bg-white rounded-xl",
+        "dark:bg-slate-800 dark:text-gray-100 dark:border dark:border-slate-600",
       )}
     >
       {children}

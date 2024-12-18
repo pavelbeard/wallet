@@ -21,12 +21,10 @@ export default function UserAvatar({ src, provider }: Props) {
   const isDesktop = useDesktopBreakpoint();
 
   if (src) {
+    // desktop oauth avatar
     if (isDesktop) {
       return (
-        <div
-          data-type="desktop-oauth-avatar"
-          className="relative hidden lg:block"
-        >
+        <div data-type="desktop-oauth-avatar" className="relative">
           <div className="hover-avatar">
             <Image
               onClick={toggleOpen}
@@ -42,7 +40,8 @@ export default function UserAvatar({ src, provider }: Props) {
         </div>
       );
     } else {
-      <div data-type="mobile-oauth-avatar" className="relative block lg:hidden">
+      // mobile oauth avatar
+      <div data-type="mobile-oauth-avatar" className="relative">
         <div className="hover-avatar">
           <Image
             onClick={toggleOpenMobile}
@@ -57,6 +56,7 @@ export default function UserAvatar({ src, provider }: Props) {
       </div>;
     }
   } else {
+    // desktop credentials avatar
     if (isDesktop) {
       return (
         <div
@@ -75,6 +75,7 @@ export default function UserAvatar({ src, provider }: Props) {
         </div>
       );
     } else {
+      // mobile credentials avatar
       return (
         <div className="flex flex-col lg:hidden">
           <div

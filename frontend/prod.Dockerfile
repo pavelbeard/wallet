@@ -36,12 +36,16 @@ FROM base AS runner
 WORKDIR /app
 
 RUN \
-   addgroup --system --gid 1001 nextjs; \
+   addgroup --system --gid 1001 nextjs && \
    adduser --system --uid 1001 wallet_app;
 
 COPY --from=builder /app ./public
 
+
 RUN mkdir .next; chown -R wallet_app:nextjs .next
+
+COPY --from=builder /app/replace-env.sh /usr/local/bin/replace-env.sh
+RUN chmod +x /usr/local/bin/replace-env.sh
 
 COPY --from=builder --chown=wallet_app:nextjs /app/.next/standalone ./
 COPY --from=builder --chown=wallet_app:nextjs /app/.next/static ./.next/static
@@ -50,6 +54,11 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
+# ENV PORT=3000
+# ENV HOSTNAME="0.0.0.0"
+
 USER wallet_app
+
+ENTRYPOINT [ "replace-env.sh" ]
 
 CMD ["node", "server.js"]

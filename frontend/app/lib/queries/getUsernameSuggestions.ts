@@ -32,11 +32,21 @@ export default async function getUsernameSuggestions(username: string) {
 
   if (result?.ok) {
     const json = await result.json();
+
+    if (Array.isArray(json.username)) {
+      return {
+        error: null,
+        data: json.username as string[],
+        loading: false,
+        isTaken: true,
+      };
+    }
+
     return {
       error: null,
-      data: json.username as string[],
+      data: json.username as string,
       loading: false,
-      isTaken: true,
+      isTaken: false,
     };
   }
 

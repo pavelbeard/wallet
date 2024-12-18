@@ -48,9 +48,7 @@ class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def signin(self, request):
         try:
-            serializer = serializers.TwoFactorJWTSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = Auth.sign_in(data=serializer.validated_data, request=request)
+            result = Auth.sign_in(request=request)
             return result
         except AuthenticationFailed as e:
             logger.error(msg=e.args[0], exc_info=True)
@@ -69,9 +67,7 @@ class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def signout(self, request):
         try:
-            serializer = serializers.SignOutSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = Auth.sign_out(serializer.validated_data)
+            result = Auth.sign_out(request=request)
             return result
         except TokenError:
             logger.exception(_("Token is blacklisted"), exc_info=True)
@@ -97,28 +93,15 @@ class OAuth2ViewSet(viewsets.ViewSet, dj_rest_auth_views.SocialLoginView):
         except TypeError as e:
             logger.error(msg=e.args[0], exc_info=True)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                data={"error": e.detail},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception:
             logger.error(_("Something went wrong..."), exc_info=True)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# class CookieTokenRefreshView(TokenRefreshView):
-#     serializer_class = serializers.CookieTokenRefreshSerializer
-
-#     def finalize_response(self, request, response, *args, **kwargs):
-#         if response.data.get("refresh") and response.status_code == status.HTTP_200_OK:
-#             stuff_logic.set_auth_cookies(
-#                 response=response,
-#                 jwt_tokens={
-#                     "access": response.data["access"],
-#                     "refresh": response.data["refresh"],
-#                 },
-#             )
-
-#         if response.status_code == status.HTTP_401_UNAUTHORIZED:
-#             response.data["error"] = _("Token is blacklisted.")
-
-#         return super().finalize_response(request, response, *args, **kwargs)
 
 
 class TwoFactorAuthViewSet(viewsets.ViewSet):
@@ -136,12 +119,7 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
     def verify_totp_device(self, request):
         """Verify/enable a TOTP device."""
         try:
-            serializer = serializers.VerifyTOTPDeviceSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            user = request.user
-            result = TOTPDeviceController.verify_totp_device(
-                serializer.validated_data, user
-            )
+            result = TOTPDeviceController.verify_totp_device(request=request)
             return result
         except TypeError:
             return Response(
@@ -249,11 +227,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"])
     def create_change_email_request(self, request):
         try:
-            serializer = serializers.ChangeEmailSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.change_email_request(
-                validated_data=serializer.validated_data, user=request.user
-            )
+            result = WalletUserController.change_email_request(request=request)
             return result
         except TypeError as e:
             return Response(
@@ -267,9 +241,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"])
     def verify_email_change(self, request):
         try:
-            serializer = serializers.VerifyEmailChangeSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.verify_email_change(serializer.validated_data)
+            result = WalletUserController.verify_email_change(request=request)
             return result
         except TypeError as e:
             return Response(
@@ -284,12 +256,9 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     def change_password(self, request, **kwargs):
         """Change user password."""
         try:
-            pk = kwargs.get("public_id")
-            serializer = serializers.ChangePasswordSerializer(
-                data=request.data, context={"public_id": pk}
+            result = WalletUserController.change_password(
+                request=request, pk=kwargs.get("public_id")
             )
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.change_password(serializer.validated_data)
             return result
         except TypeError as e:
             logger.error(msg=e.args[0], exc_info=True)
@@ -308,13 +277,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def create_reset_password_request(self, request):
         try:
-            serializer = serializers.CreateResetPasswordRequestSerializer(
-                data=request.data
-            )
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.create_reset_password_request(
-                serializer.validated_data
-            )
+            result = WalletUserController.create_reset_password_request(request=request)
             return result
         except ValidationError as e:
             return Response(
@@ -328,9 +291,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def create_new_password(self, request):
         try:
-            serializer = serializers.CreateNewPasswordSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.create_new_password(serializer.validated_data)
+            result = WalletUserController.create_new_password(request=request)
             return result
         except ValidationError as e:
             return Response(
@@ -344,11 +305,7 @@ class WalletUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
     def username_suggestions(self, request):
         try:
-            serializer = serializers.UsernameSuggestionsSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            result = WalletUserController.username_suggestions(
-                serializer.validated_data
-            )
+            result = WalletUserController.username_suggestions(request=request)
             return result
         except TypeError:
             return Response(
@@ -361,13 +318,9 @@ class WalletUserViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, **kwargs):
         try:
-            serializer = serializers.DeleteAccountSerializer(
-                data=request.data, context={"public_id": kwargs.get("public_id")}
-            )
-            serializer.is_valid(raise_exception=True)
             WalletUserController.destroy(
-                validated_data=serializer.validated_data,
-                public_id=kwargs.get("public_id"),
+                request=request,
+                pk=kwargs.get("public_id"),
             )
             return Response(status=status.HTTP_204_NO_CONTENT)
         except TypeError as e:

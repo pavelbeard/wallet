@@ -49,7 +49,6 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - POSTGRES_DB_PASSWORD=${POSTGRES_DB_PASSWORD}
-    command: ["python", "/home/wallet_app/app/entrypoint.py"]
     depends_on:
       - db
     restart: on-failure
@@ -69,7 +68,6 @@ services:
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     environment:
       - NEXT_API_URL=http://django:8000
-      - NEXTAUTH_URL=http://localhost:3010
       - STATIC_PATH=http://localhost:3010
       # secrets
       - AUTH_TRUST_HOST=false

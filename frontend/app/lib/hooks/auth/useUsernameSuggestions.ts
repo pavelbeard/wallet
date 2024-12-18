@@ -29,7 +29,7 @@ export default function useUsernameSuggestions(username: string | undefined) {
         },
       );
     }
-  }, [debouncedUsername, username]);
+  }, [debouncedUsername]);
 
   useEffect(() => {
     if (

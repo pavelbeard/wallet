@@ -31,8 +31,7 @@ class WalletUserManager(BaseUserManager, AbstractManager):
         user = self.model(**user_data)
         if password and not extra_fields.get("is_oauth_user"):
             user.password = make_password(password)
-
-        if not extra_fields.get("is_superuser") or (
+        elif not extra_fields.get("is_superuser") or (
             not password and not extra_fields.get("is_oauth_user")
         ):
             raise TypeError(_("Password or oauth creation method are required."))

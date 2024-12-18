@@ -1,8 +1,8 @@
 import { API_PATH } from "@/app/lib/helpers/constants";
+import { AccessDenied } from "@auth/core/errors";
 import { CredentialInput } from "@auth/core/providers";
 import { Account, Profile, User } from "next-auth";
 import getUserDataJson from "../helpers/getUserDataJson";
-import logger from "../helpers/logger";
 
 type Provider = {
   user: User;
@@ -36,9 +36,15 @@ export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
         },
       );
 
-      logger("Google signin result", result);
+      const json = await result.json();
 
-      const { access, refresh } = (await result.json()) as {
+      if ("error" in json) {
+        // @ts-expect-error error is necessary
+        const errorData = Object.values(Object.values(json.error)[0])[0][0];
+        throw new AccessDenied(errorData);
+      }
+
+      const { access, refresh } = json as {
         access: string;
         refresh: string;
       };
@@ -64,7 +70,6 @@ export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
 
       return true;
     } catch (error) {
-      console.error(error);
       return false;
     }
   },

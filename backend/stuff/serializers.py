@@ -6,7 +6,7 @@ from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff import stuff_logic
+from stuff import two_factor_utils
 from stuff.controller import WalletUserController
 from stuff.types import Action
 
@@ -179,7 +179,7 @@ class TwoFactorJWTSerializer(
     @classmethod
     def get_token(cls, user: WalletUser):
         device = user.totpdevice_set.first()
-        payload = stuff_logic.jwt_custom_payload(
+        payload = two_factor_utils.jwt_custom_payload(
             user=user, device=device, Action=Action.sign_in
         )
         tokens = super().get_token(user)

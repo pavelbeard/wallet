@@ -6,7 +6,6 @@ import sys
 from django.core.management import CommandError, execute_from_command_line
 from env_config import env
 
-
 def check_db(
     args, post_args: list | tuple, db: str, seconds: int = 0, attempts: int = 5
 ) -> bool:
@@ -35,23 +34,12 @@ def migrate():
 def createsuperuser():
     """Create superuser"""
     try:
-        from django.contrib.auth import get_user_model
-
-        User = get_user_model()
-        if not User.objects.filter(
-            username=env.get_env.DJANGO_SUPERUSER_USERNAME
-        ).exists():
-            execute_from_command_line(
-                [
-                    "manage.py",
-                    "createsuperuser",
-                    "--username",
-                    env.get_env.DJANGO_SUPERUSER_USERNAME,
-                    "--noinput",
-                    "--email",
-                    env.get_env.DJANGO_SUPERUSER_EMAIL,
-                ]
-            )
+        execute_from_command_line(
+            [
+                "manage.py",
+                "initadmin",
+            ]
+        )
     except CommandError as e:
         logging.info("Info: ", e)
 
@@ -76,8 +64,6 @@ def main(app_name):
         createsuperuser()
         collectstatic()
         create_devices()
-        # CORRECT THIS
-        # DOES NOT WORK
         p = subprocess.Popen(
             args=[
                 "uvicorn",

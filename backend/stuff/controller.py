@@ -14,7 +14,7 @@ from rest_framework_simplejwt import tokens
 
 from stuff.utils import send_email, suggest_username
 
-from . import exceptions, serializers, stuff_logic
+from . import exceptions, serializers, two_factor_utils
 from .models import EmailVerificationToken, PasswordResetToken, WalletUser
 from .types import Action
 
@@ -22,13 +22,10 @@ from .types import Action
 class Auth:
     @staticmethod
     # TODO: add email verification, add username creation and first/last names
-    def sign_up(request: HttpRequest):
+    def sign_up(request: HttpRequest) -> Response:
         serializer = serializers.SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         instance = serializer.save()
-        if not instance:
-            raise TypeError(_("Failed to create user!"))
 
         user = WalletUser.objects.filter(email=instance.email).first()
 
@@ -44,7 +41,11 @@ class Auth:
         )
 
     @staticmethod
-    def sign_in(data: Dict[str, str | bool], request: HttpRequest) -> Response:
+    def sign_in(request: HttpRequest) -> Response:
+        serializer = serializers.TwoFactorJWTSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: Dict[str, str | bool] = serializer.validated_data
+
         response = Response()
         access_token = data["access"]
         refresh_token = data["refresh"]
@@ -56,7 +57,7 @@ class Auth:
                 "refresh": refresh_token,
             }
             auth_response = response
-            csrf_response = stuff_logic.set_csrf_cookie(
+            csrf_response = two_factor_utils.set_csrf_cookie(
                 request=request, response=auth_response
             )
             return csrf_response
@@ -64,7 +65,11 @@ class Auth:
         raise exceptions.AuthenticationFailed(_("User is not active"))
 
     @staticmethod
-    def sign_out(data: Dict[str, str]):
+    def sign_out(request: HttpRequest) -> Response:
+        serializer = serializers.SignOutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: Dict[str, str] = serializer.validated_data
+
         refresh_token = data.get("refresh_token")
 
         token = tokens.RefreshToken(refresh_token)
@@ -87,11 +92,11 @@ class Oauth2Auth:
         user.email_verified = True
         user.save()
 
-        jwt_tokens = stuff_logic.get_custom_jwt(user=user, action=Action.oauth2)
+        jwt_tokens = two_factor_utils.get_custom_jwt(user=user, action=Action.oauth2)
 
         return Response(
             data={"access": jwt_tokens["access"], "refresh": jwt_tokens["refresh"]},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
@@ -102,7 +107,7 @@ class TOTPDeviceController:
         response = Response()
         # configure device
         user = request.user
-        device = stuff_logic.get_user_totp_device(user)
+        device = two_factor_utils.get_user_totp_device(user)
         if not device:
             device = user.totpdevice_set.create(confirmed=False)
         url = device.config_url
@@ -120,7 +125,12 @@ class TOTPDeviceController:
         return response
 
     @staticmethod
-    def verify_totp_device(data: Dict[str, str], user: WalletUser):
+    def verify_totp_device(request: HttpRequest) -> Response:
+        serializer = serializers.VerifyTOTPDeviceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user: WalletUser = request.user
+        data: Dict[str, str] = serializer.validated_data
+
         otp_token = data.get("token")
         if not otp_token:
             return Response(
@@ -128,7 +138,7 @@ class TOTPDeviceController:
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        device = stuff_logic.get_user_totp_device(user)
+        device = two_factor_utils.get_user_totp_device(user)
         if device is not None and device.verify_token(token=otp_token):
             if not device.confirmed:
                 device.confirmed = True
@@ -136,12 +146,8 @@ class TOTPDeviceController:
 
                 user.is_two_factor_enabled = True
                 user.save()
-            tokens = stuff_logic.get_custom_jwt(user, device, action=Action.verify)
+            tokens = two_factor_utils.get_custom_jwt(user, device, action=Action.verify)
             response = Response(status=status.HTTP_200_OK)
-            # new_token_response = stuff_logic.set_auth_cookies(
-            #     response=response,
-            #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
-            # )
             response.data = {
                 "access": tokens["access"],
                 "refresh": tokens["refresh"],
@@ -154,7 +160,7 @@ class TOTPDeviceController:
     @staticmethod
     def create_backup_tokens(request: HttpRequest):
         number_of_codes = 12
-        device = stuff_logic.get_user_static_device(request.user)
+        device = two_factor_utils.get_user_static_device(request.user)
         if not device:
             device = StaticDevice.objects.create(user=request.user, name="Static")
 
@@ -177,9 +183,9 @@ class TOTPDeviceController:
             )
 
         user = request.user
-        device = stuff_logic.get_user_static_device(user)
+        device = two_factor_utils.get_user_static_device(user)
         if device is not None and device.verify_token(otp_token):
-            token = stuff_logic.get_custom_jwt(user, device)
+            token = two_factor_utils.get_custom_jwt(user, device)
             # TODO: update refresh token
             return Response({"access": token}, status=status.HTTP_200_OK)
 
@@ -201,7 +207,7 @@ class TOTPDeviceController:
         user.is_two_factor_enabled = False
         user.save()
 
-        tokens = stuff_logic.get_custom_jwt(user, None, Action.delete)
+        tokens = two_factor_utils.get_custom_jwt(user, None, Action.delete)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
 
@@ -241,7 +247,13 @@ class WalletUserController:
         return Response(data, status=status.HTTP_200_OK)
 
     @staticmethod
-    def change_email_request(validated_data: Dict[str, str], user: WalletUser):
+    def change_email_request(request: HttpRequest) -> Response:
+        serializer = serializers.ChangeEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user: WalletUser = request.user
+        validated_data: Dict[str, str] = serializer.validated_data
+
         email = validated_data.get("email")
 
         old_records = EmailVerificationToken.objects.filter(user=user)
@@ -262,7 +274,12 @@ class WalletUserController:
         )
 
     @staticmethod
-    def verify_email_change(validated_data: Dict[str, str]):
+    def verify_email_change(request: HttpRequest) -> Response:
+        serializer = serializers.VerifyEmailChangeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str] = serializer.validated_data
+
         email = validated_data.get("email")
         user = WalletUser.objects.filter(pk=validated_data.get("user_pk")).first()
 
@@ -277,22 +294,36 @@ class WalletUserController:
         )
 
     @staticmethod
-    def change_password(data: Dict[str, str]) -> Response:
+    def change_password(request: HttpRequest, pk: str) -> Response:
         """Change user password."""
-        user = WalletUser.objects.filter(public_id=data.get("public_id")).first()
+        serializer = serializers.ChangePasswordSerializer(
+            data=request.data, context={"public_id": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str] = serializer.validated_data
+
+        user = WalletUser.objects.filter(
+            public_id=validated_data.get("public_id")
+        ).first()
         if not user:
             raise TypeError(_("User not found"))
 
-        user.set_password(data.get("password"))
+        user.set_password(validated_data.get("password"))
         user.save()
 
         return Response({"detail": _("Password changed!")}, status=status.HTTP_200_OK)
 
     @staticmethod
-    def create_reset_password_request(data: Dict[str, str]) -> Response:
+    def create_reset_password_request(request: HttpRequest) -> Response:
         """Forgot password."""
-        email = data.get("email")
-        username = data.get("username")
+        serializer = serializers.CreateResetPasswordRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str] = serializer.validated_data
+
+        email = validated_data.get("email")
+        # username = validated_data.get("username")
 
         user = WalletUser.objects.filter(email=email).first()
 
@@ -317,9 +348,16 @@ class WalletUserController:
         )
 
     @staticmethod
-    def create_new_password(data: Dict[str, str | int]) -> Response:
-        user = WalletUser.objects.filter(public_id=data.get("public_id")).first()
-        password = data.get("password")
+    def create_new_password(request: HttpRequest) -> Response:
+        serializer = serializers.CreateNewPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str | int] = serializer.validated_data
+
+        user = WalletUser.objects.filter(
+            public_id=validated_data.get("public_id")
+        ).first()
+        password = validated_data.get("password")
 
         if not user:
             raise TypeError(_("User not found"))
@@ -333,9 +371,14 @@ class WalletUserController:
         )
 
     @staticmethod
-    def username_suggestions(data: Dict[str, str | int]) -> Response:
-        username = data.get("username")
-        roll_count = data.get("count")
+    def username_suggestions(request: HttpRequest) -> Response:
+        serializer = serializers.UsernameSuggestionsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str | int] = serializer.validated_data
+
+        username = validated_data.get("username")
+        roll_count = validated_data.get("count")
 
         if not username:
             raise TypeError(_("Please provide username in query params"))
@@ -348,12 +391,19 @@ class WalletUserController:
         return Response({"username": username}, status=status.HTTP_200_OK)
 
     @staticmethod
-    def destroy(validated_data: Dict[str, str] | None, public_id: Any) -> None:
-        user: WalletUser = WalletUser.objects.filter(public_id=public_id).first()
+    def destroy(request: HttpRequest, pk: Any) -> None:
+        serializer = serializers.DeleteAccountSerializer(
+            data=request.data, context={"public_id": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        validated_data: Dict[str, str] = serializer.validated_data
+
+        user: WalletUser = WalletUser.objects.filter(public_id=pk).first()
 
         if user.is_two_factor_enabled:
             token = validated_data.get("token")
-            device = stuff_logic.get_user_totp_device(user)
+            device = two_factor_utils.get_user_totp_device(user)
             if device is not None and device.verify_token(token):
                 device.delete()
                 user.delete()

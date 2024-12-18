@@ -20,17 +20,17 @@ export function Buttons({
   const buttons: { [key: string]: JSX.Element } = {
     dark: (
       <button key="dark" onClick={() => setColorScheme("dark")}>
-        <DarkMode />
+        <DarkMode className="max-lg:size-5" />
       </button>
     ),
     system: (
       <button key="system" onClick={() => setColorScheme("system")}>
-        <SystemMode />
+        <SystemMode className="max-lg:size-5" />
       </button>
     ),
     light: (
       <button key="light" onClick={() => setColorScheme("light")}>
-        <LightMode />
+        <LightMode className="max-lg:size-5" />
       </button>
     ),
   };
@@ -50,8 +50,8 @@ export default function ChangeTheme() {
     <div
       onClick={() => setOpen(!isOpen)}
       className={clsx(
-        "relative flex h-10 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800",
-        "[&>button]:p-2",
+        "relative flex h-[28px] lg:h-10 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800",
+        "[&>button]:p-1 lg:[&>button]:p-2",
         isOpen
           ? [
               "[&>button:first-child]:rounded-l-md [&>button:hover]:bg-slate-600",

@@ -25,3 +25,5 @@ WORKDIR $APP_HOME
 COPY . $APP_HOME
 
 EXPOSE 8000
+
+CMD ["python", "run.py"]

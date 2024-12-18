@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
@@ -24,14 +23,16 @@ class UserAdmin(BaseUserAdmin):
         "username",
         "public_id",
         "email",
+        "email_verified",
         "is_two_factor_enabled",
+        "is_oauth_user",
         "is_active",
         "is_staff",
         "is_superuser",
     )
 
     fieldsets = (
-        (None, {"fields": ("username", "email", "password", "is_two_factor_enabled")}),
+        (None, {"fields": ("username", "email", "password")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
         ("Groups", {"fields": ("groups",)}),
         ("User permissions", {"fields": ("user_permissions",)}),
@@ -68,11 +69,12 @@ class EmailVerificationTokenAdmin(admin.ModelAdmin):
     def is_valid(self, obj: EmailVerificationToken):
         return obj.is_valid()
 
+
 @admin.register(PasswordResetToken)
 class PasswordResetTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token", "created_at", "until", "is_valid", "is_active")
     search_fields = ("user", "token", "created_at", "until")
-    
+
     @admin.display(boolean=True, description=_("Is token valid"))
     def is_valid(self, obj: PasswordResetToken):
         return obj.is_valid()

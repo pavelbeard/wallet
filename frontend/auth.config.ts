@@ -1,4 +1,5 @@
 import {
+  authorizedCallback,
   jwtCallback,
   sessionCallback,
   signInCallback,
@@ -9,6 +10,10 @@ import { JWT as NextAuthJWT } from "next-auth/jwt";
 
 export const authConfig = {
   callbacks: {
+    async authorized({ request, auth }) {
+      const result = await authorizedCallback({ request, auth });
+      return result;
+    },
     async signIn({ user, account, profile, email, credentials }) {
       const result = await signInCallback({
         user,
@@ -44,6 +49,7 @@ export const authConfig = {
     },
   },
   providers,
+  debug: true,
 } satisfies NextAuthConfig;
 
 export const providersList: string[] = providers.map((provider) => provider.id);

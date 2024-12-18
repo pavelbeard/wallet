@@ -1,7 +1,10 @@
+from calendar import c
+import os
 import time
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from qrcode.image.pil import PilImage
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -10,9 +13,9 @@ from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
-from stuff import stuff_logic
+from backend.stuff import two_factor_utils
 from stuff.models import EmailVerificationToken, PasswordResetToken, WalletUser
-from stuff.stuff_logic import override_api_settings
+from backend.stuff.two_factor_utils import override_api_settings
 
 User = get_user_model()
 
@@ -338,7 +341,7 @@ class TokensVerificationTestCase(APITestCase):
 
     def test_two_factor_verification_qr(self):
         test_data = "otpauth://totp/testuser?secret=7JHJUOZQN4PBQK4ZTJONKSGQUYGGDESL&algorithm=SHA1&digits=6&period=30"
-        result = stuff_logic.generate_2fa_key_in_qr_code(test_data)
+        result = two_factor_utils.generate_2fa_key_in_qr_code(test_data)
 
         self.assertEqual(type(result), PilImage)
 
@@ -562,3 +565,20 @@ class PasswordResetTestCase(APITestCase):
         self.assertIn("detail", response2.json())
 
         print(response2.content)
+
+
+class DbTest(TestCase):
+    def test_database(self):
+        from psycopg2 import connect
+
+        conn = connect(
+            host="3.69.85.185",
+            database="wallet",
+            user="main",
+            password=os.environ.get("POSTGRES_DB_PASSWORD_TEST"),
+            port=5432,
+        )
+        
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM pg_user;")
+        print(cur.fetchall())

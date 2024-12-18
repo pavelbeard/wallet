@@ -1,6 +1,6 @@
+import rewriteRoutes from "@/app/lib/helpers/rewriteRoutes";
 import { WalletUser } from "@/auth";
 import { routing } from "@/i18n/routing";
-import { LocalesList } from "@/i18n/types";
 import {
   authRoutes,
   DEFAULT_SIGNED_IN_PATH,
@@ -14,18 +14,6 @@ import {
   type NextRequest,
 } from "next/server";
 import { CustomMiddleware } from "./types";
-
-function rewriteRoutes(protectedPaths: string[], locales: LocalesList) {
-  let protectedIntlRoutes = [...protectedPaths];
-
-  protectedPaths.forEach((route) => {
-    locales.forEach((locale) => {
-      protectedIntlRoutes = [...protectedIntlRoutes, `/${locale}${route}`];
-    });
-  });
-
-  return protectedIntlRoutes;
-}
 
 export default function authjsMiddleware(middleware: CustomMiddleware) {
   return async (request: NextRequest, event: NextFetchEvent) => {

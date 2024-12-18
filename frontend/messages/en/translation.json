@@ -40,7 +40,12 @@
     },
     "errors": {
       "badCredentials": "Bad credentials!",
-      "unknown": "Something went wrong..."
+      "unknown": "Something went wrong...",
+      "accessDenied": "Access denied",
+      "userExists": "User already exists",
+      "configuration": "Configuration error",
+      "accessDeniedMessage": "Probably the user with this email exists.",
+      "configurationMessage": "Server error. If that repeat again, address to the developers"
     }
   },
   "mainPage": {
@@ -165,7 +170,9 @@
     "signOut": "Sign out",
     "main": "Main",
     "passwords": "Passwords",
-    "cards": "Cards"
+    "cards": "Cards",
+    "profile": "Profile",
+    "theme": "Theme"
   },
   "userMenu": {
     "profile": "Profile",

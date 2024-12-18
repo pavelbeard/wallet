@@ -37,19 +37,19 @@ WORKDIR /app
 
 RUN \
    addgroup --system --gid 1001 nextjs; \
-   adduser --system --uid 1001 cartera;
+   adduser --system --uid 1001 wallet_app;
 
 COPY --from=builder /app ./public
 
-RUN mkdir .next; chown cartera:nextjs .next
+RUN mkdir .next; chown wallet_app:nextjs .next
 
-COPY --from=builder --chown=cartera:nextjs /app/.next/standalone ./
-COPY --from=builder --chown=cartera:nextjs /app/.next/static ./.next/static
+COPY --from=builder --chown=wallet_app:nextjs /app/.next/standalone ./
+COPY --from=builder --chown=wallet_app:nextjs /app/.next/static ./.next/static
 
 ENV NODE_ENV=development
 
 EXPOSE 3000
 
-USER cartera
+USER wallet_app
 
 CMD ["node", "server.js"]

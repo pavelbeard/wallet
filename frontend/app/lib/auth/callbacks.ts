@@ -3,9 +3,19 @@ import {
   SIGN_IN_HANDLERS,
   SIGN_IN_PROVIDERS,
 } from "@/app/lib/auth/signInProviders";
+import rewriteRoutes from "@/app/lib/helpers/rewriteRoutes";
 import { NextAuthUserSchema, UpdateSessionSchema } from "@/app/lib/schemas.z";
 import { Awaitable } from "@/app/lib/types";
 import { WalletUser } from "@/auth";
+import { routing } from "@/i18n/routing";
+import { LocalesList } from "@/i18n/types";
+import {
+  authRoutes,
+  DEFAULT_SIGNED_IN_PATH,
+  DEFAULT_SIGNED_OUT_PATH,
+  DEFAULT_VERIFICATION_ROUTE,
+  protectedRoutes,
+} from "@/routes";
 import {
   Account,
   DefaultSession,
@@ -17,6 +27,12 @@ import {
 import { AdapterSession, AdapterUser } from "next-auth/adapters";
 import { JWT as NextAuthJWT } from "next-auth/jwt";
 import { CredentialInput } from "next-auth/providers";
+import { NextRequest, NextResponse } from "next/server";
+
+type AuthorizedCallback = (params: {
+  request: NextRequest;
+  auth: Session | null;
+}) => Awaitable<boolean | NextResponse | Response | undefined>;
 
 type SignInCallback = (params: {
   user: User | AdapterUser;
@@ -52,6 +68,79 @@ type SessionCallback = (
     trigger?: "update";
   },
 ) => Awaitable<Session | DefaultSession>;
+
+const routeMatcher = (
+  routes: string[],
+  locales: LocalesList,
+  pathname: string,
+) => {
+  const rewrittenRoutes = rewriteRoutes(routes, locales);
+  return rewrittenRoutes.includes(pathname);
+};
+
+const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
+  const user = auth?.user as WalletUser;
+  const { pathname } = request.nextUrl;
+  const locale = request.cookies.get("NEXT_LOCALE")?.value;
+
+  const isProtectedRoute = routeMatcher(
+    protectedRoutes,
+    routing.locales,
+    pathname,
+  );
+
+  const isErrorRoute = "/auth/error" == pathname;
+
+  const isVerificationRoute = routeMatcher(
+    [DEFAULT_VERIFICATION_ROUTE],
+    routing.locales,
+    pathname,
+  );
+
+  const isAuthRoute = routeMatcher(authRoutes, routing.locales, pathname);
+
+  // ** CASE 0: User got an error **
+  if (isErrorRoute) {
+    return NextResponse.redirect(
+      new URL(
+        `/${locale ?? "es"}${pathname}${request.nextUrl.search}`,
+        request.url,
+      ),
+    );
+  }
+
+  // ** CASE 1: User is authenticated with 2FA and verified **
+  if (user && (isAuthRoute || (user?.verified && isVerificationRoute))) {
+    return NextResponse.redirect(
+      new URL(`/${locale ?? "es"}${DEFAULT_SIGNED_IN_PATH}`, request.url),
+    );
+  }
+
+  // ** CASE 2: User is authenticated with 2FA but without verification **
+  if (user?.is_two_factor_enabled && !user?.verified && isProtectedRoute) {
+    const tokenVerifyPath = new URL(
+      `/${locale ?? "es"}${DEFAULT_VERIFICATION_ROUTE}`,
+      request.url,
+    );
+    tokenVerifyPath.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(tokenVerifyPath);
+  }
+
+  // ** CASE 3: User is not authenticated **
+  if (!user && (isProtectedRoute || isVerificationRoute)) {
+    const unauthenticatedPath = new URL(
+      `/${locale ?? "es"}${DEFAULT_SIGNED_OUT_PATH}`,
+      request.url,
+    );
+    return NextResponse.redirect(unauthenticatedPath);
+  }
+
+  // ** CASE 4: User is accessing public route **
+  // ** CASE 5: User is accessing protected route **
+  // ** CASE 6: Fallback **
+
+  return NextResponse.next();
+};
 
 const signInCallback: SignInCallback = ({
   user,
@@ -147,4 +236,4 @@ const sessionCallback: SessionCallback = ({ session, token }) => {
   return session;
 };
 
-export { jwtCallback, sessionCallback, signInCallback };
+export { authorizedCallback, jwtCallback, sessionCallback, signInCallback };

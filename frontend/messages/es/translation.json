@@ -40,7 +40,11 @@
     },
     "errors": {
       "badCredentials": "Credentiales incorrectas!",
-      "unknown": "Algo ha pasado mal..."
+      "unknown": "Algo ha pasado mal...",
+      "accessDenied": "Acceso denegado",
+      "configuration": "Error de configuración",
+      "accessDeniedMessage": "Probablemente el usuario con este nombre de email existe.",
+      "configurationMessage": "Error del servidor. \nSi eso se repite nuevamente, dirígete a los desarrolladores."
     }
   },
   "mainPage": {
@@ -166,7 +170,9 @@
     "signOut": "Cerrar sesión",
     "main": "Inicio",
     "passwords": "Contraseñas",
-    "cards": "Tarjetas"
+    "cards": "Tarjetas",
+    "profile": "Perfil",
+    "theme": "Tema"
   },
   "userMenu": {
     "profile": "Perfil",

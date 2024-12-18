@@ -32,4 +32,4 @@ USER wallet_app
 
 EXPOSE 8800
 
-CMD ["python", "/home/wallet_app/app/entrypoint.py"]
+CMD ["python", "/home/wallet_app/app/run.py"]

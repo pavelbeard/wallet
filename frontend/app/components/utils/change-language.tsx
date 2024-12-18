@@ -19,7 +19,7 @@ export default function ChangeLanguage({
   return (
     <div
       className={clsx(
-        "h-10 flex items-center justify-center gap-2 rounded-md bg-slate-100 p-2",
+        "h-[28px] lg:h-10 flex items-center justify-center gap-2 rounded-md bg-slate-100 p-2",
         "hover:bg-slate-600 dark:bg-slate-800 hover:text-slate-100",
       )}
     >
@@ -34,7 +34,7 @@ export default function ChangeLanguage({
               {routing.locales.map((locale) => (
                 <Link
                   key={locale}
-                  className="w-32 rounded-md bg-slate-100 p-2 hover:bg-slate-600 dark:bg-slate-800"
+                  className="w-32 rounded-md bg-slate-100 p-1 lg:p-2 hover:bg-slate-600 dark:bg-slate-800"
                   href={href}
                   locale={locale}
                 >

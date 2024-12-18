@@ -37,14 +37,19 @@ services:
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
-      - POSTGRES_USER=main
       - POSTGRES_DB=wallet
+      - POSTGRES_USER=main
       # secrets
-      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_DB_PASSWORD_CUSEC
-    restart: on-failure
+      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_DB_PASSWORD
     volumes:
       - postgresdata:/var/lib/postgresql/data
-
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    secrets:
+      - POSTGRES_DB_PASSWORD
 
   django:
     image: pavelbeard/wallet-backend.production:latest
@@ -52,8 +57,8 @@ services:
       # loadbalancer
       - "traefik.enable=true"
       - "traefik.http.routers.django.rule=Host(`cusec.es`) && (PathPrefix(`/api-v1`) || PathPrefix(`/admin`))"
+      - "traefik.http.routers.django.entrypoints=websecure"
       - "traefik.http.routers.django.tls.certresolver=myresolver"
-      - "traefik.http.services.django.loadbalancer.server.port=8000"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
@@ -62,25 +67,36 @@ services:
       - DJANGO_SUPERUSER_EMAIL=heavycream9090@icloud.com
       - DJANGO_SETTINGS_DEBUG_MODE=False
       - SERVER_ADDRESS=0.0.0.0
-      - SERVER_PORT=8000
+      - SERVER_PORT=8800
       - POSTGRES_DB_HOST=db
       - POSTGRES_DB_NAME=wallet
       - POSTGRES_DB_USER=main
       - POSTGRES_DB_PORT=5432
       - FRONTEND_URL=https://cusec.es
       # secrets
-      - SECRET_KEY=/run/secrets/SECRET_KEY_CUSEC
-      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID_CUSEC
-      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET_CUSEC
-      - DJANGO_SUPERUSER_PASSWORD=/run/secrets/DJANGO_SUPERUSER_PASSWORD_CUSEC
-      - POSTGRES_DB_PASSWORD=/run/secrets/POSTGRES_DB_PASSWORD_CUSEC
-      - RESEND_API_KEY=/run/secrets/RESEND_API_KEY_CUSEC
+      - SECRET_KEY=/run/secrets/SECRET_KEY
+      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID
+      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET
+      - DJANGO_SUPERUSER_PASSWORD=/run/secrets/DJANGO_SUPERUSER_PASSWORD
+      - POSTGRES_DB_PASSWORD=/run/secrets/POSTGRES_DB_PASSWORD
+      - RESEND_API_KEY=/run/secrets/RESEND_API_KEY
     depends_on:
       - db
-    restart: on-failure
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    secrets:
+      - SECRET_KEY
+      - AUTH_GOOGLE_ID
+      - AUTH_GOOGLE_SECRET
+      - DJANGO_SUPERUSER_PASSWORD
+      - POSTGRES_DB_PASSWORD
+      # - RESEND_API_KEY
 
   nextjs:
     image: pavelbeard/wallet-frontend.production:latest
@@ -88,22 +104,31 @@ services:
       # loadbalancer
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`cusec.es`) && (PathPrefix(`/`) || PathPrefix(`/api`))"
-      - "traefik.http.routers.nextjs.entrypoints=web"
+      - "traefik.http.routers.nextjs.entrypoints=websecure"
       - "traefik.http.routers.nextjs.tls.certresolver=myresolver"
-      - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - NEXT_API_URL=http://django:8800
-      - NEXTAUTH_URL=http://cusec.es
-      - STATIC_PATH=http://cusec.es
+      - STATIC_PATH=https://cusec.es
+      - AUTH_REDIRECT_PROXY_URL=https://cusec.es/api/auth
+      - AUTH_URL=https://cusec.es
+      - AUTH_TRUST_HOST=true
       # secrets
-      - AUTH_SECRET=/run/secrets/SECRET_KEY_CUSEC
-      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID_CUSEC
-      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET_CUSEC
-    restart: on-failure
+      - AUTH_SECRET=/run/secrets/AUTH_SECRET
+      - AUTH_GOOGLE_ID=/run/secrets/AUTH_GOOGLE_ID
+      - AUTH_GOOGLE_SECRET=/run/secrets/AUTH_GOOGLE_SECRET
     depends_on:
       - django
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    secrets:
+      - AUTH_SECRET
+      - AUTH_GOOGLE_ID
+      - AUTH_GOOGLE_SECRET
 
   file_server:
     image: pavelbeard/wallet-file-server.production:latest
@@ -111,13 +136,18 @@ services:
       # loadbalancer
       - "traefik.enable=true"
       - "traefik.http.routers.file_server.rule=Host(`cusec.es`) && (PathPrefix(`/backend/static`) || PathPrefix(`/backend/media`))"
+      - "traefik.http.routers.file_server.entrypoints=websecure"
       - "traefik.http.routers.file_server.tls.certresolver=myresolver"
       # watchtower
       - "com.centurylinklabs.watchtower.enable=true"
-    restart: on-failure
     volumes:
       - file_server_data.staticfiles:/home/wallet_app/app/staticfiles
       - file_server_data.images:/home/wallet_app/app/media
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
 volumes:
   letsencrypt:
@@ -126,15 +156,17 @@ volumes:
   file_server_data.images:
 
 secrets:
-  AUTH_GOOGLE_ID_CUSEC:
+  AUTH_SECRET:
     external: true
-  AUTH_GOOGLE_SECRET_CUSEC:
+  AUTH_GOOGLE_ID:
     external: true
-  SECRET_KEY_CUSEC:
+  AUTH_GOOGLE_SECRET:
     external: true
-  DJANGO_SUPERUSER_PASSWORD_CUSEC:
+  SECRET_KEY:
     external: true
-  POSTGRES_DB_PASSWORD_CUSEC:
+  DJANGO_SUPERUSER_PASSWORD:
     external: true
-  RESEND_API_KEY_CUSEC:
+  POSTGRES_DB_PASSWORD:
+    external: true
+  RESEND_API_KEY:
     external: true

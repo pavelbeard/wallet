@@ -1,7 +1,7 @@
 "use server";
 
-import { API_PATH } from "@/app/lib/helpers/constants";
 import { SignUpSchema, SignUpValidator } from "@/app/lib/schemas.z";
+import query from "../helpers/query";
 
 export default async function registration(values: SignUpValidator) {
   const validatedData = SignUpSchema.safeParse(values);
@@ -13,13 +13,20 @@ export default async function registration(values: SignUpValidator) {
     };
   }
 
-  const response = await fetch(`${API_PATH}/api/auth/signup/`, {
+  const response = await query({
+    url: "/auth/signup/",
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(validatedData.data),
+    body: validatedData.data,
   });
 
-  if (!response.ok) {
+  if (response instanceof Error) {
+    return {
+      success: null,
+      error: response.message,
+    };
+  }
+
+  if (response && !response.ok) {
     const errorData = await response.json();
 
     return {

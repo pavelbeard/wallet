@@ -2,6 +2,19 @@ import os
 from pathlib import Path
 
 
+def get_secret(key, default=None):
+    value = os.environ.get(key, default)
+    
+    if value is None:
+        return default
+    
+    if os.path.isfile(value):
+        with open(value, "r") as f:
+            return f.read().strip()
+        
+    return value.strip()
+
+
 class Environment:
     @property
     def base_dir(self):
@@ -27,43 +40,13 @@ class Environment:
             self.DJANGO_SUPERUSER_EMAIL = os.environ.get("DJANGO_SUPERUSER_EMAIL_TEST", "admin@example.com")
 
             return self
-
         else:
-            SECRET_KEY_FILE = "/run/secrets/SECRET_KEY_CUSEC"
-            POSTGRES_DB_PASSWORD_FILE = "/run/secrets/POSTGRES_DB_PASSWORD_CUSEC"
-            RESEND_API_KEY_FILE = "/run/secrets/RESEND_API_KEY_CUSEC"
-            AUTH_GOOGLE_ID_FILE = "/run/secrets/AUTH_GOOGLE_ID_CUSEC"
-            AUTH_GOOGLE_SECRET_FILE = "/run/secrets/AUTH_GOOGLE_SECRET_CUSEC"
-
-            if os.path.exists(SECRET_KEY_FILE):
-                with open(SECRET_KEY_FILE, "r") as f:
-                    self.SECRET_KEY = f.read()
-            else:
-                self.SECRET_KEY = os.environ.get("SECRET_KEY")
-
-            if os.path.exists(POSTGRES_DB_PASSWORD_FILE):
-                with open(POSTGRES_DB_PASSWORD_FILE, "r") as f:
-                    self.POSTGRES_DB_PASSWORD = f.read()
-            else:
-                self.POSTGRES_DB_PASSWORD = os.environ.get("POSTGRES_DB_PASSWORD")
-
-            if os.path.exists(RESEND_API_KEY_FILE):
-                with open(RESEND_API_KEY_FILE, "r") as f:
-                    self.RESEND_API_KEY = f.read()
-            else:
-                self.RESEND_API_KEY = os.environ.get("RESEND_TEST_API_KEY")
-
-            if os.path.exists(AUTH_GOOGLE_ID_FILE):
-                with open(AUTH_GOOGLE_ID_FILE, "r") as f:
-                    self.AUTH_GOOGLE_ID = f.read()
-            else:
-                self.AUTH_GOOGLE_ID = os.environ.get("AUTH_GOOGLE_ID")
-
-            if os.path.exists(AUTH_GOOGLE_SECRET_FILE):
-                with open(AUTH_GOOGLE_SECRET_FILE, "r") as f:
-                    self.AUTH_GOOGLE_SECRET = f.read()
-            else:
-                self.AUTH_GOOGLE_SECRET = os.environ.get("AUTH_GOOGLE_SECRET")
+            self.SECRET_KEY = get_secret("SECRET_KEY")
+            self.POSTGRES_DB_PASSWORD = get_secret("POSTGRES_DB_PASSWORD")
+            self.RESEND_API_KEY = get_secret("RESEND_API_KEY")
+            self.AUTH_GOOGLE_ID = get_secret("AUTH_GOOGLE_ID")
+            self.AUTH_GOOGLE_SECRET = get_secret("AUTH_GOOGLE_SECRET")
+            self.DJANGO_SUPERUSER_PASSWORD = get_secret("DJANGO_SUPERUSER_PASSWORD")
 
             self.FRONTEND_URL = os.environ.get("FRONTEND_URL")
             self.POSTGRES_DB_NAME = os.environ.get("POSTGRES_DB_NAME")
