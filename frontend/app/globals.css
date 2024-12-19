@@ -28,7 +28,7 @@
 }
 
 .welcome-text {
-  @apply text-xl lg:text-3xl text-white font-bold text-center;
+  @apply text-center text-xl font-bold text-white lg:text-3xl;
 }
 
 .main-links {
@@ -48,7 +48,11 @@
 }
 
 .hover-avatar {
-  @apply hover:scale-110 transition-all hover:duration-300 hover:ease-in-out;
+  @apply transition-all hover:scale-110 hover:duration-300 hover:ease-in-out;
+}
+
+.bar-item {
+  @apply cursor-pointer hover:rounded-xl hover:bg-white hover:text-black hover:shadow-black hover:drop-shadow-xl dark:hover:bg-slate-600 dark:hover:text-slate-400;
 }
 
 @layer utilities {

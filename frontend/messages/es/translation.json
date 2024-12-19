@@ -172,7 +172,8 @@
     "passwords": "Contraseñas",
     "cards": "Tarjetas",
     "profile": "Perfil",
-    "theme": "Tema"
+    "theme": "Tema",
+    "language": "Idioma"
   },
   "userMenu": {
     "profile": "Perfil",
@@ -242,5 +243,12 @@
   },
   "usernameSuggestions": {
     "error": "Se toma el nombre de usuario"
+  },
+  "topbar": {
+    "theme": {
+      "light": "Luz",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
   }
 }

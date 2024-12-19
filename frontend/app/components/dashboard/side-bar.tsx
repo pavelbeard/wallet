@@ -1,50 +1,54 @@
 "use client";
 
+import useUser from "@/app/lib/hooks/ui/useUser";
 import { sideMenu } from "@/app/lib/sidebar";
 import { SideBarItem } from "@/app/lib/types";
 import { Link } from "@/i18n/routing";
-import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
+import UserAvatarSkeleton from "../user/user-avatar-skeleton";
+import SideBarSignOut from "./side-bar-sign-out";
 
-const SideBarProfileMobile = dynamic(
-  () => import("@/app/components/dashboard/side-bar-profile"),
-  {
-    ssr: false,
-  },
-);
-
-const SideBarThemeMobile = dynamic(
-  () => import("@/app/components/dashboard/side-bar-theme"),
-  {
-    ssr: false,
-  },
-);
+const UserAvatar = dynamic(() => import("@/app/components/user/user-avatar"), {
+  ssr: false,
+  loading: () => <UserAvatarSkeleton />,
+});
 
 export default function SideBar() {
+  const user = useUser();
+  const image = user?.image;
+  const provider = user?.provider ?? "credentials";
   const t = useTranslations();
   const locale = useLocale();
   const sideBar = useMemo(() => sideMenu, []);
 
   const liStyle = clsx(
     "group p-2",
-    "cursor-pointer hover:rounded-xl hover:bg-white hover:shadow-black hover:drop-shadow-xl dark:hover:bg-slate-600",
+    "cursor-pointer hover:rounded-xl hover:bg-white hover:shadow-black hover:drop-shadow-xl",
+    "dark:hover:bg-slate-600",
   );
 
   return (
     <aside
       className={clsx(
-        "border-gray-300 bg-slate-100 p-4 shadow-black drop-shadow-md",
+        "flex flex-col",
+        "border-gray-300 bg-slate-100 shadow-black drop-shadow-md",
         "dark:bg-slate-800 dark:text-gray-100",
         "dark:border-slate-600 lg:border-r-[1px]",
         "max-lg:flex-1",
       )}
     >
-      <nav className="grid h-full grid-rows-[1fr_150px]">
+      <div className="flex items-center gap-2 border-b border-gray-300 p-4 dark:border-slate-600">
+        <UserAvatar src={image} provider={provider} />
+        <span className="hidden text-lg font-bold lg:block">
+          {user?.username}
+        </span>
+        <span className="text-lg font-bold lg:hidden">{user?.username}</span>
+      </div>
+      <nav className="grid h-full grid-rows-[1fr_150px] p-4 lg:grid-rows-[1fr_50px]">
         <ul className="flex flex-col gap-2">
-          <SideBarProfileMobile liStyle={liStyle} t={t} locale={locale} />
           {sideBar.map(({ url, title, icon }: SideBarItem) => (
             <Link
               locale={locale}
@@ -53,8 +57,7 @@ export default function SideBar() {
               className={clsx(
                 "flex items-center gap-x-2",
                 "group box-border p-2 text-sm",
-                "hover:bg-white dark:hover:bg-slate-600",
-                "cursor-pointer hover:rounded-xl hover:text-black hover:shadow-black hover:drop-shadow-xl",
+                "bar-item",
               )}
             >
               {icon} {t(title)}
@@ -62,17 +65,7 @@ export default function SideBar() {
           ))}
         </ul>
         <ul className="flex flex-col gap-2">
-          <SideBarThemeMobile liStyle={liStyle} t={t} locale={locale} />
-          <li className={clsx(liStyle)}>
-            <Link
-              locale={locale}
-              href="/auth/sign-out"
-              className="flex items-center gap-x-2 text-sm font-bold"
-            >
-              <ArrowLeftStartOnRectangleIcon className="size-6 group-hover:text-black" />
-              {t("sidebar.signOut")}
-            </Link>
-          </li>
+          <SideBarSignOut liStyle={liStyle} t={t} locale={locale} />
         </ul>
       </nav>
     </aside>

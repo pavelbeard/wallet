@@ -81,6 +81,7 @@ export default async function Layout({
             themes={["dark", "light", "system"]}
             attribute="class"
             defaultTheme="system"
+            
           >
             <SessionProvider>
               {children}

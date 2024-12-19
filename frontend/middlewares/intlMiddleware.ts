@@ -1,3 +1,7 @@
+/**
+ * TO DEPRECATE
+ */
+
 import { routing } from "@/i18n/routing";
 import { match } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";

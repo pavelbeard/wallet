@@ -1,13 +1,10 @@
 "use client";
 
 import AuthMethodLogo from "@/app/components/user/auth-method-logo";
-import useUserMenu from "@/app/lib/hooks/ui/useUserMenu";
 import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
-import UserMenuDesktop from "@/app/ui/user-menu";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Image from "next/image";
-import { createPortal } from "react-dom";
 
 type Props = { src?: string | null; provider: string | "Credentials" };
 
@@ -17,7 +14,6 @@ type Props = { src?: string | null; provider: string | "Credentials" };
  * @provider Needs for auth method icon
  */
 export default function UserAvatar({ src, provider }: Props) {
-  const { isOpen, toggleOpen, toggleOpenMobile } = useUserMenu();
   const isDesktop = useDesktopBreakpoint();
 
   if (src) {
@@ -27,7 +23,6 @@ export default function UserAvatar({ src, provider }: Props) {
         <div data-type="desktop-oauth-avatar" className="relative">
           <div className="hover-avatar">
             <Image
-              onClick={toggleOpen}
               className="rounded-full"
               src={src}
               alt="user-avatar"
@@ -36,7 +31,6 @@ export default function UserAvatar({ src, provider }: Props) {
             />
             <AuthMethodLogo provider={provider} />
           </div>
-          {isOpen && createPortal(<UserMenuDesktop />, document.body)}
         </div>
       );
     } else {
@@ -44,7 +38,6 @@ export default function UserAvatar({ src, provider }: Props) {
       <div data-type="mobile-oauth-avatar" className="relative">
         <div className="hover-avatar">
           <Image
-            onClick={toggleOpenMobile}
             className="rounded-full"
             src={src}
             alt="user-avatar"
@@ -68,10 +61,9 @@ export default function UserAvatar({ src, provider }: Props) {
           )}
         >
           <div className="hover-avatar">
-            <UserCircleIcon onClick={toggleOpen} className="size-[64px]" />
+            <UserCircleIcon className="size-[64px]" />
             <AuthMethodLogo provider={provider} />
           </div>
-          {isOpen && createPortal(<UserMenuDesktop />, document.body)}
         </div>
       );
     } else {
@@ -86,7 +78,7 @@ export default function UserAvatar({ src, provider }: Props) {
               "dark:border-slate-600 dark:bg-slate-800",
             )}
           >
-            <UserCircleIcon onClick={toggleOpenMobile} className="size-12" />
+            <UserCircleIcon className="size-12" />
             <AuthMethodLogo provider={provider} />
           </div>
         </div>

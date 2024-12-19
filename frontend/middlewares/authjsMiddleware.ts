@@ -1,3 +1,7 @@
+/**
+ * TO DEPRECATE
+ */
+
 import rewriteRoutes from "@/app/lib/helpers/rewriteRoutes";
 import { WalletUser } from "@/auth";
 import { routing } from "@/i18n/routing";

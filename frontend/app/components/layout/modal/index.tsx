@@ -18,6 +18,7 @@ export default function Modal({ closeCallback, children }: Props) {
   }, []);
 
   const ref = useClickOutside<HTMLDivElement>(closeCallback);
+  
   return (
     <div
       className={clsx(

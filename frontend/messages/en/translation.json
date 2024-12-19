@@ -172,7 +172,8 @@
     "passwords": "Passwords",
     "cards": "Cards",
     "profile": "Profile",
-    "theme": "Theme"
+    "theme": "Theme",
+    "language": "Language"
   },
   "userMenu": {
     "profile": "Profile",
@@ -242,5 +243,12 @@
   },
   "usernameSuggestions": {
     "error": "Username is taken"
+  },
+  "topbar": {
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   }
 }

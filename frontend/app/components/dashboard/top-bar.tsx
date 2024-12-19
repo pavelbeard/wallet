@@ -1,38 +1,47 @@
 "use client";
 
-import useUser from "@/app/lib/hooks/ui/useUser";
+import PageName from "@/app/components/dashboard/page-name";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
-import UserAvatarSkeleton from "../user/user-avatar-skeleton";
-import PageName from "./page-name";
+import ChangeLanguageSkeleton from "./change-language-skeleton";
+import ChangeThemeSkeleton from "./change-theme-skeleton";
 
-const UserAvatar = dynamic(() => import("@/app/components/user/user-avatar"), {
-  ssr: false,
-  loading: () => <UserAvatarSkeleton />,
-});
+const ChangeTheme = dynamic(
+  () => import("@/app/components/dashboard/change-theme"),
+  {
+    ssr: false,
+    loading: () => <ChangeThemeSkeleton />,
+  },
+);
+
+const ChangeLanguage = dynamic(
+  () => import("@/app/components/dashboard/change-language"),
+  {
+    ssr: false,
+    loading: () => <ChangeLanguageSkeleton />,
+  },
+);
 
 export default function TopBar() {
-  const user = useUser();
-  const image = user?.image;
-  const provider = user?.provider ?? "credentials";
-
   return (
     <div
       className={clsx(
-        "p-4 border-b-[1px] border-gray-300 bg-slate-100 drop-shadow-xl shadow-black",
-        "dark:bg-slate-800 dark:text-gray-100 dark:border-slate-600",
-        "relative flex items-start lg:items-center gap-x-4",
-        "lg:drop-shadow-sm lg:justify-end",
+        "border-b-[1px] border-gray-300 bg-slate-100 p-4 shadow-black drop-shadow-xl",
+        "dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100",
+        "relative flex items-start gap-x-4 lg:items-center",
+        "lg:justify-end lg:drop-shadow-sm",
       )}
     >
-      <div className="max-md:hidden flex flex-grow basis-0" aria-label="for flex box"></div>
-      <PageName className="flex justify-center items-center font-bold max-lg:hidden" />
-      <div className="flex flex-grow basis-0 justify-start items-center lg:justify-end gap-4">
-        <span className="hidden lg:block text-lg font-bold">
-          {user?.username}
-        </span>
-        <UserAvatar src={image} provider={provider} />
-        <span className="lg:hidden text-lg font-bold">{user?.username}</span>
+      <div
+        className="flex flex-grow basis-0 max-md:hidden"
+        aria-label="for flex box"
+      >
+        {/* EMPTY */}
+      </div>
+      <PageName className="flex items-center justify-center font-bold max-lg:hidden" />
+      <div className="flex flex-grow basis-0 items-center justify-start gap-4 lg:justify-end">
+        <ChangeLanguage />
+        <ChangeTheme />
       </div>
     </div>
   );
