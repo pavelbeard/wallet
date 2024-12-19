@@ -1,7 +1,7 @@
 import { WalletUser } from "@/auth";
 import BurgerMenu from "./burger-menu";
 import BurgerButtonMenu from "./burger-menu-btn";
-import LogoHeader from "./logo-header";
+import LogoHeader from "@/app/ui/logo-header";
 
 export default function HeaderMobile({
   sidebarMenuRef,
@@ -20,7 +20,7 @@ export default function HeaderMobile({
 }) {
   return (
     <>
-      <LogoHeader className="flex flex-grow basis-0 items-center" />
+      <LogoHeader position="left" />
 
       <BurgerButtonMenu
         isBurgerOpen={isBurgerOpen}

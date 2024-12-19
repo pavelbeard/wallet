@@ -15,7 +15,7 @@ export default function LogoHeader({
       locale={locale}
       href={"/"}
       className={clsx(
-        "group relative z-10 flex flex-grow basis-0 items-center",
+        "group relative z-50 flex flex-grow basis-0 items-center",
         position == "center" && "justify-center",
         position == "left" && "justify-start",
         position == "right" && "justify-end",
@@ -37,7 +37,7 @@ export default function LogoHeader({
         height={32}
         width={32}
       />
-      <span className="ml-2 text-lg font-bold group-hover:text-white">
+      <span className="ml-2 text-lg font-bold group-hover:text-slate-400 dark:group-hover:text-white">
         Cartera
       </span>
     </Link>

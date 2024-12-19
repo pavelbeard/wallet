@@ -1,9 +1,9 @@
 import { WalletUser } from "@/auth";
 import { MENU } from "./constants";
-import LogoHeader from "./logo-header";
 import NavBar from "./nav-bar";
 import NavItem from "./nav-item";
 import DropdownMenu from "./nav-item-dropdown";
+import LogoHeader from "@/app/ui/logo-header";
 
 export default function HeaderDesktop({
   user,
@@ -19,7 +19,7 @@ export default function HeaderDesktop({
 
   return (
     <>
-      <LogoHeader className="flex flex-grow basis-0 items-center" />
+      <LogoHeader position="left" />
 
       <NavBar className="flex">
         {/* Level 1 */}
