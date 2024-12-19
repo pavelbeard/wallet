@@ -12,7 +12,7 @@ test("Test web page appearing, sign up valid, and sign up invalid", async ({
   const page = await ctx.newPage();
 
   await test.step("Is appearing web page?", async () => {
-    await page.goto("http://localhost:3000");
+    await page.goto("http://localhost:3000/en");
     await page.waitForURL("http://localhost:3000/en", {
       timeout: 10000,
       waitUntil: "domcontentloaded",
@@ -43,7 +43,7 @@ test("Test web page appearing, sign up valid, and sign up invalid", async ({
       .waitFor({ timeout: 30000, state: "visible" });
   });
 
-  await test.step("Sign up with invalid username", async () => {
+  await test.step("Sign up with invalid email", async () => {
     await page.goto("http://localhost:3000/en");
     await page.waitForURL("http://localhost:3000/en", {
       timeout: 10000,
@@ -57,7 +57,7 @@ test("Test web page appearing, sign up valid, and sign up invalid", async ({
     await page.getByTestId("sign-up-last-name-input").fill("Doe");
     await page
       .getByTestId("sign-up-email-input")
-      .fill("johndoe2489@cartera.es");
+      .fill("johndoe8889@cartera.es");
     await page.getByTestId("sign-up-password-input").fill("Rt3$YiOO");
     await page.getByTestId("sign-up-password-input-confirm").fill("Rt3$YiOO");
     await page.getByTestId("sign-up-btn").click();

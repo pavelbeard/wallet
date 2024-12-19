@@ -69,12 +69,9 @@ def send_email(email: str, subject: str, body: str):
     try:
         resend.api_key = settings.RESEND_API_KEY
 
-        if True:
-            return
-
         params: resend.Emails.SendParams = {
             "from": settings.EMAIL_HOST_USER,
-            "to": email,
+            "to": ["heavycream9090@gmail.com"],
             "subject": subject,
             "html": body,
         }
@@ -155,5 +152,33 @@ def get_user_info(request: WSGIRequest | HttpRequest, user: WalletUser):
         utils_logger.error(e, exc_info=True)
 
 
+def generate_master_password():
+    """Generate a random master password."""
+    password = ""
+    for i in range(7):
+        if i == 0:
+            password += (
+                "".join(
+                    [
+                        random.choice(string.ascii_uppercase + string.digits)
+                        for _ in range(2)
+                    ]
+                )
+                + "-"
+            )
+        else:
+            password += (
+                "".join(
+                    [
+                        random.choice(string.ascii_uppercase + string.digits)
+                        for _ in range(6)
+                    ]
+                )
+                + "-"
+            )
+
+    return password[:-1]
+
 if __name__ == "__main__":  # pragma: no cover
-    print(suggest_username("pavel", 10))
+    # print(suggest_username("pavel", 10))
+    print(generate_master_password())

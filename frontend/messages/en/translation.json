@@ -142,7 +142,12 @@
       "change2fa": "Change 2FA",
       "oauth2note": "Ask your account provider",
       "deleted": "2FA if turned off",
-      "notDeleted": "Wrong password"
+      "notDeleted": "Wrong password",
+      "2faAttention": {
+        "text": "In order to get access to this page, you should configure two factor authentication.",
+        "title": "Cartera | Configurate 2FA!",
+        "description": "Cartera | Configurate 2FA!"
+      }
     },
     "main": {
       "twoFactorBtn": "2FA management"
@@ -250,5 +255,8 @@
       "dark": "Dark",
       "system": "System"
     }
+  },
+  "changePassword": {
+    "success": "Password changed"
   }
 }

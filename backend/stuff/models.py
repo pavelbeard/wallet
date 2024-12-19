@@ -14,6 +14,17 @@ from . import managers
 # Create your models here.
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
+
+    def __str__(self):
+        return self.name
+
+
 class WalletUser(AbstractModel, AbstractUser):
     username_validator = RegexValidator(
         r"^[a-z0-9_]+$",
@@ -31,6 +42,7 @@ class WalletUser(AbstractModel, AbstractUser):
         validators=[username_validator],
     )
     password = models.CharField(max_length=250, blank=True, null=True)
+    master_password = models.CharField(max_length=250, blank=True, null=True)
     email = models.EmailField(blank=True, null=True, unique=True)
     email_verified = models.BooleanField(default=False)
     is_oauth_user = models.BooleanField(default=False)

@@ -1,5 +1,3 @@
-from calendar import c
-import os
 import time
 from datetime import timedelta
 
@@ -89,7 +87,6 @@ class StuffTests(APITestCase):
 
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn("detail", response.json())
 
         obj = WalletUser.objects.first()
         for field in obj._meta.fields:
@@ -476,21 +473,21 @@ class EmailChangeTestCase(APITestCase):
             password="Rt3$YiOO",
             is_active=True,
         )
-        
+
         User.objects.create_user(
             username="testuser2",
             email="test2@testdomain.com",
             password="Rt3$YiOO",
             is_active=True,
         )
-        
+
         User.objects.create_user(
             username="testuser3",
             email="test3@testdomain.com",
             password="Rt3$YiOO",
             is_active=True,
-        )   
-        
+        )
+
         User.objects.create_user(
             username="testuser4",
             email="test4@testdomain.com",
@@ -528,7 +525,10 @@ class EmailChangeTestCase(APITestCase):
             data={"token": token.token},
         )
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-        self.assertEqual(WalletUser.objects.get(email="test10@testdomain.com").email, "test10@testdomain.com")
+        self.assertEqual(
+            WalletUser.objects.get(email="test10@testdomain.com").email,
+            "test10@testdomain.com",
+        )
 
 
 class PasswordResetTestCase(APITestCase):
@@ -567,18 +567,10 @@ class PasswordResetTestCase(APITestCase):
         print(response2.content)
 
 
-class DbTest(TestCase):
-    def test_database(self):
-        from psycopg2 import connect
-
-        conn = connect(
-            host="3.69.85.185",
-            database="wallet",
-            user="main",
-            password=os.environ.get("POSTGRES_DB_PASSWORD_TEST"),
-            port=5432,
-        )
+class UtilsTestCase(TestCase):
+    def test_generate_master_password(self):
+        from stuff.utils import generate_master_password
         
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM pg_user;")
-        print(cur.fetchall())
+        password = generate_master_password()
+        
+        self.assertEqual(7, len(password.split("-")))

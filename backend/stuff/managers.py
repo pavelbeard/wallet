@@ -27,6 +27,8 @@ class WalletUserManager(BaseUserManager, AbstractManager):
             user_data["username"] = GlobalUserModel.normalize_username(username)
         if email:
             user_data["email"] = self.normalize_email(email)
+        if user_data.get("master_password"):
+            user_data["master_password"] = make_password(user_data.get("master_password"))
 
         user = self.model(**user_data)
         if password and not extra_fields.get("is_oauth_user"):

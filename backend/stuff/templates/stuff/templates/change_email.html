@@ -1,0 +1,29 @@
+{% extends "core.html" %} {% block style %}
+<style>
+  a {
+    cursor: pointer;
+    text-decoration: none;
+    color: #4d4c4c;
+    &:hover {
+      text-decoration: underline;
+      color: #104710;
+    }
+  }
+
+  .content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="content">
+  <h1>{{ change_email_title }}</h1>
+  <span>
+    {{ change_email_text_1 }}
+    <a href="{{ change_email_link }}">{{ change_email_link_text }}</a>
+  </span>
+  <p>{{ change_email_text_2 }}</p>
+</section>
+{% endblock %}

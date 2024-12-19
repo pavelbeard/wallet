@@ -14,7 +14,9 @@ import {
   DEFAULT_SIGNED_IN_PATH,
   DEFAULT_SIGNED_OUT_PATH,
   DEFAULT_VERIFICATION_ROUTE,
+  OTPProtectedRoutes,
   protectedRoutes,
+  TWO_FACTOR_ATTENTION_ROUTE,
 } from "@/routes";
 import {
   Account,
@@ -99,7 +101,13 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
 
   const isAuthRoute = routeMatcher(authRoutes, routing.locales, pathname);
 
-  // ** CASE 0: User got an error **
+  const isOTPProtectedRoute = routeMatcher(
+    OTPProtectedRoutes,
+    routing.locales,
+    pathname,
+  );
+
+  // ** CASE 1: User got an error **
   if (isErrorRoute) {
     return NextResponse.redirect(
       new URL(
@@ -109,14 +117,37 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
     );
   }
 
-  // ** CASE 1: User is authenticated with 2FA and verified **
+  // ** CASE 2: If user gets protected route by OTP and not verified or doesn't have 2FA or is an OAuth user **
+  if (
+    isOTPProtectedRoute &&
+    (!user.verified || !user.is_two_factor_enabled || user.is_oauth_user)
+  ) {
+    return NextResponse.redirect(
+      new URL(
+        `/${locale ?? "es"}${TWO_FACTOR_ATTENTION_ROUTE}${request.nextUrl.search}`,
+        request.url,
+      ),
+    );
+  }
+
+  // ** CASE 3: User is verifying email **
+  if (pathname == "/verify-email" && isProtectedRoute) {
+    return NextResponse.redirect(
+      new URL(
+        `/${locale ?? "es"}/verify-email${request.nextUrl.search}`,
+        request.url,
+      ),
+    );
+  }
+
+  // ** CASE 4: User is authenticated with 2FA and verified **
   if (user && (isAuthRoute || (user?.verified && isVerificationRoute))) {
     return NextResponse.redirect(
       new URL(`/${locale ?? "es"}${DEFAULT_SIGNED_IN_PATH}`, request.url),
     );
   }
 
-  // ** CASE 2: User is authenticated with 2FA but without verification **
+  // ** CASE 5: User is authenticated with 2FA but without verification **
   if (user?.is_two_factor_enabled && !user?.verified && isProtectedRoute) {
     const tokenVerifyPath = new URL(
       `/${locale ?? "es"}${DEFAULT_VERIFICATION_ROUTE}`,
@@ -126,7 +157,7 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
     return NextResponse.redirect(tokenVerifyPath);
   }
 
-  // ** CASE 3: User is not authenticated **
+  // ** CASE 6: User is not authenticated **
   if (!user && (isProtectedRoute || isVerificationRoute)) {
     const unauthenticatedPath = new URL(
       `/${locale ?? "es"}${DEFAULT_SIGNED_OUT_PATH}`,
@@ -135,9 +166,9 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
     return NextResponse.redirect(unauthenticatedPath);
   }
 
-  // ** CASE 4: User is accessing public route **
-  // ** CASE 5: User is accessing protected route **
-  // ** CASE 6: Fallback **
+  // ** CASE 7: User is accessing public route **
+  // ** CASE 9: User is accessing protected route **
+  // ** CASE 10: Fallback **
 
   return NextResponse.next();
 };

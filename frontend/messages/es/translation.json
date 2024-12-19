@@ -142,7 +142,12 @@
       "change2fa": "Cambiar 2FA",
       "oauth2note": "Pregúntele a su proveedor de cuenta",
       "deleted": "2FA si está apagado",
-      "notDeleted": "Contraseña incorrecta"
+      "notDeleted": "Contraseña incorrecta",
+      "2faAttention": {
+        "text": "Para acceder a esta página, debes configurar la autenticación de dos factores.",
+        "title": "Cartera | \n¡Configura 2FA!",
+        "description": "Cartera | \n¡Configura 2FA!"
+      }
     },
     "main": {
       "twoFactorBtn": "Gestión 2FA"
@@ -250,5 +255,8 @@
       "dark": "Oscuro",
       "system": "Sistema"
     }
+  },
+  "changePassword": {
+    "success": "Contraseña cambiada"
   }
 }

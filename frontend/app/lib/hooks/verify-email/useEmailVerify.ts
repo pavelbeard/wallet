@@ -1,6 +1,6 @@
 import { useRouter } from "@/i18n/routing";
 import { useSession } from "next-auth/react";
-import { useState, useTransition } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import emailVerify from "../../queries/emailVerify";
 
 export default function useEmailVerify(token: string) {
@@ -12,7 +12,9 @@ export default function useEmailVerify(token: string) {
     error: null as string | null,
   });
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
     startTransition(async () => {
       const { success, error, newEmail } = await emailVerify(token);
 

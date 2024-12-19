@@ -1,0 +1,31 @@
+{% extends "core.html" %} {% block style %}
+<style>
+  .team {
+    margin-top: 16px;
+    color: #595d5d;
+  }
+
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="content">
+  <h1>{{ welcome_title }}</h1>
+  <p>{{ welcome_text }}</p>
+  <div class="text-container">
+    <p>{{ master_password_text_1 }} <strong>{{ master_password }}</strong></p>
+    <p>{{ master_password_text_2 }}</p>
+  </div>
+  <p class="team">{{ team }}</p>
+</section>
+{% endblock %}

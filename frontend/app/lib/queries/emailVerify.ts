@@ -6,7 +6,7 @@ import protectedQuery from "../helpers/protectedQuery";
 export default async function emailVerify(token: string) {
   const t = await getTranslations();
   const result = await protectedQuery({
-    url: `/users/verify_email/`,
+    url: `/users/verify_email_change/`,
     method: "POST",
     body: { token },
   });

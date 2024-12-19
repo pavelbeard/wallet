@@ -46,7 +46,6 @@ export default async function Page({ params: { locale } }: PageProps) {
     <section className="flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
       <div className="flex flex-col gap-4 max-w-[600px] mx-auto h-full">
         <p className="">{t("profile.twofactor.description")}</p>
-
         <TwoFactor />
       </div>
     </section>

@@ -6,7 +6,7 @@ from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff import two_factor_utils
+from stuff import two_factor_utils, utils
 from stuff.controller import WalletUserController
 from stuff.types import Action
 
@@ -124,6 +124,9 @@ class SignupSerializer(WalletUserSerializer):
                 data["username"] = username_suggested
         if data["password"] != data["password2"]:
             raise serializers.ValidationError(_("Passwords do not match!"))
+        
+        master_password = utils.generate_master_password()
+        data["master_password"] = master_password
 
         del data["password2"]
 
@@ -192,20 +195,6 @@ class TwoFactorJWTSerializer(
         return tokens
 
 
-# class CookieTokenRefreshSerializer(jwt_serializers.TokenRefreshSerializer):
-#     refresh = None
-
-#     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
-#         attrs["refresh"] = self.context["request"].COOKIES.get(
-#             settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"]
-#         )
-#         if attrs["refresh"]:
-#             tokens = super().validate(attrs)
-#             return tokens
-#         else:
-#             raise InvalidToken("There isn't a refresh token in the cookies.")
-
-
 class PasswordSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, max_length=32, write_only=True)
 
@@ -224,9 +213,9 @@ class PasswordSerializer(serializers.Serializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    actualPassword = serializers.CharField(min_length=8, max_length=20)
-    password = serializers.CharField(min_length=8, max_length=20)
-    password2 = serializers.CharField(min_length=8, max_length=20)
+    actualPassword = serializers.CharField(min_length=8, max_length=48)
+    password = serializers.CharField(min_length=8, max_length=48)
+    password2 = serializers.CharField(min_length=8, max_length=48)
 
     def validate(self, attrs):
         actual_password = attrs.get("actualPassword")

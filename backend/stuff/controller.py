@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_otp import devices_for_user
 from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
@@ -21,24 +23,36 @@ from .types import Action
 
 class Auth:
     @staticmethod
-    # TODO: add email verification, add username creation and first/last names
     def sign_up(request: HttpRequest) -> Response:
         serializer = serializers.SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
+        master_password = serializer.validated_data.get("master_password")
 
         user = WalletUser.objects.filter(email=instance.email).first()
 
+        context = {
+            "welcome_title": _("Welcome!"),
+            "welcome_text": _(
+                "Thanks for registration in a super vault of your secrets!"
+            ),
+            "master_password_text_1": _("Your master password is:"),
+            "master_password_text_2": _(
+                "Please save this password in a safe physical place."
+            ),
+            "master_password": master_password,
+            "team": _("Thanks again! Your Cartera team."),
+            "year": timezone.now().year,
+            "all_rights_reserved": _("All rights reserved."),
+        }
+
         send_email(
             email=user.email,
-            subject=_("Welcome!"),
-            body=_("Thanks for registration in a super vault of your secrets!"),
+            subject=str(_("Welcome!")),
+            body=render_to_string("stuff/templates/welcome.html", context),
         )
 
-        return Response(
-            {"detail": _("You have been registered successfully!")},
-            status=status.HTTP_201_CREATED,
-        )
+        return Response(status=status.HTTP_201_CREATED)
 
     @staticmethod
     def sign_in(request: HttpRequest) -> Response:
@@ -111,16 +125,7 @@ class TOTPDeviceController:
         if not device:
             device = user.totpdevice_set.create(confirmed=False)
         url = device.config_url
-        # DOESN'T WORK IN FRONTEND
-        # create qr
-        # two_fa_img = stuff_logic.generate_2fa_key_in_qr_code(url)
-        # use it in response
-        # response.headers["Content-Type"] = "multipart/mixed; boundary=boundary"
-        # two_fa_img.save(response, "PNG")
-        # last preparations for the response
         response.status_code = status.HTTP_200_OK
-        # 2fa configuration key is necessary too
-        # two_fa_config_key = re.findall(r"secret=(.*)&algorithm", url)[0]
         response.data = {"config_key": url}
         return response
 
@@ -211,11 +216,6 @@ class TOTPDeviceController:
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
 
-        # new_token_response = stuff_logic.set_auth_cookies(
-        #     response=response,
-        #     jwt_tokens={"access": tokens["access"], "refresh": tokens["refresh"]},
-        # )
-
         response.data = {
             **response.data,
             "access": tokens["access"],
@@ -261,11 +261,24 @@ class WalletUserController:
             old_records.update(is_active=False)
 
         record = EmailVerificationToken.objects.create(user=user, email=email)
+        
+        context = {
+            "change_email_title": _("Change email request"),
+            "change_email_text_1": _("Please verify your email by this"),
+            "change_email_link": f"{settings.FRONTEND_URL}/verify-email?token={record.token}",
+            "change_email_link_text": _("link"),
+            "change_email_text_2": _(
+                "If you didn't request this, please ignore this email."
+            ),
+            "year": timezone.now().year,
+            "all_rights_reserved": _("All rights reserved."),
+            "team": _("Thanks again! Your Cartera team."),
+        }
 
         send_email(
             email=email,
-            subject=_("Change email verification"),
-            body=f"Please verify your email by this link: {settings.FRONTEND_URL}/verify-email?token={record.token}",
+            subject=str(_("Change email verification")),
+            body=render_to_string("stuff/templates/change_email.html", context),
         )
 
         return Response(
@@ -323,7 +336,6 @@ class WalletUserController:
         validated_data: Dict[str, str] = serializer.validated_data
 
         email = validated_data.get("email")
-        # username = validated_data.get("username")
 
         user = WalletUser.objects.filter(email=email).first()
 
@@ -336,10 +348,23 @@ class WalletUserController:
 
         record = PasswordResetToken.objects.create(user=user)
 
+        context = {
+            "reset_password_title": _("Reset password request"),
+            "reset_password_text_1": _("Please reset your password by this"),
+            "reset_password_link": f"{settings.FRONTEND_URL}/reset-password?token={record.token}",
+            "reset_password_link_text": _("link"),
+            "reset_password_text_2": _(
+                "If you didn't request this, please ignore this email."
+            ),
+            "year": timezone.now().year,
+            "all_rights_reserved": _("All rights reserved."),
+            "team": _("Thanks again! Your Cartera team."),
+        }
+
         send_email(
             email=user.email,
-            subject=_("Reset your password"),
-            body=f"Please reset your password by this link: {settings.FRONTEND_URL}/reset-password?token={record.token}",
+            subject=str(_("Reset your password")),
+            body=render_to_string("stuff/templates/reset_password.html", context),
         )
 
         return Response(

@@ -243,6 +243,10 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         try:
             result = WalletUserController.verify_email_change(request=request)
             return result
+        except ValidationError as e:
+            return Response(
+                data={"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST
+            )
         except TypeError as e:
             return Response(
                 data={"error": e.args[0]},
