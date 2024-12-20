@@ -60,6 +60,9 @@
         "submit": "Enviar",
         "inputLabel": "Tu contraseña maestra"
       }
+    },
+    "signUp": {
+      "success": "Se ha enviado un correo con contraseña maestra a su correo:"
     }
   },
   "mainPage": {
@@ -79,7 +82,12 @@
   "dashboard": {
     "title": "Cartera | Panel de control",
     "description:": "Tarjetas, contraseñas, información total",
-    "description": "Tarjetas, contraseñas, información total."
+    "description": "Tarjetas, contraseñas, información total.",
+    "passwords": {
+      "success": "Contraseñas totales",
+      "total": "Contraseñas totales",
+      "title": "Aquí puedes guardar tus contraseñas."
+    }
   },
   "profile": {
     "title": "Cartera | Perfil",

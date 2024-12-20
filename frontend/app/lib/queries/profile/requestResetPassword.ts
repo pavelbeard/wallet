@@ -1,14 +1,17 @@
 "use server";
 
 import { getTranslations } from "next-intl/server";
-import protectedQuery from "../helpers/protectedQuery";
+import query from "../../helpers/query";
+import { ResetPasswordRequestValidator } from "../../schemas.z";
 
-export default async function emailVerify(token: string) {
+export default async function requestResetPassword(
+  data: ResetPasswordRequestValidator,
+) {
   const t = await getTranslations();
-  const result = await protectedQuery({
-    url: `/users/verify_email_change/`,
+  const result = await query({
+    url: "/users/create_reset_password_request/",
     method: "POST",
-    body: { token },
+    body: data,
   });
 
   if (result instanceof Error) {
@@ -21,17 +24,14 @@ export default async function emailVerify(token: string) {
   if (!result?.ok) {
     return {
       success: null,
-      error: t("verify.emailError"),
+      error: t("error.requestFailed"),
     };
   }
 
   if (result?.ok) {
-    const { new_email } = await result.json();
-
     return {
-      success: t("verify.verifySuccess"),
+      success: t("resetPassword.success"),
       error: null,
-      newEmail: new_email,
     };
   }
 

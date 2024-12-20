@@ -1,7 +1,7 @@
 "use server";
 
-import getTranslations from "../helpers/getTranslations";
-import query from "../helpers/query";
+import getTranslations from "../../helpers/getTranslations";
+import query from "../../helpers/query";
 
 export default async function getUsernameSuggestions(username: string) {
   const t = await getTranslations();

@@ -12,7 +12,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from stuff.models import EmailVerificationToken, PasswordResetToken, WalletUser
-from stuff.two_factor_utils import (
+from utils.two_factor_utils import (
     generate_2fa_key_in_qr_code,
     override_api_settings,
 )
@@ -210,7 +210,6 @@ class StuffTests(APITestCase):
         # test api accessibility
         response3 = self.client.get(card_url, format="json")
         self.assertEqual(response3.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 
 class DeleteAccountTestCase(APITestCase):
@@ -577,3 +576,16 @@ class UtilsTestCase(TestCase):
         password = generate_master_password()
 
         self.assertEqual(7, len(password.split("-")))
+
+
+class TestResendEmail(TestCase):
+    def test_resend_email(self):
+        from utils.email_utils import send_email
+
+        result = send_email(
+            email="heavycream9090@gmail.com",
+            subject="Test subject",
+            body="Test body",
+        )
+
+        print(result)

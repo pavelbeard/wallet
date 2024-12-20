@@ -2,7 +2,7 @@
 
 import getUser from "@/app/lib/helpers/getUser";
 import { TOTPData } from "@/app/lib/types";
-import protectedQuery from "../helpers/protectedQuery";
+import protectedQuery from "../../helpers/protectedQuery";
 
 export default async function createTotpDevice(): Promise<TOTPData | null> {
   const user = await getUser();

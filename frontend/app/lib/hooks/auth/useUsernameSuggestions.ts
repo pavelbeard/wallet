@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import getUsernameSuggestions from "../../queries/getUsernameSuggestions";
+import getUsernameSuggestions from "../../queries/profile/getUsernameSuggestions";
 import useDebounce from "../useDebounce";
 
 export default function useUsernameSuggestions(username: string | undefined) {

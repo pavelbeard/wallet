@@ -2,9 +2,9 @@
 
 import { PasswordSchema } from "@/app/lib/schemas.z";
 import { z } from "zod";
-import getTranslations from "../helpers/getTranslations";
-import getUserDataJson from "../helpers/getUserDataJson";
-import protectedQuery from "../helpers/protectedQuery";
+import getTranslations from "../../helpers/getTranslations";
+import getUserDataJson from "../../helpers/getUserDataJson";
+import protectedQuery from "../../helpers/protectedQuery";
 
 export default async function delete2fa(data: z.infer<typeof PasswordSchema>) {
   const t = await getTranslations();

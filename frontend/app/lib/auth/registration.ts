@@ -1,9 +1,11 @@
 "use server";
 
+import getTranslations from "@/app/lib/helpers/getTranslations";
+import query from "@/app/lib/helpers/query";
 import { SignUpSchema, SignUpValidator } from "@/app/lib/schemas.z";
-import query from "../helpers/query";
 
 export default async function registration(values: SignUpValidator) {
+  const t = await getTranslations();
   const validatedData = SignUpSchema.safeParse(values);
 
   if (validatedData.error) {
@@ -37,7 +39,7 @@ export default async function registration(values: SignUpValidator) {
   }
 
   return {
-    success: `Mail with validation code has been sent on your mail: ${validatedData.data.email}`,
+    success: `${t("auth.signUp.success")} ${validatedData.data.email}`,
     error: null,
   };
 }

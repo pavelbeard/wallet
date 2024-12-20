@@ -1,4 +1,4 @@
-import delete2fa from "@/app/lib/queries/delete2fa";
+import delete2fa from "@/app/lib/queries/profile/delete2fa";
 import { PasswordValidator } from "@/app/lib/schemas.z";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";

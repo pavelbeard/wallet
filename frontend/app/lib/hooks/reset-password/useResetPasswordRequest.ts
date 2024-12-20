@@ -5,7 +5,7 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { UseFormClearErrors, UseFormWatch } from "react-hook-form";
 import { z } from "zod";
-import requestResetPassword from "../../queries/requestResetPassword";
+import requestResetPassword from "../../queries/profile/requestResetPassword";
 
 export default function useResetPasswordRequest(
   watch: UseFormWatch<ResetPasswordRequestValidator>,

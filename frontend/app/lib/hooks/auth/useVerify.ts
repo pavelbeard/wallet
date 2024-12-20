@@ -3,7 +3,7 @@ import { DEFAULT_SIGNED_IN_PATH } from "@/routes";
 import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { SubmitHandler } from "react-hook-form";
-import verify2fa from "../../queries/verify2fa";
+import verify2fa from "../../queries/profile/verify2fa";
 import { TwoFactorValidator } from "../../schemas.z";
 
 export default function useVerify() {

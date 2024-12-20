@@ -1,4 +1,4 @@
-import verify2fa from "@/app/lib/queries/verify2fa";
+import verify2fa from "@/app/lib/queries/profile/verify2fa";
 import { TwoFactorValidator } from "@/app/lib/schemas.z";
 import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";

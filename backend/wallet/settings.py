@@ -307,7 +307,11 @@ FRONTEND_URL = env.get_env.FRONTEND_URL
 
 # email
 
-EMAIL_HOST_USER = "onboarding@resend.dev"
+EMAIL_HOST_USER = (
+    "Cartera team (development mode) <onboarding@resend.dev>"
+    if env.get_env.debug_mode
+    else "Cartera team <cartera@cusec.es>"
+)
 RESEND_API_KEY = env.get_env.RESEND_API_KEY
 
 # HASHERS

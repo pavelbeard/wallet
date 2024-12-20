@@ -61,6 +61,9 @@
         "success": "Success!",
         "inputLabel": "Your master password"
       }
+    },
+    "signUp": {
+      "success": "Mail with master password has been sent on your mail:"
     }
   },
   "mainPage": {
@@ -79,7 +82,12 @@
   },
   "dashboard": {
     "title": "Cartera | Dashboard",
-    "description": "Cards, passwords, total information"
+    "description": "Cards, passwords, total information",
+    "passwords": {
+      "success": "Total passwords",
+      "total": "Total passwords",
+      "title": "Here you can save your passwords."
+    }
   },
   "profile": {
     "title": "Cartera | Profile",

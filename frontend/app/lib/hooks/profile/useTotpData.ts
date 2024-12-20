@@ -1,6 +1,6 @@
 import { TOTPData } from "@/app/lib/types";
 import { useEffect, useState } from "react";
-import createTotpDevice from "../../queries/createTotpDevice";
+import createTotpDevice from "../../queries/profile/createTotpDevice";
 
 export default function useTotpData() {
   const [state, setState] = useState({

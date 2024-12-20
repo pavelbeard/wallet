@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import getTranslations from "../helpers/getTranslations";
-import query from "../helpers/query";
-import { NewPasswordSchema } from "../schemas.z";
+import getTranslations from "../../helpers/getTranslations";
+import query from "../../helpers/query";
+import { NewPasswordSchema } from "../../schemas.z";
 
 export default async function createNewPassword(
   data: z.infer<typeof NewPasswordSchema>,

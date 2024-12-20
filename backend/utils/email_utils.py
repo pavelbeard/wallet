@@ -5,13 +5,13 @@ import resend
 logger = logging.getLogger(__name__)
 
 
-def send_email(email: str, subject: str, body: str):
+def send_email(email: str, subject: str, body: str,):
     try:
         resend.api_key = settings.RESEND_API_KEY
 
         params: resend.Emails.SendParams = {
             "from": settings.EMAIL_HOST_USER,
-            "to": ["heavycream9090@gmail.com"],
+            "to": [email],
             "subject": subject,
             "html": body,
         }
@@ -19,5 +19,5 @@ def send_email(email: str, subject: str, body: str):
         r = resend.Emails.send(params)
         return r
     except Exception as e:
-        logger.error(e, exc_info=True)
+        logger.error(e.args[0], exc_info=True)
         return None

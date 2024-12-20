@@ -3,8 +3,8 @@
 import { TwoFactorSchema, TwoFactorValidator } from "@/app/lib/schemas.z";
 import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
-import getUserDataJson from "../helpers/getUserDataJson";
-import protectedQuery from "../helpers/protectedQuery";
+import getUserDataJson from "../../helpers/getUserDataJson";
+import protectedQuery from "../../helpers/protectedQuery";
 
 export default async function verify2fa(data: TwoFactorValidator) {
   const locale = await getLocale();

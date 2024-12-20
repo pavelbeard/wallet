@@ -1,7 +1,7 @@
 import { useRouter } from "@/i18n/routing";
 import { useSession } from "next-auth/react";
 import { FormEvent, useState, useTransition } from "react";
-import emailVerify from "../../queries/emailVerify";
+import emailVerify from "../../queries/profile/emailVerify";
 
 export default function useEmailVerify(token: string) {
   const router = useRouter();

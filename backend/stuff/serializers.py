@@ -1,13 +1,12 @@
 from abstract.serializers import AbstractSerializer
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
-from utils.password_utils import compare_passwords
+from utils.password_utils import compare_passwords, generate_master_password
 from rest_framework import serializers
 from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff import utils
 from utils import two_factor_utils
 from stuff.controller import WalletUserController
 from stuff.types import Action
@@ -127,7 +126,7 @@ class SignupSerializer(WalletUserSerializer):
         if data["password"] != data["password2"]:
             raise serializers.ValidationError(_("Passwords do not match!"))
 
-        master_password = utils.generate_master_password()
+        master_password = generate_master_password()
         data["master_password"] = master_password
 
         del data["password2"]

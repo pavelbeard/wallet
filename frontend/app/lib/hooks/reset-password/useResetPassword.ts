@@ -1,7 +1,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { UseFormClearErrors, UseFormWatch } from "react-hook-form";
 import { z } from "zod";
-import createNewPassword from "../../queries/createNewPassword";
+import createNewPassword from "../../queries/profile/createNewPassword";
 import { NewPasswordSchema, NewPasswordValidator } from "../../schemas.z";
 
 export default function useResetPassword(
