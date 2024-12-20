@@ -1,7 +1,7 @@
 import { routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({
   params: { locale },
@@ -21,7 +21,6 @@ export const generateStaticParams = async () => {
 };
 
 export default async function Page({ params: { locale } }: LocaleProps) {
-  setRequestLocale(locale);
   return (
     <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:grid-rows-[300px_300px] lg:gap-6">
       <div className="col-start-1 h-full w-full bg-slate-400">Cards</div>

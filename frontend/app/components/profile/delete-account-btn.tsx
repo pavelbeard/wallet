@@ -1,14 +1,13 @@
 "use client";
 
-import protectedQuery from "@/app/lib/helpers/protectedQuery";
+import useDeleteProfile from "@/app/lib/hooks/profile/useDeleteProfile";
 import useUser from "@/app/lib/hooks/ui/useUser";
 import CustomButton from "@/app/ui/button-custom";
 import FormTitle from "@/app/ui/form-title";
 import Submit from "@/app/ui/submit";
 import { LocaleProps } from "@/i18n/types";
-import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { FormEvent, useState, useTransition } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import Modal from "../layout/modal";
 
@@ -17,44 +16,8 @@ export default function DeleteAccountBtn({}: LocaleProps) {
   const t = useTranslations();
   const user = useUser();
   const public_id = user?.public_id;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, setFormMessages] = useState({
-    success: null as string | null,
-    error: null as string | null,
-  });
-  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    startTransition(async () => {
-      const result = await protectedQuery({
-        url: `/users/${public_id}/`,
-        method: "DELETE",
-      });
-
-      if (result instanceof Error) {
-        setFormMessages({
-          success: null,
-          error: t("error.somethingWentWrong"),
-        });
-        return;
-      }
-
-      if (!result?.ok) {
-        setFormMessages({
-          success: null,
-          error: t("profile.userCard.deleteRequest.error"),
-        });
-        return;
-      }
-
-      if (result?.ok) {
-        await signOut();
-        return;
-      }
-    });
-  };
+  const { handleSubmit, formMessages, isPending } = useDeleteProfile(public_id);
 
   return (
     <section className="col-span-2 row-start-3 flex h-fit w-full flex-col items-center rounded-xl border border-slate-700 bg-slate-400 p-4 dark:border-slate-600 dark:bg-slate-800">

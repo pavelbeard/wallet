@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 from stuff.models import WalletUser, Tag
-from passwords.utils import encrypt_password
+from utils.password_utils import encrypt
 
 # Create your models here.
 
@@ -10,9 +10,12 @@ from passwords.utils import encrypt_password
 class PasswordRecordManager(models.Manager):
     def create(self, **kwargs):
         password = kwargs.pop("password")
-        master_password = kwargs.pop("master_password")
-        encrypted_password = encrypt_password(password, master_password)
-        kwargs["password"] = encrypted_password
+        user = kwargs.get("wallet_user")
+        master_password = user.master_password
+        data = encrypt(password, master_password)
+        kwargs["password"] = data["encrypted_data"]
+        kwargs["salt"] = data["salt"]
+        
         return super().create(**kwargs)
 
 
@@ -21,6 +24,7 @@ class PasswordRecord(models.Model):
     label = models.CharField(max_length=255)
     login = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
+    salt = models.CharField(max_length=255)
     url = models.URLField(max_length=255, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)

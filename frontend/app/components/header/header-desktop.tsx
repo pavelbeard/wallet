@@ -10,12 +10,7 @@ export default function HeaderDesktop({
 }: {
   user: WalletUser | undefined;
 }) {
-  const isOauthUser = user?.is_oauth_user;
-  const isTwoFactorEnabled = user?.is_two_factor_enabled;
   const isVerified = user?.verified;
-  const canAccessDashboard =
-    user?.email &&
-    (!isTwoFactorEnabled || isOauthUser || (isTwoFactorEnabled && isVerified));
 
   return (
     <>
@@ -61,7 +56,7 @@ export default function HeaderDesktop({
         className="flex flex-grow basis-0 justify-end"
         data-testid="desktop-right-nav"
       >
-        {canAccessDashboard ? (
+        {isVerified ? (
           <NavItem isOnHeader title="Dashboard" href="/dashboard" />
         ) : (
           <NavItem isOnHeader title="Sign in" href="/auth/sign-in" />

@@ -11,9 +11,11 @@ from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
-from backend.stuff import two_factor_utils
 from stuff.models import EmailVerificationToken, PasswordResetToken, WalletUser
-from backend.stuff.two_factor_utils import override_api_settings
+from stuff.two_factor_utils import (
+    generate_2fa_key_in_qr_code,
+    override_api_settings,
+)
 
 User = get_user_model()
 
@@ -210,6 +212,7 @@ class StuffTests(APITestCase):
         self.assertEqual(response3.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+
 class DeleteAccountTestCase(APITestCase):
     def setUp(self):
         user = WalletUser.objects.create_user(
@@ -338,7 +341,7 @@ class TokensVerificationTestCase(APITestCase):
 
     def test_two_factor_verification_qr(self):
         test_data = "otpauth://totp/testuser?secret=7JHJUOZQN4PBQK4ZTJONKSGQUYGGDESL&algorithm=SHA1&digits=6&period=30"
-        result = two_factor_utils.generate_2fa_key_in_qr_code(test_data)
+        result = generate_2fa_key_in_qr_code(test_data)
 
         self.assertEqual(type(result), PilImage)
 
@@ -570,7 +573,7 @@ class PasswordResetTestCase(APITestCase):
 class UtilsTestCase(TestCase):
     def test_generate_master_password(self):
         from stuff.utils import generate_master_password
-        
+
         password = generate_master_password()
-        
+
         self.assertEqual(7, len(password.split("-")))

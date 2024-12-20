@@ -29,6 +29,7 @@ class UserAdmin(BaseUserAdmin):
         "is_active",
         "is_staff",
         "is_superuser",
+        "master_password_exists",
     )
 
     fieldsets = (
@@ -37,6 +38,11 @@ class UserAdmin(BaseUserAdmin):
         ("Groups", {"fields": ("groups",)}),
         ("User permissions", {"fields": ("user_permissions",)}),
     )
+    
+    @admin.display(boolean=True, description=_("Master password"))
+    def master_password_exists(self, obj: WalletUser):
+        master_password_exists = obj.master_password is not None
+        return master_password_exists
 
 
 @admin.register(DDevice)

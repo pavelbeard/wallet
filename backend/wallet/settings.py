@@ -170,7 +170,7 @@ if DEBUG:
     MEDIA_URL = "/media/"
 else:
     MEDIA_URL = "/backend/media/"
-    
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -224,7 +224,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": ("stuff.permissions.IsUserVerified",),
     "PAGE_SIZE": 9,
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     # "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
@@ -247,7 +247,6 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "public_id",
     "AUTH_TOKEN_CLASSES": ["rest_framework_simplejwt.tokens.AccessToken"],
     "TOKEN_TYPE_CLAIM": "token_type",
-    
     "AUTH_ACCESS_COOKIE": "__clientid",
     "AUTH_REFRESH_COOKIE": "__rclientid",
     "AUTH_COOKIE_DOMAIN": None,
@@ -255,7 +254,6 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_PATH": "/",
     "AUTH_COOKIE_SAMESITE": "Lax",
-    
     "TOKEN_OBTAIN_SERIALIZER": "stuff.serializers.TwoFactorJWTSerializer",
 }
 
@@ -311,3 +309,13 @@ FRONTEND_URL = env.get_env.FRONTEND_URL
 
 EMAIL_HOST_USER = "onboarding@resend.dev"
 RESEND_API_KEY = env.get_env.RESEND_API_KEY
+
+# HASHERS
+
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]

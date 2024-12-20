@@ -1,7 +1,7 @@
 ### module for complicated logic ###
 import contextlib
 from calendar import timegm
-from typing import Any, Dict, List
+from typing import Any, List
 
 import jwt
 from django.conf import settings
@@ -17,10 +17,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import authentication as jwt_authentication
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from stuff import qr_generator
 from stuff.models import WalletUser
 from stuff.types import Action
+
+from utils import qr_generator
 
 
 @contextlib.contextmanager
@@ -95,6 +95,14 @@ def jwt_custom_payload(
         payload["is_two_factor_enabled"] = user.is_two_factor_enabled
     if getattr(user, "email_verified") is not None:
         payload["is_email_verified"] = user.email_verified
+        
+    if user.is_oauth_user and user.image.name is not None:
+        payload["image"] = user.image.name
+    else:
+        try:
+            payload["image"] = user.image.url
+        except ValueError:
+            pass
 
     if settings.SIMPLE_JWT.get("ROTATE_REFRESH_TOKENS"):
         payload["orig_iat"] = timegm(timezone.now().utctimetuple())
@@ -115,6 +123,18 @@ def jwt_custom_payload(
         payload["otp_device_id"] = device.persistent_id
         payload["created_at"] = device.created_at.strftime("%d %b %Y")
         payload["verified"] = True
+    elif Action == Action.master_password:
+        payload["otp_device_id"] = None
+        payload["created_at"] = None
+        payload["verified"] = True
+    elif Action == Action.oauth2:
+        payload["otp_device_id"] = None
+        payload["created_at"] = None
+        # if user is first oauth login (fast register), then mark it as verified
+        if user.is_first_oauth_login:
+            payload["verified"] = True
+        else:
+            payload["verified"] = False
     else:
         payload["otp_device_id"] = None
         payload["created_at"] = None
@@ -192,29 +212,6 @@ def get_user_static_device(user: WalletUser, confirmed=None) -> StaticDevice | N
     for device in devices:
         if isinstance(device, StaticDevice):
             return device
-
-
-def set_auth_cookies(response: Response, jwt_tokens: Dict[str, str]) -> Response:
-    if jwt_tokens.get("access"):
-        response.set_cookie(
-            key=settings.SIMPLE_JWT["AUTH_ACCESS_COOKIE"],
-            value=jwt_tokens["access"],
-            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-        )
-    if jwt_tokens.get("refresh"):
-        response.set_cookie(
-            key=settings.SIMPLE_JWT["AUTH_REFRESH_COOKIE"],
-            value=jwt_tokens["refresh"],
-            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],  # type: ignore
-            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-        )
-    response.data = {"access": jwt_tokens["access"]}
-    return response
 
 
 def set_csrf_cookie(response: Response, request: HttpRequest):

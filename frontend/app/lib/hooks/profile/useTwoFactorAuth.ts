@@ -6,7 +6,6 @@ import { SubmitHandler } from "react-hook-form";
 
 export default function useTwoFactorAuth() {
   const { update } = useSession();
-  const [copied, setCopied] = useState<string | null>(null);
   const [verify2faState, setVerify2faState] = useState({
     success: null as string | null,
     error: null as string | null,
@@ -30,14 +29,9 @@ export default function useTwoFactorAuth() {
     });
   };
 
-  const resetCopied = () => setCopied(null);
-
   return {
     verify2faState,
     handleSubmit2FA,
-    copied,
-    setCopied,
-    resetCopied,
     isPending,
   };
 }

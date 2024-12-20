@@ -13,10 +13,9 @@ import {
   authRoutes,
   DEFAULT_SIGNED_IN_PATH,
   DEFAULT_SIGNED_OUT_PATH,
+  DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE,
   DEFAULT_VERIFICATION_ROUTE,
-  OTPProtectedRoutes,
   protectedRoutes,
-  TWO_FACTOR_ATTENTION_ROUTE,
 } from "@/routes";
 import {
   Account,
@@ -82,8 +81,8 @@ const routeMatcher = (
 
 const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
   const user = auth?.user as WalletUser;
-  const { pathname } = request.nextUrl;
-  const locale = request.cookies.get("NEXT_LOCALE")?.value;
+  const { pathname, search } = request.nextUrl;
+  const locale = request.cookies.get("NEXT_LOCALE")?.value ?? "es";
 
   const isProtectedRoute = routeMatcher(
     protectedRoutes,
@@ -101,74 +100,44 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
 
   const isAuthRoute = routeMatcher(authRoutes, routing.locales, pathname);
 
-  const isOTPProtectedRoute = routeMatcher(
-    OTPProtectedRoutes,
-    routing.locales,
-    pathname,
-  );
+  const redirectTo = (path: string, callbackUrl?: string) => {
+    const url = new URL(`/${locale}${path}`, request.url);
+    if (callbackUrl) {
+      url.searchParams.set("callbackUrl", callbackUrl);
+    }
+    return NextResponse.redirect(url);
+  };
 
-  // ** CASE 1: User got an error **
   if (isErrorRoute) {
-    return NextResponse.redirect(
-      new URL(
-        `/${locale ?? "es"}${pathname}${request.nextUrl.search}`,
-        request.url,
-      ),
-    );
+    return redirectTo(`{pathname}${search}`);
   }
 
-  // ** CASE 2: If user gets protected route by OTP and not verified or doesn't have 2FA or is an OAuth user **
-  if (
-    isOTPProtectedRoute &&
-    (!user.verified || !user.is_two_factor_enabled || user.is_oauth_user)
-  ) {
-    return NextResponse.redirect(
-      new URL(
-        `/${locale ?? "es"}${TWO_FACTOR_ATTENTION_ROUTE}${request.nextUrl.search}`,
-        request.url,
-      ),
-    );
+  if (isProtectedRoute) {
+    if (!user) {
+      return redirectTo(DEFAULT_SIGNED_OUT_PATH);
+    }
+
+    if (
+      (!user?.verified && !user?.is_two_factor_enabled) ||
+      user?.is_oauth_user
+    ) {
+      return redirectTo(DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE, pathname);
+    }
+
+    if (user?.is_two_factor_enabled && !user?.verified) {
+      return redirectTo(DEFAULT_VERIFICATION_ROUTE, pathname);
+    }
   }
 
-  // ** CASE 3: User is verifying email **
+  if (user) {
+    if (isAuthRoute && user?.verified && isVerificationRoute) {
+      return redirectTo(DEFAULT_SIGNED_IN_PATH);
+    }
+  }
+
   if (pathname == "/verify-email" && isProtectedRoute) {
-    return NextResponse.redirect(
-      new URL(
-        `/${locale ?? "es"}/verify-email${request.nextUrl.search}`,
-        request.url,
-      ),
-    );
+    return redirectTo("/verify-email");
   }
-
-  // ** CASE 4: User is authenticated with 2FA and verified **
-  if (user && (isAuthRoute || (user?.verified && isVerificationRoute))) {
-    return NextResponse.redirect(
-      new URL(`/${locale ?? "es"}${DEFAULT_SIGNED_IN_PATH}`, request.url),
-    );
-  }
-
-  // ** CASE 5: User is authenticated with 2FA but without verification **
-  if (user?.is_two_factor_enabled && !user?.verified && isProtectedRoute) {
-    const tokenVerifyPath = new URL(
-      `/${locale ?? "es"}${DEFAULT_VERIFICATION_ROUTE}`,
-      request.url,
-    );
-    tokenVerifyPath.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(tokenVerifyPath);
-  }
-
-  // ** CASE 6: User is not authenticated **
-  if (!user && (isProtectedRoute || isVerificationRoute)) {
-    const unauthenticatedPath = new URL(
-      `/${locale ?? "es"}${DEFAULT_SIGNED_OUT_PATH}`,
-      request.url,
-    );
-    return NextResponse.redirect(unauthenticatedPath);
-  }
-
-  // ** CASE 7: User is accessing public route **
-  // ** CASE 9: User is accessing protected route **
-  // ** CASE 10: Fallback **
 
   return NextResponse.next();
 };
@@ -244,7 +213,10 @@ const jwtCallback: JWTCallback = async ({
     const validatedSession = UpdateSessionSchema.safeParse(session);
     if (!validatedSession.success) return token;
 
-    token.user = { ...validatedSession.data.user, provider: "credentials" };
+    // @ts-expect-error | Token includes provider, because that calls in the trigger update
+    const provider = token?.user?.provider;
+
+    token.user = { ...validatedSession.data.user, provider };
     token.access_token = validatedSession.data.access_token;
     token.access_token_exp = validatedSession.data.access_token_exp;
     token.refresh_token = validatedSession.data.refresh_token;

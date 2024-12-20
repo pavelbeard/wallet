@@ -24,14 +24,17 @@ export const SIGN_IN_HANDLERS: { [index: string]: Handler } = {
   credentials: async (): Promise<boolean | string> => {
     return true;
   },
-  google: async ({ account }: Provider): Promise<boolean | string> => {
+  google: async ({ account, user }: Provider): Promise<boolean | string> => {
     try {
       const result = await fetch(
         `${API_PATH}/api-v1/oauth2/signin_with_google/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ access_token: account?.access_token }),
+          body: JSON.stringify({
+            access_token: account?.access_token,
+            user,
+          }),
           credentials: "include",
         },
       );

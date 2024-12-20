@@ -87,6 +87,9 @@ const AuthDataSchema = z.object({
   user: z.object({
     public_id: z.string().min(1, { message: "Public id is required" }),
     username: z.string().min(1, { message: "Username is required" }),
+    first_name: z.string().optional().nullable(),
+    last_name: z.string().optional().nullable(),
+    image: z.string().optional().nullable(),
     email: z.string().min(1, { message: "Email is required" }),
     orig_iat: z.number().min(1, { message: "Orig iat is required" }),
     otp_device_id: z.string().optional().nullable(),
@@ -141,6 +144,9 @@ const NewPasswordSchema = z
   .superRefine(passwordComplexityChecker);
 
 const ResetPasswordRequestSchema = RequestEmailSchema;
+const MasterPasswordSchema = z.object({
+  masterPassword: z.string().min(1, { message: "Write your master password!" }),
+});
 
 export type SignInValidator = z.infer<typeof SignInSchema>;
 export type SignUpValidator = z.infer<typeof SignUpSchema>;
@@ -155,9 +161,11 @@ export type NewPasswordValidator = z.infer<typeof NewPasswordSchema>;
 export type ResetPasswordRequestValidator = z.infer<
   typeof ResetPasswordRequestSchema
 >;
+export type MasterPasswordValidator = z.infer<typeof MasterPasswordSchema>;
 
 export {
   ChangePasswordSchema,
+  MasterPasswordSchema,
   NewPasswordSchema,
   NextAuthUserSchema,
   PasswordSchema,

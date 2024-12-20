@@ -41,11 +41,18 @@ class WalletUser(AbstractModel, AbstractUser):
         unique=True,
         validators=[username_validator],
     )
+    image = models.ImageField(
+        upload_to="users/images",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])],
+    )
     password = models.CharField(max_length=250, blank=True, null=True)
-    master_password = models.CharField(max_length=250, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True, unique=True)
+    master_password = models.CharField(max_length=250)
+    email = models.EmailField(unique=True)
     email_verified = models.BooleanField(default=False)
     is_oauth_user = models.BooleanField(default=False)
+    is_first_oauth_login = models.BooleanField(default=False)
     provider = models.CharField(max_length=250, blank=True, null=True)
     is_two_factor_enabled = models.BooleanField(default=False)
 
@@ -55,6 +62,11 @@ class WalletUser(AbstractModel, AbstractUser):
 
         if self.email == "":
             self.email = None
+
+        if self.last_login is None:
+            self.is_first_oauth_login = True
+        else:
+            self.is_first_oauth_login = False
 
         if not (self.username or self.email):
             raise ValueError("Username or Email must be set")

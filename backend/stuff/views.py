@@ -4,13 +4,10 @@ from typing import Type
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from dj_rest_auth.registration import views as dj_rest_auth_views
-from django.http import HttpRequest, JsonResponse
-from django.utils.translation import gettext_lazy as _
+from django.http import HttpRequest
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework_simplejwt.exceptions import AuthenticationFailed, TokenError
 
 from . import models, serializers
 from . import permissions as stuff_permissions
@@ -20,114 +17,57 @@ from .controller import (
     TOTPDeviceController,
     WalletUserController,
 )
-from .utils import get_user_info, super_logger
+from .utils import get_user_info, handle_exception, super_logger
 
 logger = super_logger(__name__)
 
 
 class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def signup(self, request):
-        try:
-            result = Auth.sign_up(request=request)
-            return result
-        except TypeError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                {"error": {"detail": e.args}}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except ValidationError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                data={"error": e.detail}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception:
-            logger.error(msg=_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = Auth.sign_up(request=request)
+        return result
 
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def signin(self, request):
-        try:
-            result = Auth.sign_in(request=request)
-            return result
-        except AuthenticationFailed as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                {"error": _("Bad credentials.")}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except ValidationError as e:
-            logger.error(_("Failed to sign in user"), exc_info=True)
-            return Response(
-                data={"error": e.detail}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = Auth.sign_in(request=request)
+        return result
 
     @action(detail=False, methods=["POST"])
+    @handle_exception
     def signout(self, request):
-        try:
-            result = Auth.sign_out(request=request)
-            return result
-        except TokenError:
-            logger.exception(_("Token is blacklisted"), exc_info=True)
-            return JsonResponse(
-                {"error": _("Token is blacklisted")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = Auth.sign_out(request=request)
+        return result
 
 
 class OAuth2ViewSet(viewsets.ViewSet, dj_rest_auth_views.SocialLoginView):
     adapter_class: Type[OAuth2Adapter]
 
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def signin_with_google(self, request, *args, **kwargs):
         self.adapter_class = GoogleOAuth2Adapter
-        try:
-            response = super().post(request, *args, **kwargs)
-            result = Oauth2Auth.signin_with_google(request=request, response=response)
-            return result
-        except TypeError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        except ValidationError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                data={"error": e.detail},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = super().post(request, *args, **kwargs)
+        result = Oauth2Auth.signin_with_google(request=request, response=response)
+        return result
 
 
 class TwoFactorAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
+    @handle_exception
     def create_totp_device(self, request):
         """Set up a new TOTP device."""
-        try:
-            result = TOTPDeviceController.create_totp_device(request=request)
-            return result
-        except Exception:
-            logger.exception(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = TOTPDeviceController.create_totp_device(request=request)
+        return result
 
-    @action(detail=False, methods=["POST"])
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.IsAuthenticated])
+    @handle_exception
     def verify_totp_device(self, request):
         """Verify/enable a TOTP device."""
-        try:
-            result = TOTPDeviceController.verify_totp_device(request=request)
-            return result
-        except TypeError:
-            return Response(
-                {"error": _("Invalid TOTP token.")}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception:
-            logger.exception(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = TOTPDeviceController.verify_totp_device(request=request)
+        return result
 
     @action(
         detail=False,
@@ -137,26 +77,16 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
             stuff_permissions.IsOtpVerified,
         ],
     )
+    @handle_exception
     def create_backup_tokens(self, request):
-        try:
-            result = TOTPDeviceController.create_backup_tokens(request=request)
-            return result
-        except Exception:
-            logger.exception(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = TOTPDeviceController.create_backup_tokens(request=request)
+        return result
 
     @action(detail=False, methods=["POST"])
+    @handle_exception
     def verify_backup_token(self, request):
-        try:
-            result = TOTPDeviceController.verify_backup_token(request=request)
-            return result
-        except TypeError:
-            return Response(
-                {"error": _("Invalid token.")}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception:
-            logger.exception(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = TOTPDeviceController.verify_backup_token(request=request)
+        return result
 
     @action(
         detail=False,
@@ -166,13 +96,10 @@ class TwoFactorAuthViewSet(viewsets.ViewSet):
             stuff_permissions.IsOtpVerified,
         ],
     )
+    @handle_exception
     def delete_totp_device(self, request):
-        try:
-            result = TOTPDeviceController.delete_totp_device(request=request)
-            return result
-        except Exception:
-            logger.exception(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = TOTPDeviceController.delete_totp_device(request=request)
+        return result
 
 
 class WalletUserViewSet(viewsets.ModelViewSet):
@@ -190,158 +117,79 @@ class WalletUserViewSet(viewsets.ModelViewSet):
         "partial_update",
         "username_suggestions",
         "destroy",
+        "check_master_password",
     )
 
     @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def check_user_by_username(self, request):
-        try:
-            result = WalletUserController.check_user_by_username(
-                request=request, qs=self.queryset
-            )
-            return result
-        except TypeError:
-            return Response(
-                data={"error": _("Please provide username in query params")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.check_user_by_username(
+            request=request, qs=self.queryset
+        )
+        return result
 
     @action(detail=False, methods=["GET"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def check_user_by_email(self, request):
-        try:
-            result = WalletUserController.check_user_by_email(
-                request=request, qs=self.queryset
-            )
-            return result
-        except TypeError:
-            return Response(
-                data={"error": _("Please provide email in query params")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.check_user_by_email(
+            request=request, qs=self.queryset
+        )
+        return result
 
     @action(detail=False, methods=["POST"])
+    @handle_exception
     def create_change_email_request(self, request):
-        try:
-            result = WalletUserController.change_email_request(request=request)
-            return result
-        except TypeError as e:
-            return Response(
-                data={"error": e.args[0]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.change_email_request(request=request)
+        return result
 
     @action(detail=False, methods=["POST"])
+    @handle_exception
     def verify_email_change(self, request):
-        try:
-            result = WalletUserController.verify_email_change(request=request)
-            return result
-        except ValidationError as e:
-            return Response(
-                data={"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except TypeError as e:
-            return Response(
-                data={"error": e.args[0]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.verify_email_change(request=request)
+        return result
 
     @action(detail=True, methods=["POST"])
+    @handle_exception
     def change_password(self, request, **kwargs):
         """Change user password."""
-        try:
-            result = WalletUserController.change_password(
-                request=request, pk=kwargs.get("public_id")
-            )
-            return result
-        except TypeError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                data={"error": {"detail": e.args}}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except ValidationError as e:
-            return Response(
-                data={"error": e.detail},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.change_password(
+            request=request, pk=kwargs.get("public_id")
+        )
+        return result
 
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def create_reset_password_request(self, request):
-        try:
-            result = WalletUserController.create_reset_password_request(request=request)
-            return result
-        except ValidationError as e:
-            return Response(
-                data={"error": e.detail},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.create_reset_password_request(request=request)
+        return result
 
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def create_new_password(self, request):
-        try:
-            result = WalletUserController.create_new_password(request=request)
-            return result
-        except ValidationError as e:
-            return Response(
-                data={"error": e.detail},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.create_new_password(request=request)
+        return result
 
     @action(detail=False, methods=["POST"], permission_classes=[permissions.AllowAny])
+    @handle_exception
     def username_suggestions(self, request):
-        try:
-            result = WalletUserController.username_suggestions(request=request)
-            return result
-        except TypeError:
-            return Response(
-                data={"error": _("Please provide username in query params")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result = WalletUserController.username_suggestions(request=request)
+        return result
 
+    @handle_exception
     def destroy(self, request, **kwargs):
-        try:
-            WalletUserController.destroy(
-                request=request,
-                pk=kwargs.get("public_id"),
-            )
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except TypeError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                data={"error": {"detail": e.args}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except ValidationError as e:
-            logger.error(msg=e.args[0], exc_info=True)
-            return Response(
-                data={"error": e.detail},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception:
-            logger.error(_("Something went wrong..."), exc_info=True)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        WalletUserController.destroy(
+            request=request,
+            pk=kwargs.get("public_id"),
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=["POST"], permission_classes=[permissions.IsAuthenticated])
+    @handle_exception
+    def check_master_password(self, request):
+        result = WalletUserController.check_master_password(
+            request=request,
+        )
+        return result
 
 
 class WalletUserDeviceViewSet(viewsets.ModelViewSet):
@@ -349,6 +197,7 @@ class WalletUserDeviceViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.WalletUserDeviceSerializer
     allowed_methods = ("list",)
 
+    @handle_exception
     def list(self, request: HttpRequest):
         get_user_info(request=request, user=request.user)
 

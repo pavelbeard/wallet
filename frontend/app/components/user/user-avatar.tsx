@@ -1,53 +1,35 @@
 "use client";
 
 import AuthMethodLogo from "@/app/components/user/auth-method-logo";
+import logger from "@/app/lib/helpers/logger";
 import useDesktopBreakpoint from "@/app/lib/hooks/useDesktopBreakpoint";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import Image from "next/image";
 
-type Props = { src?: string | null; provider: string | "Credentials" };
+type Props = { image?: string | null; provider: string | "Credentials" };
 
 /**
  *
  * @src User image src
  * @provider Needs for auth method icon
  */
-export default function UserAvatar({ src, provider }: Props) {
+export default function UserAvatar({ image, provider }: Props) {
   const isDesktop = useDesktopBreakpoint();
+  const size = isDesktop ? 64 : 48;
 
-  if (src) {
-    // desktop oauth avatar
-    if (isDesktop) {
-      return (
-        <div data-type="desktop-oauth-avatar" className="relative">
-          <div className="hover-avatar">
-            <Image
-              className="rounded-full"
-              src={src}
-              alt="user-avatar"
-              width="64"
-              height="64"
-            />
-            <AuthMethodLogo provider={provider} />
-          </div>
-        </div>
-      );
-    } else {
-      // mobile oauth avatar
-      <div data-type="mobile-oauth-avatar" className="relative">
-        <div className="hover-avatar">
-          <Image
-            className="rounded-full"
-            src={src}
-            alt="user-avatar"
-            width="48"
-            height="48"
-          />
-          <AuthMethodLogo provider={provider} />
-        </div>
-      </div>;
-    }
+  if (image) {
+    return (
+      <div className="relative">
+        <img
+          className="rounded-full"
+          src={image}
+          alt="user-avatar"
+          width={size}
+          height={size}
+        />
+        <AuthMethodLogo provider={provider} />
+      </div>
+    );
   } else {
     // desktop credentials avatar
     if (isDesktop) {
@@ -55,21 +37,19 @@ export default function UserAvatar({ src, provider }: Props) {
         <div
           data-type="desktop-avatar"
           className={clsx(
-            "relative hidden items-center justify-center lg:flex",
+            "relative items-center justify-center lg:flex",
             "size-16 rounded-full border-[1px] border-gray-300 bg-gray-100",
             "dark:border-slate-600 dark:bg-slate-800",
           )}
         >
-          <div className="hover-avatar">
-            <UserCircleIcon className="size-[64px]" />
-            <AuthMethodLogo provider={provider} />
-          </div>
+          <UserCircleIcon className="size-[64px]" />
+          <AuthMethodLogo provider={provider} />
         </div>
       );
     } else {
       // mobile credentials avatar
       return (
-        <div className="flex flex-col lg:hidden">
+        <div className="flex flex-col">
           <div
             data-type="mobile-avatar"
             className={clsx(

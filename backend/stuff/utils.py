@@ -3,15 +3,19 @@ import os
 import random
 import re
 import string
+from functools import wraps
 from typing import Any, Dict, List
 
 import requests
-import resend
-import resend.exceptions
-from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpRequest
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import TokenError
 from user_agents import parse
 
 from stuff.models import DDevice, WalletUser, WalletUserDevice
@@ -63,24 +67,6 @@ def suggest_username(username: str, count: int = 3) -> List[str]:
         suggestions.append(f"{username}{number}")
 
     return list(set(suggestions))[:count]
-
-
-def send_email(email: str, subject: str, body: str):
-    try:
-        resend.api_key = settings.RESEND_API_KEY
-
-        params: resend.Emails.SendParams = {
-            "from": settings.EMAIL_HOST_USER,
-            "to": ["heavycream9090@gmail.com"],
-            "subject": subject,
-            "html": body,
-        }
-
-        r = resend.Emails.send(params)
-        return r
-    except Exception as e:
-        super_logger.error(e, exc_info=True)
-        return None
 
 
 def get_user_location():
@@ -152,33 +138,43 @@ def get_user_info(request: WSGIRequest | HttpRequest, user: WalletUser):
         utils_logger.error(e, exc_info=True)
 
 
-def generate_master_password():
-    """Generate a random master password."""
-    password = ""
-    for i in range(7):
-        if i == 0:
-            password += (
-                "".join(
-                    [
-                        random.choice(string.ascii_uppercase + string.digits)
-                        for _ in range(2)
-                    ]
-                )
-                + "-"
-            )
-        else:
-            password += (
-                "".join(
-                    [
-                        random.choice(string.ascii_uppercase + string.digits)
-                        for _ in range(6)
-                    ]
-                )
-                + "-"
-            )
 
-    return password[:-1]
+def handle_exception(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except TypeError as e:
+            utils_logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                {"error": e.args[0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except ValidationError as e:
+            utils_logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                data={"error": e.detail},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except AuthenticationFailed as e:
+            utils_logger.error(msg=e.args[0], exc_info=True)
+            return Response(
+                {"error": _("Bad credentials.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except TokenError:
+            utils_logger.error(msg=_("Token is blacklisted"), exc_info=True)
+            return Response(
+                {"error": _("Token is blacklisted")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            utils_logger.error(msg=e.args[0], exc_info=True)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return wrapper
+
 
 if __name__ == "__main__":  # pragma: no cover
     # print(suggest_username("pavel", 10))
-    print(generate_master_password())
+    pass

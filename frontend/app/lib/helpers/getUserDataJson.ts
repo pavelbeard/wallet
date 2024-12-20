@@ -11,6 +11,9 @@ export default async function getUserDataJson(
   const userData = {
     public_id: decodedToken.public_id,
     username: decodedToken.username,
+    first_name: decodedToken.first_name,
+    last_name: decodedToken.last_name,
+    image: decodedToken.image,
     email: decodedToken.email,
     orig_iat: decodedToken.orig_iat,
     otp_device_id: decodedToken.otp_device_id,

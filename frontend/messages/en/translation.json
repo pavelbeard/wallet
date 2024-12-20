@@ -46,6 +46,21 @@
       "configuration": "Configuration error",
       "accessDeniedMessage": "Probably the user with this email exists.",
       "configurationMessage": "Server error. If that repeat again, address to the developers"
+    },
+    "masterPassword": {
+      "title": "Cartera | Master password check",
+      "description": "Cartera | Master password generate",
+      "generate": {
+        "title": "Cartera | Master password generate",
+        "button": "Generate master password",
+        "formTitle": "Master password creation"
+      },
+      "send": {
+        "formTitle": "Master password required",
+        "submit": "Send",
+        "success": "Success!",
+        "inputLabel": "Your master password"
+      }
     }
   },
   "mainPage": {
@@ -103,7 +118,8 @@
       "deleteAccountQuestion": "Are you sure?",
       "deleteAccountNote": "That action will delete all your data!",
       "deleteRequest": {
-        "error": "An error is happend while deleting account."
+        "error": "An error is happend while deleting account.",
+        "success": "Thanks for using our service. See you next!"
       },
       "deleteOauth2Account": "Unlink account",
       "deleteOauth2Note": "That action will delete all your data, but data from account provider will be left."
@@ -140,7 +156,7 @@
       "added": "Added",
       "next": "Next",
       "change2fa": "Change 2FA",
-      "oauth2note": "Ask your account provider",
+      "oauth2note": "Master password",
       "deleted": "2FA if turned off",
       "notDeleted": "Wrong password",
       "2faAttention": {

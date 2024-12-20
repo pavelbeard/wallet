@@ -21,12 +21,13 @@ export default function useSignIn() {
 
     startTransition(() => {
       authenticate(data).then((result) => {
-        router.push("/dashboard");
         setFormMessages({
           ...formMessages,
           success: result?.success,
           error: result?.error,
         });
+
+        router.push("/dashboard");
       });
     });
   };

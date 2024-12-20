@@ -39,7 +39,7 @@ function TwoFactorStatus({ user, title, note }: UserProps & { note: string }) {
             ? "text-green-500 bg-green-500/40"
             : isProviderCredentials
               ? "text-red-500 bg-red-500/40"
-              : "text-yellow-800 dark:text-yellow-300 bg-yellow-500/40",
+              : "text-green-500 bg-green-500/40",
         )}
       >
         {twoFactorStatus ? (
@@ -48,7 +48,7 @@ function TwoFactorStatus({ user, title, note }: UserProps & { note: string }) {
           <XMarkIcon className="size-[12px]" />
         ) : (
           <div className="flex items-center gap-2 h-[12px]">
-            <ExclamationTriangleIcon className="size-[12px]" />
+            <CheckIcon className="size-[12px]" />
             {note}
           </div>
         )}

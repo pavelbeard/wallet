@@ -28,11 +28,8 @@ function FormComponent({
 }) {
   const t = useTranslations();
   const {
-    copied,
-    setCopied,
     verify2faState,
     handleSubmit2FA: onSubmit,
-    resetCopied,
     isPending,
   } = useTwoFactorAuth();
 
@@ -60,8 +57,6 @@ function FormComponent({
     delay: 300,
     dependencies: [watch("token")],
   });
-
-  useEffect(() => resetCopied, [resetCopied]);
 
   return (
     <form
@@ -100,8 +95,6 @@ function FormComponent({
               <>
                 <TwoFactorCodeDisplay
                   config_key={config_key}
-                  copiedMessage={copied}
-                  setCopied={setCopied}
                 />
 
                 <Button onClick={() => setNext(true)}>

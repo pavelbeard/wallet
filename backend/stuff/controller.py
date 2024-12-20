@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import Any, Dict
 
@@ -13,10 +14,19 @@ from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
+from utils.password_utils import generate_master_password, hash_master_password
+from utils.email_utils import send_email
+from utils.template_messages import create_welcome_context
+from utils.two_factor_utils import (
+    get_custom_jwt,
+    get_user_static_device,
+    get_user_totp_device,
+    set_csrf_cookie,
+)
 
-from stuff.utils import send_email, suggest_username
+from stuff.utils import suggest_username
 
-from . import exceptions, serializers, two_factor_utils
+from . import exceptions, serializers
 from .models import EmailVerificationToken, PasswordResetToken, WalletUser
 from .types import Action
 
@@ -31,20 +41,7 @@ class Auth:
 
         user = WalletUser.objects.filter(email=instance.email).first()
 
-        context = {
-            "welcome_title": _("Welcome!"),
-            "welcome_text": _(
-                "Thanks for registration in a super vault of your secrets!"
-            ),
-            "master_password_text_1": _("Your master password is:"),
-            "master_password_text_2": _(
-                "Please save this password in a safe physical place."
-            ),
-            "master_password": master_password,
-            "team": _("Thanks again! Your Cartera team."),
-            "year": timezone.now().year,
-            "all_rights_reserved": _("All rights reserved."),
-        }
+        context = create_welcome_context(master_password, f"{user.first_name} {user.last_name}")
 
         send_email(
             email=user.email,
@@ -71,9 +68,7 @@ class Auth:
                 "refresh": refresh_token,
             }
             auth_response = response
-            csrf_response = two_factor_utils.set_csrf_cookie(
-                request=request, response=auth_response
-            )
+            csrf_response = set_csrf_cookie(request=request, response=auth_response)
             return csrf_response
 
         raise exceptions.AuthenticationFailed(_("User is not active"))
@@ -95,7 +90,6 @@ class Auth:
 class Oauth2Auth:
     @staticmethod
     def signin_with_google(request: HttpRequest, response: HttpResponse) -> Response:
-        # TOKEN Doesn't work in frontend
         response_user_data = response.data.get("user")
         user = WalletUser.objects.get(pk=response_user_data.get("pk"))
 
@@ -104,9 +98,24 @@ class Oauth2Auth:
         user.last_name = response_user_data.get("last_name")
         user.is_oauth_user = True
         user.email_verified = True
-        user.save()
+        user.image = request.data.get("user").get("image")
 
-        jwt_tokens = two_factor_utils.get_custom_jwt(user=user, action=Action.oauth2)
+        if user.is_first_oauth_login:
+            master_password = generate_master_password()
+            hashed_master_password = hash_master_password(
+                master_password, os.urandom(16).hex()
+            )
+            user.master_password = hashed_master_password
+            context = create_welcome_context(master_password, f"{user.first_name} {user.last_name}", oauth_user=True)
+            send_email(
+                email=user.email,
+                subject=str(_("Welcome!")),
+                body=render_to_string("stuff/templates/welcome.html", context),
+            )
+
+        jwt_tokens = get_custom_jwt(user=user, action=Action.oauth2)
+
+        user.save()
 
         return Response(
             data={"access": jwt_tokens["access"], "refresh": jwt_tokens["refresh"]},
@@ -121,7 +130,7 @@ class TOTPDeviceController:
         response = Response()
         # configure device
         user = request.user
-        device = two_factor_utils.get_user_totp_device(user)
+        device = get_user_totp_device(user)
         if not device:
             device = user.totpdevice_set.create(confirmed=False)
         url = device.config_url
@@ -136,22 +145,15 @@ class TOTPDeviceController:
         user: WalletUser = request.user
         data: Dict[str, str] = serializer.validated_data
 
-        otp_token = data.get("token")
-        if not otp_token:
-            return Response(
-                {"error": _("Token is missing.")},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        device = two_factor_utils.get_user_totp_device(user)
-        if device is not None and device.verify_token(token=otp_token):
+        device = get_user_totp_device(user)
+        if device is not None and device.verify_token(token=data.get("token")):
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
 
                 user.is_two_factor_enabled = True
                 user.save()
-            tokens = two_factor_utils.get_custom_jwt(user, device, action=Action.verify)
+            tokens = get_custom_jwt(user, device, action=Action.verify)
             response = Response(status=status.HTTP_200_OK)
             response.data = {
                 "access": tokens["access"],
@@ -165,7 +167,7 @@ class TOTPDeviceController:
     @staticmethod
     def create_backup_tokens(request: HttpRequest):
         number_of_codes = 12
-        device = two_factor_utils.get_user_static_device(request.user)
+        device = get_user_static_device(request.user)
         if not device:
             device = StaticDevice.objects.create(user=request.user, name="Static")
 
@@ -188,9 +190,9 @@ class TOTPDeviceController:
             )
 
         user = request.user
-        device = two_factor_utils.get_user_static_device(user)
+        device = get_user_static_device(user)
         if device is not None and device.verify_token(otp_token):
-            token = two_factor_utils.get_custom_jwt(user, device)
+            token = get_custom_jwt(user, device)
             # TODO: update refresh token
             return Response({"access": token}, status=status.HTTP_200_OK)
 
@@ -212,7 +214,7 @@ class TOTPDeviceController:
         user.is_two_factor_enabled = False
         user.save()
 
-        tokens = two_factor_utils.get_custom_jwt(user, None, Action.delete)
+        tokens = get_custom_jwt(user, None, Action.delete)
         response = Response(status=status.HTTP_200_OK)
         response.data = {"detail": _("Device detached from 2FA")}
 
@@ -227,12 +229,28 @@ class TOTPDeviceController:
 
 class WalletUserController:
     @staticmethod
+    def check_master_password(request: HttpRequest):
+        serializer = serializers.MasterPasswordSerializer(
+            data=request.data, context={"pk": request.user.id}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        tokens = get_custom_jwt(user=request.user, action=Action.master_password)
+
+        response = Response()
+        response.data = {
+            "access": tokens["access"],
+            "refresh": tokens["refresh"],
+        }
+        return response
+
+    @staticmethod
     def check_user_by_username(
         request: HttpRequest, qs: QuerySet[WalletUser], **kwargs
     ):
         param = request.query_params.get("username")
         if not param:
-            raise TypeError()
+            raise TypeError(_("Please provide username in query params"))
         user = get_object_or_404(qs, username=param)
         data = serializers.WalletUserSerializer(user).data
         return Response(data, status=status.HTTP_200_OK)
@@ -241,7 +259,7 @@ class WalletUserController:
     def check_user_by_email(request: HttpRequest, qs: QuerySet[WalletUser], **kwargs):
         param = request.query_params.get("email")
         if not param:
-            raise TypeError()
+            raise TypeError(_("Please provide email in query params"))
         user = get_object_or_404(qs, email=param)
         data = serializers.WalletUserSerializer(user).data
         return Response(data, status=status.HTTP_200_OK)
@@ -261,7 +279,7 @@ class WalletUserController:
             old_records.update(is_active=False)
 
         record = EmailVerificationToken.objects.create(user=user, email=email)
-        
+
         context = {
             "change_email_title": _("Change email request"),
             "change_email_text_1": _("Please verify your email by this"),
@@ -428,7 +446,7 @@ class WalletUserController:
 
         if user.is_two_factor_enabled:
             token = validated_data.get("token")
-            device = two_factor_utils.get_user_totp_device(user)
+            device = get_user_totp_device(user)
             if device is not None and device.verify_token(token):
                 device.delete()
                 user.delete()

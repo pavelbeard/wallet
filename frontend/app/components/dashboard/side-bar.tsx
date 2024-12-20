@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import { useMemo } from "react";
 import UserAvatarSkeleton from "../user/user-avatar-skeleton";
 import SideBarSignOut from "./side-bar-sign-out";
+import logger from "@/app/lib/helpers/logger";
 
 const UserAvatar = dynamic(() => import("@/app/components/user/user-avatar"), {
   ssr: false,
@@ -40,12 +41,12 @@ export default function SideBar() {
         "max-lg:flex-1",
       )}
     >
-      <div className="flex items-center gap-2 border-b border-gray-300 p-4 dark:border-slate-600">
-        <UserAvatar src={image} provider={provider} />
-        <span className="hidden text-lg font-bold lg:block">
-          {user?.username}
+      <div className="flex flex-col items-start gap-4 border-b border-gray-300 p-4 dark:border-slate-600">
+        <UserAvatar image={image} provider={provider} />
+        <span className="hidden text-sm font-bold lg:block">
+          {user?.username ?? "..."}
         </span>
-        <span className="text-lg font-bold lg:hidden">{user?.username}</span>
+        <span className="text-sm font-bold lg:hidden">{user?.username ?? "..."}</span>
       </div>
       <nav className="grid h-full grid-rows-[1fr_150px] p-4 lg:grid-rows-[1fr_50px]">
         <ul className="flex flex-col gap-2">

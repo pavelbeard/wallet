@@ -5,6 +5,8 @@ export interface WalletUser {
   id?: string;
   public_id: string;
   username: string;
+  first_name: string;
+  last_name: string;
   email: string;
   image?: string;
   orig_iat: number;

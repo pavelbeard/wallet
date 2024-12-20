@@ -1,12 +1,14 @@
 from abstract.serializers import AbstractSerializer
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from utils.password_utils import compare_passwords
 from rest_framework import serializers
 from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
 
-from stuff import two_factor_utils, utils
+from stuff import utils
+from utils import two_factor_utils
 from stuff.controller import WalletUserController
 from stuff.types import Action
 
@@ -124,7 +126,7 @@ class SignupSerializer(WalletUserSerializer):
                 data["username"] = username_suggested
         if data["password"] != data["password2"]:
             raise serializers.ValidationError(_("Passwords do not match!"))
-        
+
         master_password = utils.generate_master_password()
         data["master_password"] = master_password
 
@@ -258,6 +260,13 @@ class UsernameSuggestionsSerializer(serializers.Serializer):
 
 class VerifyTOTPDeviceSerializer(serializers.Serializer):
     token = serializers.CharField()
+    
+    def validate(self, attrs):
+        token = attrs.get("token")
+        if not token:
+            raise serializers.ValidationError("Token is missing.")
+        
+        return attrs
 
 
 class ChangeEmailSerializer(serializers.Serializer):
@@ -376,3 +385,23 @@ class CreateNewPasswordSerializer(serializers.Serializer):
             "public_id": record.user.public_id,
             "password": password,
         }
+
+class MasterPasswordSerializer(serializers.Serializer):
+    masterPassword = serializers.CharField(style={"input_type": "password"})
+
+    def validate(self, attrs):
+        master_password = attrs.get("masterPassword")
+        user_pk = self.context.get("pk")
+        user = WalletUser.objects.filter(pk=user_pk).first()
+        
+        # TODO: add master password's trust time
+        
+        if not master_password:
+            raise serializers.ValidationError("Master password is required.")
+        
+        user_master_password = user.master_password
+
+        if not compare_passwords(master_password, user_master_password):
+            raise serializers.ValidationError("Master password is incorrect.")
+
+        return {}

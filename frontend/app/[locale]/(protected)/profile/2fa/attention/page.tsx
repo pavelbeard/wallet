@@ -33,7 +33,7 @@ export default async function Attention({ params: { locale } }: LocaleProps) {
         href="/profile/2fa"
         locale={locale}
         className={clsx(
-          "rounded-xl border border-slate-300 bg-slate-100 p-2",
+          "rounded-xl border border-slate-300 bg-slate-100 dark:bg-slate-400 p-2",
           "dark:border-slate-600 dark:hover:bg-slate-500",
           "hover:bg-slate-200"
         )}

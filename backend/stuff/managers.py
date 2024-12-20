@@ -1,8 +1,15 @@
+import os
+
 from abstract.managers import AbstractManager
 from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
+from utils.email_utils import send_email
+from utils.password_utils import generate_master_password, hash_master_password
+
+from utils.template_messages import create_welcome_context
 
 
 class WalletUserManager(BaseUserManager, AbstractManager):
@@ -28,7 +35,10 @@ class WalletUserManager(BaseUserManager, AbstractManager):
         if email:
             user_data["email"] = self.normalize_email(email)
         if user_data.get("master_password"):
-            user_data["master_password"] = make_password(user_data.get("master_password"))
+            user_data["master_password"] = hash_master_password(
+                master_password=user_data.get("master_password"),
+                salt=os.urandom(16).hex(),
+            )
 
         user = self.model(**user_data)
         if password and not extra_fields.get("is_oauth_user"):
@@ -54,6 +64,18 @@ class WalletUserManager(BaseUserManager, AbstractManager):
     def create_superuser(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+
+        master_password = generate_master_password()
+
+        context = create_welcome_context(master_password, "Cartera admin")
+
+        send_email(
+            email=email,
+            subject=str(_("Welcome!")),
+            body=render_to_string("stuff/templates/welcome.html", context),
+        )
+
+        extra_fields.setdefault("master_password", master_password)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")

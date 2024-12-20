@@ -12,6 +12,7 @@ class Action(enum.Enum):
     verify = "verify"
     delete = "delete"
     oauth2 = "oauth2"
+    master_password = "master_password"
 
 
 class LOGIN_TYPE(Enum):

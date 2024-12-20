@@ -4,18 +4,16 @@
 export const publicRoutes: string[] = ["/", "/verify-password"];
 
 /**
- * Routes, which middleware should protect by default
+ * Routes, which middleware should protect by TOTP/Master password
  */
 export const protectedRoutes: string[] = [
   "/dashboard",
   "/profile",
   "/profile/2fa",
   "/verify-email",
+  "/passwords",
+  "/cards",
 ];
-/**
- * Routes, which middleware should protect by OTP only
- */
-export const OTPProtectedRoutes: string[] = ["/passwords", "/cards"];
 
 /**
  * Route, which user should be proceed to verify 2FA
@@ -23,9 +21,10 @@ export const OTPProtectedRoutes: string[] = ["/passwords", "/cards"];
 export const DEFAULT_VERIFICATION_ROUTE = "/auth/sign-in/verify";
 
 /**
- * Fallback route, which user should be proceed to create 2FA
+ * Route, which user should be proceed to verify master password
  */
-export const TWO_FACTOR_ATTENTION_ROUTE = "/profile/2fa/attention";
+export const DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE =
+  "/auth/sign-in/master-password";
 
 /**
  * Routes, which middleware should ignore by default, but if you is authenticated - skip these routes
