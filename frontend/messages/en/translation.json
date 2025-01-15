@@ -60,6 +60,10 @@
         "submit": "Send",
         "success": "Success!",
         "inputLabel": "Your master password"
+      },
+      "page": {
+        "title": "Cartera | Master password required",
+        "description": "Cartera | Master password required"
       }
     },
     "signUp": {
@@ -282,5 +286,9 @@
   },
   "changePassword": {
     "success": "Password changed"
+  },
+  "passwords": {
+    "title": "Passwords",
+    "description": "Passwords"
   }
 }

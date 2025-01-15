@@ -1,16 +1,12 @@
 "use client";
 
 import useUser from "@/app/lib/hooks/ui/useUser";
-import { sideMenu } from "@/app/lib/sidebar";
-import { SideBarItem } from "@/app/lib/types";
-import { Link } from "@/i18n/routing";
+import SideMenuItems from "@/app/lib/side-menu-items";
 import clsx from "clsx";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
 import UserAvatarSkeleton from "../user/user-avatar-skeleton";
 import SideBarSignOut from "./side-bar-sign-out";
-import logger from "@/app/lib/helpers/logger";
 
 const UserAvatar = dynamic(() => import("@/app/components/user/user-avatar"), {
   ssr: false,
@@ -23,7 +19,6 @@ export default function SideBar() {
   const provider = user?.provider ?? "credentials";
   const t = useTranslations();
   const locale = useLocale();
-  const sideBar = useMemo(() => sideMenu, []);
 
   const liStyle = clsx(
     "group p-2",
@@ -46,28 +41,13 @@ export default function SideBar() {
         <span className="hidden text-sm font-bold lg:block">
           {user?.username ?? "..."}
         </span>
-        <span className="text-sm font-bold lg:hidden">{user?.username ?? "..."}</span>
+        <span className="text-sm font-bold lg:hidden">
+          {user?.username ?? "..."}
+        </span>
       </div>
       <nav className="grid h-full grid-rows-[1fr_150px] p-4 lg:grid-rows-[1fr_50px]">
-        <ul className="flex flex-col gap-2">
-          {sideBar.map(({ url, title, icon }: SideBarItem) => (
-            <Link
-              locale={locale}
-              href={url}
-              key={title}
-              className={clsx(
-                "flex items-center gap-x-2",
-                "group box-border p-2 text-sm",
-                "bar-item",
-              )}
-            >
-              {icon} {t(title)}
-            </Link>
-          ))}
-        </ul>
-        <ul className="flex flex-col gap-2">
-          <SideBarSignOut liStyle={liStyle} t={t} locale={locale} />
-        </ul>
+        <SideMenuItems />
+        <SideBarSignOut liStyle={liStyle} t={t} locale={locale} />
       </nav>
     </aside>
   );

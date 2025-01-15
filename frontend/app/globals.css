@@ -55,6 +55,10 @@
   @apply cursor-pointer hover:rounded-xl hover:bg-white hover:text-black hover:shadow-black hover:drop-shadow-xl dark:hover:bg-slate-600 dark:hover:text-slate-400;
 }
 
+.bar-item-active {
+  @apply cursor-pointer rounded-xl bg-white text-black shadow-black drop-shadow-xl dark:bg-slate-600 dark:text-slate-400;
+}
+
 @layer utilities {
   .grid-row-3-auto-1fr-auto {
     grid-template-rows: auto 1fr auto;

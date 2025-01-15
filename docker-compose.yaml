@@ -96,7 +96,7 @@ services:
       - AUTH_GOOGLE_SECRET
       - DJANGO_SUPERUSER_PASSWORD
       - POSTGRES_DB_PASSWORD
-      # - RESEND_API_KEY
+      - RESEND_API_KEY
 
   nextjs:
     image: pavelbeard/wallet-frontend.production:latest

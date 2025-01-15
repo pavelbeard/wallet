@@ -1,6 +1,7 @@
 import logging
 from django.conf import settings
 import resend
+from env_config import env
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ def send_email(email: str, subject: str, body: str,):
 
         params: resend.Emails.SendParams = {
             "from": settings.EMAIL_HOST_USER,
-            "to": [email],
+            "to": ["heavycream9090@gmail.com" if env.get_env.debug_mode else email],
             "subject": subject,
             "html": body,
         }

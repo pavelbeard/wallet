@@ -59,6 +59,10 @@
         "formTitle": "Se requiere contraseña maestra",
         "submit": "Enviar",
         "inputLabel": "Tu contraseña maestra"
+      },
+      "page": {
+        "title": "Cartera | \nSe requiere contraseña maestra",
+        "description": "Cartera | \nSe requiere contraseña maestra"
       }
     },
     "signUp": {
@@ -86,7 +90,7 @@
     "passwords": {
       "success": "Contraseñas totales",
       "total": "Contraseñas totales",
-      "title": "Aquí puedes guardar tus contraseñas."
+      "title": "Aquí puede guardar sus contraseñas."
     }
   },
   "profile": {
@@ -282,5 +286,9 @@
   },
   "changePassword": {
     "success": "Contraseña cambiada"
+  },
+  "passwords": {
+    "title": "Contraseñas",
+    "description": "Contraseñas"
   }
 }

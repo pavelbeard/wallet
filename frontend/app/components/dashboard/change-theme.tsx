@@ -12,6 +12,7 @@ export default function ChangeTheme() {
   const isDesktop = useDesktopBreakpoint();
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
+  const lsTheme = localStorage.getItem("theme") || "";
   const [isOpen, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
   const buttons: { [x: string]: JSX.Element } = {
@@ -38,7 +39,7 @@ export default function ChangeTheme() {
                 key={key}
                 className={clsx(
                   "flex items-center gap-2 p-2 text-xs",
-                  "bar-item",
+                  lsTheme == key ? "bar-item-active" : "bar-item"
                 )}
                 onClick={() => setTheme(key)}
               >

@@ -43,8 +43,7 @@ export function Buttons({
 export default function ChangeTheme() {
   const { theme: colorScheme, setTheme: setColorScheme } = useTheme();
   const [isOpen, setOpen] = useState(false);
-
-  logger(colorScheme);
+  const lsTheme = localStorage.getItem("theme");
 
   return (
     <div
@@ -52,7 +51,7 @@ export default function ChangeTheme() {
       className={clsx(
         "relative flex h-[28px] lg:h-10 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800",
         "[&>button]:p-1 lg:[&>button]:p-2",
-        isOpen
+        isOpen || colorScheme == lsTheme
           ? [
               "[&>button:first-child]:rounded-l-md [&>button:hover]:bg-slate-600",
               "[&>button:hover]:text-slate-300 [&>button:last-child]:rounded-r-md",

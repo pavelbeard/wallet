@@ -22,10 +22,10 @@ class PasswordRecordManager(models.Manager):
 class PasswordRecord(models.Model):
     wallet_user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
     label = models.CharField(max_length=255)
+    url = models.URLField(max_length=255, blank=True, null=True)
     login = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     salt = models.CharField(max_length=255)
-    url = models.URLField(max_length=255, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     created = models.DateTimeField(auto_now_add=True)

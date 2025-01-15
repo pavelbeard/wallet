@@ -1,11 +1,11 @@
 import DashboardCard from "@/app/components/dashboard/passwords-card";
-import getPasswords from "@/app/lib/dashboard/getPasswords";
+import getPasswords from "@/app/lib/queries/dashboard/getPasswords";
 import Card from "@/app/ui/card";
 import { routing } from "@/i18n/routing";
 import { LocaleProps } from "@/i18n/types";
 import { KeyIcon } from "@heroicons/react/24/solid";
 import { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 export async function generateMetadata({
   params: { locale },
@@ -25,17 +25,17 @@ export const generateStaticParams = async () => {
 };
 
 export default async function Page({ params: { locale } }: LocaleProps) {
+  setRequestLocale(locale);
+
   const t = await getTranslations({
     locale,
   });
 
-  const {
-    error: passwordsError,
-    totalPasswords,
-  } = await getPasswords();
+  const { error: passwordsError, totalPasswords } = await getPasswords();
 
   return (
     <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:grid-rows-[300px_300px] lg:gap-6">
+      {/* TODO: add cards */}
       <Card className="col-start-1 h-full w-full p-4">Cards</Card>
       <DashboardCard href="/passwords" locale={locale}>
         <div className="flex flex-col gap-4 p-4">

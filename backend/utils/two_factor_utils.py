@@ -71,6 +71,7 @@ def jwt_custom_payload(
     """Optionally includes an OTP device in JWT,
     2FA verification, is user an Oauth user and is user having email verified"""
 
+    # TODO: Add IP address check in order to let user to use TOTP/Master password only from new devices
     # generate new pair of keys
 
     payload = {

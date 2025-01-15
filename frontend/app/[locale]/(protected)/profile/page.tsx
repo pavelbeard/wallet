@@ -7,10 +7,6 @@ import { LocaleProps } from "@/i18n/types";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Metadata } from "next/types";
 
-type ProtectedPageProps = {
-  params: { locale: string };
-};
-
 export async function generateMetadata({
   params: { locale },
 }: LocaleProps): Promise<Metadata> {
@@ -28,7 +24,7 @@ export const generateStaticParams = async () => {
   return routing.locales.map((locale) => ({ locale }));
 };
 
-export default async function Page({ params: { locale } }: ProtectedPageProps) {
+export default async function Page({ params: { locale } }: LocaleProps) {
   setRequestLocale(locale);
 
   return (

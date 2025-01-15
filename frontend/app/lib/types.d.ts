@@ -64,3 +64,16 @@ export type AuthData = {
 };
 
 export type Awaitable<T> = T | PromiseLike<T>;
+
+export type Password = {
+  id: number;
+  wallet_user: number;
+  label: string;
+  url: string;
+  login: string;
+  password: string;
+  notes: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+};

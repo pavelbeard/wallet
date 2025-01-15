@@ -93,7 +93,7 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
   const isErrorRoute = "/auth/error" == pathname;
 
   const isVerificationRoute = routeMatcher(
-    [DEFAULT_VERIFICATION_ROUTE],
+    [DEFAULT_VERIFICATION_ROUTE, DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE],
     routing.locales,
     pathname,
   );
@@ -117,20 +117,25 @@ const authorizedCallback: AuthorizedCallback = ({ request, auth }) => {
       return redirectTo(DEFAULT_SIGNED_OUT_PATH);
     }
 
-    if (
-      (!user?.verified && !user?.is_two_factor_enabled) ||
-      user?.is_oauth_user
-    ) {
-      return redirectTo(DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE, pathname);
-    }
+    if (!user?.verified) {
+      if (user?.is_oauth_user) {
+        return redirectTo(DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE, pathname);
+      }
 
-    if (user?.is_two_factor_enabled && !user?.verified) {
-      return redirectTo(DEFAULT_VERIFICATION_ROUTE, pathname);
+      if (user?.is_two_factor_enabled) {
+        return redirectTo(DEFAULT_VERIFICATION_ROUTE, pathname);
+      }
+
+      return redirectTo(DEFAULT_VERIFICATION_MASTER_PASSWORD_ROUTE, pathname);
     }
   }
 
   if (user) {
-    if (isAuthRoute && user?.verified && isVerificationRoute) {
+    if (user?.verified && isAuthRoute) {
+      return redirectTo(DEFAULT_SIGNED_IN_PATH);
+    }
+
+    if (user?.verified && isVerificationRoute) {
       return redirectTo(DEFAULT_SIGNED_IN_PATH);
     }
   }

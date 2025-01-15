@@ -12,15 +12,17 @@ export default function SideBarSignOut({
   locale: any;
 }) {
   return (
-    <li className={clsx(liStyle)}>
-      <Link
-        locale={locale}
-        href="/auth/sign-out"
-        className="flex items-center gap-x-2 text-sm font-bold"
-      >
-        <ArrowLeftStartOnRectangleIcon className="size-6 group-hover:text-black" />
-        {t("sidebar.signOut")}
-      </Link>
-    </li>
+    <ul className="flex flex-col gap-2">
+      <li className={clsx(liStyle)}>
+        <Link
+          locale={locale}
+          href="/auth/sign-out"
+          className="flex items-center gap-x-2 text-sm font-bold"
+        >
+          <ArrowLeftStartOnRectangleIcon className="size-6 group-hover:text-black" />
+          {t("sidebar.signOut")}
+        </Link>
+      </li>
+    </ul>
   );
 }

@@ -49,7 +49,7 @@ export const authConfig = {
     },
   },
   providers,
-  debug: true,
+  // debug: true,
 } satisfies NextAuthConfig;
 
 export const providersList: string[] = providers.map((provider) => provider.id);
